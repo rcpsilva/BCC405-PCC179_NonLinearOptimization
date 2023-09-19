@@ -1,7 +1,12 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage[margin=1.2in]{geometry}
-\usepackage{hyperref}
+\PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
+
+\usepackage{tikz}
+  \usetikzlibrary{shapes,arrows,fit,calc,positioning}
+  \tikzset{box/.style={draw, diamond, thick, text centered, minimum height=0.5cm, minimum width=1cm}}
+  \tikzset{line/.style={draw, thick, -latex'}}
 
 \usepackage{listings}
 \usepackage{xcolor}
@@ -40,14 +45,23 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 
-\title{\vspace{-2 cm}Universidade Federal de Ouro Preto \\ PCC179 - Otimização Não-Linear \\ Nivelamento}
+\title{\vspace{-2 cm}Universidade Federal de Ouro Preto \\ PCC179/BCC405 - Otimização Não-Linear \\ Nivelamento}
 \author{Prof. Rodrigo Silva}
-%\date{}
-
+\date{}
 
 \begin{document}
 
 \maketitle
+
+%\section*{Instruções}
+
+%Cada aluno deve submeter na Plataforma Moodle um arquivo PDF com o nome no formato, \textit{seu\_nome\_intropython.pdf}, contendo:
+%\begin{itemize}
+%    \item Nome;
+%    \item Número de Matrícula;
+%    \item Repostas das questões teóricas; e
+%    \item Link para o repositório do GitHub que contém o código da atividade prática. 
+%\end{itemize}
 
 \section{Cálculo}
 
@@ -66,9 +80,7 @@
     \item Projeções e Bases \url{https://www.khanacademy.org/math/linear-algebra/alternate-bases}
 \end{enumerate}
 
-
-
-
 %\bibliographystyle{plain}
 %\bibliography{references}
 \end{document}
+
