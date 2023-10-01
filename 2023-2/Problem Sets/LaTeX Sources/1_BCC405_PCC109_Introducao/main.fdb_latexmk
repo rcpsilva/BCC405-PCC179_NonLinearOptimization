@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1696122884 "c:/Users/rcpsi/source/repos/BCC405-PCC179_NonLinearOptimization/2023-2/Problem Sets/LaTeX Sources/1_BCC405_PCC109_Introducao/main.tex" "main.pdf" "main" 1696122887 0
-  "c:/Users/rcpsi/source/repos/BCC405-PCC179_NonLinearOptimization/2023-2/Problem Sets/LaTeX Sources/1_BCC405_PCC109_Introducao/main.tex" 1696122883 4313 9e2a3dfd8e8ff4a7365f0a3debd7ed58 ""
+["pdflatex"] 1696123981 "c:/Users/rcpsi/source/repos/BCC405-PCC179_NonLinearOptimization/2023-2/Problem Sets/LaTeX Sources/1_BCC405_PCC109_Introducao/main.tex" "main.pdf" "main" 1696123983 0
+  "c:/Users/rcpsi/source/repos/BCC405-PCC179_NonLinearOptimization/2023-2/Problem Sets/LaTeX Sources/1_BCC405_PCC109_Introducao/main.tex" 1696123980 4301 21225c978841ff58cc20795d72b7477c ""
   "c:/texlive/2022/texmf-dist/fonts/map/fontname/texfonts.map" 1679354266 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "c:/texlive/2022/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1679352646 1004 54797486969f23fa377b128694d548df ""
   "c:/texlive/2022/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1679352646 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
@@ -162,9 +162,9 @@
   "c:/texlive/2022/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1679359898 4662804 131178ccc9b2f4741a821427ce79dce1 ""
   "c:/texlive/2022/texmf-var/web2c/pdftex/pdflatex.fmt" 1679360027 7883451 1906458788776f148e040852b775af01 ""
   "c:/texlive/2022/texmf.cnf" 1679359856 713 e69b156964470283e0530f5060668171 ""
-  "main.aux" 1696122887 669 2c5281ba7cbed1cda954621a990262b2 "pdflatex"
-  "main.out" 1696122887 134 1af23133844d356530826270f51b8042 "pdflatex"
-  "main.tex" 1696122883 4313 9e2a3dfd8e8ff4a7365f0a3debd7ed58 ""
+  "main.aux" 1696123983 669 2c5281ba7cbed1cda954621a990262b2 "pdflatex"
+  "main.out" 1696123983 134 1af23133844d356530826270f51b8042 "pdflatex"
+  "main.tex" 1696123980 4301 21225c978841ff58cc20795d72b7477c ""
   (generated)
   "main.aux"
   "main.log"
