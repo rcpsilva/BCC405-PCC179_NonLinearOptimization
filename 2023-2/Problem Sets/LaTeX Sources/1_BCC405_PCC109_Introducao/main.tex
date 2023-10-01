@@ -1,0 +1,100 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1.2in]{geometry}
+\usepackage{hyperref}
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\newcommand{\x}{\mathbf{x}}
+
+\title{\vspace{-2 cm}Universidade Federal de Ouro Preto \\ PCC104 - Projeto e Análise de Algoritmos \\ Força Bruta e Busca Exaustiva}
+\author{Prof. Rodrigo Silva}
+%\date{}
+
+
+\begin{document}
+
+\maketitle
+
+% \begin{itemize}
+%     \item Implementar as atividades práticas em C++ é altamente recomendado.
+%     \item Utilize ao máximo os algoritmos e estruturas de dados da biblioteca STL. \url{https://www.geeksforgeeks.org/the-c-standard-template-library-stl/}. 
+%     \item Evite ao máximo a utilização de ponteiros, mas se precisar, utilizar ponteiros inteligentes \url{https://alandefreitas.github.io/moderncpp/basic-syntax/pointers/smart-pointers/}. 
+%     \item Quando precisar de uma estrutura de dados linear sempre avalie primeiro a utilização da classe \texttt{vector} (\url{https://en.cppreference.com/w/cpp/container/vector})
+% \end{itemize}
+
+
+\section{Conceitos Básicos}
+
+\begin{enumerate}
+    \item Como resolver um problema de maximização como um problema de minimização?
+    \item Qual a diferença entre problemas lineares e não-lineares?
+    \item O que é função objetivo?
+    \item O que é variável de projeto?
+    \item O que é uma restrição?
+    \item Em um gráfico de contorno, como definimos os contornos?
+    \item Defina mínimo local.
+    \item Defina máximo local.
+    \item Defina o termo ``espaço de busca''.
+    \item Defina mínimo local.
+    \item Defina máximo local.
+    \item Qual a diferença entre o mínimo e o minimizado de uma função?
+    \item Qual a diferença entre um mínimo local e um mínimo global?
+    \item  Sejam $g : \mathbb{R} \rightarrow \mathbb{R}$ uma função estritamente crescente e $f : \mathbb{R}^n \rightarrow \mathbb{R}$. Prove que minimizar $f(\x)$ é equivalente a minimizar $g(f(\x))$.
+    \item Prove que minimizar $f(\x)$ é equivalente à minimizar $f(\x) + k$, onde $k$ é uma constante em $\mathbb{R}$.
+    \item Para quais valores de $c$, minimizar $f(\x)$ é equivalente à minimizar $cf(\x)$? Explique.
+    \item Considere a função \(f(x) = e^x - 2x\) para \(x \in \mathbb{R}\). Determine se existe um minimizador global de \(f(x)\) em \(\mathbb{R}\).
+    %Para verificar se existe um minimizador global, primeiro vamos verificar se a função é coerciva.
+    %Dado que \(\lim_{x \to \infty} e^x = \infty\), podemos afirmar que \(f(x) = e^x - 2x\) também tende ao infinito quando \(x\) tende ao infinito. Portanto, a função \(f(x)\) é coerciva.
+    %Como a função é coerciva, de acordo com a propriedade mencionada, ela tem um minimizador global.
+    \item Considere a função \(f(x) = \frac{1}{x}\) para \(x > 0\). Verifique se \(f(x)\) é coerciva.
+    %Para verificar se a função é coerciva, precisamos determinar se \(\lim_{x \to \infty} f(x) = \infty\).
+    %
+    %\(\lim_{x \to \infty} \frac{1}{x} = 0\), o que significa que \(f(x)\) não tende ao infinito à medida que \(x\) tende ao infinito. Portanto, a função \(f(x) = \frac{1}{x}\) não é coerciva.
+    \item  
+\end{enumerate}
+
+
+
+%\footnotetext{Livro - \textit{Introduction to the Design and Analysis of Algorithms (3rd Edition)}}
+
+%\bibliographystyle{plain}
+%\bibliography{references}
+\end{document}
+
