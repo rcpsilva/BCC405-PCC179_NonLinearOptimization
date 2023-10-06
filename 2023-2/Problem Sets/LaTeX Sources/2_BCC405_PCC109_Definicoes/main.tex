@@ -1,0 +1,195 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1.2in]{geometry}
+\usepackage{hyperref}
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{amsmath}
+
+\title{\vspace{-2 cm}Universidade Federal de Ouro Preto \\ PCC109 - Otimização não-linear \\ Taylor, Matrizes e Condições de Otimalidade}
+\author{Prof. Rodrigo Silva}
+%\date{}
+
+
+\begin{document}
+
+\maketitle
+
+\section{Exercícios}
+
+\begin{enumerate}
+    \item Aproximações por série de Taylor
+    \begin{enumerate}
+        \item Considere a função multidimensional \(f(\mathbf{x}) = x_1^2 + 2x_2^2\) em torno do ponto \(\mathbf{x}_0 = (1, -1)\).
+        \begin{enumerate}
+            \item Calcule o valor da função \(f(\mathbf{x})\) no ponto \(\mathbf{x}_0\).
+            \item Calcule o vetor gradiente \(\nabla f(\mathbf{x}_0)\).
+            \item  Calcule a matriz Hessiana \(\mathbf{H}(\mathbf{x}_0)\).
+            \item Use a expansão de série de Taylor de segunda ordem para aproximar \(f(\mathbf{x})\) em torno de \(\mathbf{x}_0\).
+        \end{enumerate}
+
+    \item Considere a função multidimensional \(f(\mathbf{x}) = x_1^3 + 2x_2^2 - x_1x_2\) em torno do ponto \(\mathbf{x}_0 = (2, 1)\).
+
+        \begin{enumerate}
+            \item Calcule o valor da função \(f(\mathbf{x})\) no ponto \(\mathbf{x}_0\).
+            \item  Calcule o vetor gradiente \(\nabla f(\mathbf{x}_0)\).
+            \item  Calcule a matriz Hessiana \(\mathbf{H}(\mathbf{x}_0)\).
+            \item  Use a expansão de série de Taylor de segunda ordem para aproximar \(f(\mathbf{x})\) em torno de \(\mathbf{x}_0\).
+            
+        \end{enumerate}
+
+    \item Considere a função multidimensional \(f(\mathbf{x}) = e^{x_1} + \sin(x_2)\) em torno do ponto \(\mathbf{x}_0 = (0, 0)\).
+    
+    \begin{enumerate}
+        \item Calcule o valor da função \(f(\mathbf{x})\) no ponto \(\mathbf{x}_0\).
+        \item Calcule o vetor gradiente \(\nabla f(\mathbf{x}_0)\).
+        \item Calcule a matriz Hessiana \(\mathbf{H}(\mathbf{x}_0)\).
+        \item Use a expansão de série de Taylor de segunda ordem para aproximar \(f(\mathbf{x})\) em torno de \(\mathbf{x}_0\).
+    \end{enumerate}
+
+
+
+    \end{enumerate}
+    \item Definição de Matrizes
+    \begin{enumerate}
+        \item Considere a matriz abaixo:
+        
+                \[
+                \begin{bmatrix}
+                a_{11} & a_{12} & a_{13} \\
+                a_{21} & a_{22} & a_{23} \\
+                a_{31} & a_{32} & a_{33} \\
+                \end{bmatrix}
+                \]
+            \begin{enumerate}
+                \item Quais são os menores princiapais desta matriz?
+                \item Quais são os menores principais líderes dessa matriz?
+            \end{enumerate}
+        \item Considere as matrizes abaixo:
+        
+        \[
+                \begin{bmatrix}
+                1 & 0 \\
+                0 & 1 
+                \end{bmatrix} , 
+                \begin{bmatrix}
+                -1 & 0 \\
+                0 & -1 
+                \end{bmatrix},  
+                \begin{bmatrix}
+                    1 & 0 \\
+                    0 & -1
+                \end{bmatrix} ,
+                \begin{bmatrix}
+                    1 & 0 \\
+                    0 & 0
+                \end{bmatrix} ,
+                \begin{bmatrix}
+                    -1 & 0 \\
+                    0 & 0
+                \end{bmatrix}
+        \]
+
+        Para cada uma delas:
+        \begin{itemize}
+            \item Escreva a forma quadrática e classique a matriz em $A>0$, $A<0$, $A\geq0$,$A\leq0$ ou $A$ indefinida.
+            \item Calcule os menores principais líderes e observe o que acontece. 
+        \end{itemize}
+    \end{enumerate}
+    \item Condições de Otimalidade
+    \begin{enumerate}
+        \item  Considere a função unidimensional \(f(x) = x^4 - 8x^3 + 18x^2\). 
+        \begin{enumerate}
+            \item Encontre todos os minimizadores locais da função e determine seus valores mínimos locais.
+            \item Identifique se existe algum minimizador global e, se existir, encontre-o e determine o valor mínimo global.      
+        \end{enumerate}
+        \item Considere a função bidimensional \(f(x, y) = x^2 + y^2 - 4xy + 2x + 2y\).
+        \begin{enumerate}
+            \item Esta função possui minimizador? Justifique.
+            \item Encontre todos os minimizadores locais da função e determine seus valores mínimos locais.
+            \item Identifique se existe algum minimizador global e, se existir, encontre-o e determine o valor mínimo global.
+        \end{enumerate}
+        \item Considere a função bidimensional \(f(x, y) = (x^2 + y^2)^2 - 4x^2 - 4y^2\).
+        \begin{enumerate}
+            \item Esta função possui minimizador? Justifique.
+            \item Encontre todos os minimizadores locais da função e determine seus valores mínimos locais.
+            \item Identifique se existe algum minimizador global e, se existir, encontre-o e determine o valor mínimo global.
+        \end{enumerate}
+    \end{enumerate}
+\end{enumerate}
+
+\section{Notas}
+
+Em forma vetorizada, a expansão de série de Taylor de segunda ordem para uma função multidimensional \(f(\mathbf{x})\) em torno do ponto \(\mathbf{x}_0\) pode ser expressa da seguinte forma:
+
+\[
+\begin{split}
+f(\mathbf{x}) &\approx f(\mathbf{x}_0) + \nabla f(\mathbf{x}_0) \cdot (\mathbf{x} - \mathbf{x}_0) \\
+&+ \frac{1}{2}(\mathbf{x} - \mathbf{x}_0)^T \mathbf{H}(\mathbf{x}_0)(\mathbf{x} - \mathbf{x}_0)
+\end{split}
+\]
+
+Nessa expressão:
+
+\begin{enumerate}
+    \item \(f(\mathbf{x}_0)\) é o valor da função no ponto \(\mathbf{x}_0\).
+    \item  \(\nabla f(\mathbf{x}_0)\) é o vetor gradiente de \(f\) avaliado no ponto \(\mathbf{x}_0\).
+    \item  \(\mathbf{H}(\mathbf{x}_0)\) é a matriz Hessiana de \(f\) avaliada no ponto \(\mathbf{x}_0\).
+    \item  \((\mathbf{x} - \mathbf{x}_0)\) representa o vetor de diferenças entre \(\mathbf{x}\) e \(\mathbf{x}_0\).
+\end{enumerate}
+
+
+A matriz Hessiana \(\mathbf{H}(\mathbf{x}_0)\) é uma matriz quadrada de segundas derivadas parciais e é definida como:
+
+\[
+\mathbf{H}(\mathbf{x}_0) = \begin{bmatrix}
+\frac{\partial^2 f}{\partial x_1^2}(\mathbf{x}_0) & \frac{\partial^2 f}{\partial x_1 \partial x_2}(\mathbf{x}_0) & \ldots & \frac{\partial^2 f}{\partial x_1 \partial x_n}(\mathbf{x}_0) \\
+\frac{\partial^2 f}{\partial x_2 \partial x_1}(\mathbf{x}_0) & \frac{\partial^2 f}{\partial x_2^2}(\mathbf{x}_0) & \ldots & \frac{\partial^2 f}{\partial x_2 \partial x_n}(\mathbf{x}_0) \\
+\vdots & \vdots & \ddots & \vdots \\
+\frac{\partial^2 f}{\partial x_n \partial x_1}(\mathbf{x}_0) & \frac{\partial^2 f}{\partial x_n \partial x_2}(\mathbf{x}_0) & \ldots & \frac{\partial^2 f}{\partial x_n^2}(\mathbf{x}_0)
+\end{bmatrix}
+\]
+
+Essa forma vetorizada permite que você aproxime a função multidimensional \(f(\mathbf{x})\) como um polinômio quadrático nas proximidades do ponto \(\mathbf{x}_0\). O vetor gradiente e a matriz Hessiana capturam informações sobre as primeiras e segundas derivadas da função, tornando-a uma ferramenta poderosa para otimização e análise numérica em espaços multidimensionais.
+
+
+%\footnotetext{Livro - \textit{Introduction to the Design and Analysis of Algorithms (3rd Edition)}}
+
+%\bibliographystyle{plain}
+%\bibliography{references}
+\end{document}
+
