@@ -1,0 +1,77 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1.2in]{geometry}
+\usepackage{hyperref}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{xcolor}
+
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{white},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{deepblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{deepgreen},
+    emph={Agent,__init__,act,self,union,exists, scope},
+    emphstyle=\color{deepred},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=3
+}
+
+\lstset{style=mystyle}
+
+\title{\vspace{-2 cm}Universidade Federal de Ouro Preto \\ Otimização Não-Linear \\ Prova 1}
+\author{Prof. Rodrigo Silva}
+\date{}
+
+
+\begin{document}
+
+\maketitle
+
+
+\begin{enumerate}
+
+\item Considere o problema de otimização a seguir:
+
+\begin{equation}
+     min\ f(x_1,x_2) = x_1^3 + x_2^3 + 2x_1^2 + 4x_2^2 + 6
+\end{equation}
+
+\begin{enumerate}
+    \item Prove que este problem possui ótimo global.
+    \item A função $f(\cdot)$ é uma função convexa? Demonstre.
+    \item Encontre os pontos críticos de $f(\cdot)$.
+    \item Para cada ponto crítico utilize as condições de segunda ordem para determinar se eles são pontos de mínimo, máximo ou de sela.
+    \item É possível dizer qual o mínimo global desta função? Explique.
+    \item Suponha que precisamos resolver este problema utilizando um método de maximização. Como podemos transformar este problema em um problema de maximização?
+\end{enumerate}
+
+\end{enumerate}
+
+\end{document}
+
