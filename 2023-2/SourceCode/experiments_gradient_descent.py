@@ -1,5 +1,5 @@
 from optimize import gradient_descent, gradient_descent_adaptive_step, gradient_descent_momentum, rmsprop, adam
-from visualize import plot_sequence
+from visualize import plot_sequence, function_contour
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -22,11 +22,13 @@ _, rms, _ = rmsprop(x0,f,g,niter=1000,tol=1e-6,eta=0.9,gamma=0.9)
 _, ada, _ = adam(x0,f,g,niter=1000,tol=1e-6,eta=0.9,beta1=0.1,beta2=0.9)
 
 
+ax = function_contour(f,[-5,-5],[5,5],0.1,30)
+
 #plot_sequence(f,gd1,[-5,-5],[5,5],0.1,30)
-plot_sequence(f,gd2,[-5,-5],[5,5],0.1,30)
-plot_sequence(f,gdm,[-5,-5],[5,5],0.1,30)
-plot_sequence(f,rms,[-5,-5],[5,5],0.1,30)
-plot_sequence(f,ada,[-5,-5],[5,5],0.1,30)
+plot_sequence(f,gd2,ax)
+plot_sequence(f,gdm,ax)
+plot_sequence(f,rms,ax)
+plot_sequence(f,ada,ax)
 
 print(f'niter: \n gd1 {len(gd1)} \n gd2 {len(gd2)} \n gda {len(gda)} \n gdm {len(gdm)} \n rms {len(rms)} \n rms {len(ada)}')
 
