@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1748995416.70799 "c:/Users/rcpsi/Downloads/codigos/BCC405-PCC179_NonLinearOptimization/2025-1/ProblemSets/latex_source/TP/main.tex" "main.pdf" "main" 1748995419.19629 0
-  "c:/Users/rcpsi/Downloads/codigos/BCC405-PCC179_NonLinearOptimization/2025-1/ProblemSets/latex_source/TP/main.tex" 1748995415 4765 471c2c3de26312a7c93a4948d54ac0fa ""
+["pdflatex"] 1749572984.29595 "c:/Users/rcpsi/Downloads/codigos/BCC405-PCC179_NonLinearOptimization/2025-1/ProblemSets/latex_source/TP/main.tex" "main.pdf" "main" 1749572985.96331 0
+  "c:/Users/rcpsi/Downloads/codigos/BCC405-PCC179_NonLinearOptimization/2025-1/ProblemSets/latex_source/TP/main.tex" 1749572983 5140 e34d42370dd41832ee4f8951d0e350a7 ""
   "c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc" 1730315858 2375 baa924870cfb487815765f9094cf3728 ""
   "c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc" 1730315858 3486 c7eadf5dcc57b3b2d11736679f6636ba ""
   "c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc" 1730315858 2405 5dcf2c1b967ee25cc46c58cd52244aed ""
@@ -139,9 +139,9 @@
   "c:/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1730319856 5521136 47e49b84c41d5ab3414c7e2d0ef6eb2b ""
   "c:/texlive/2024/texmf-var/web2c/pdftex/pdflatex.fmt" 1730320026 3325936 6e896a909b476ed009efbfbadbcd5207 ""
   "c:/texlive/2024/texmf.cnf" 1730319826 713 e69b156964470283e0530f5060668171 ""
-  "main.aux" 1748995418 476 e3b27dd9a6e91f634b00133da02c3e6f "pdflatex"
-  "main.out" 1748995418 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "main.tex" 1748995415 4765 471c2c3de26312a7c93a4948d54ac0fa ""
+  "main.aux" 1749572985 476 e3b27dd9a6e91f634b00133da02c3e6f "pdflatex"
+  "main.out" 1749572985 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "main.tex" 1749572983 5140 e34d42370dd41832ee4f8951d0e350a7 ""
   (generated)
   "main.aux"
   "main.log"
