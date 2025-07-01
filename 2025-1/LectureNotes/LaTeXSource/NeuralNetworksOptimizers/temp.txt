@@ -1,0 +1,201 @@
+% optimizers_explained.tex
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{bm}
+\usepackage{xcolor}
+\usepackage{listings}
+
+% --------------------------------------------------------------------
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  frame=single,
+  breaklines=true,
+  tabsize=2,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{orange}
+}
+% --------------------------------------------------------------------
+
+\title{Optimization Algorithms Used in Neural‐Network Training}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+The following sections give the \emph{analytical update rules} and the
+\emph{Python implementations} for each optimizer available in the supplied
+code.  Symbols are reused across sections:
+
+\[
+\bm x_t\!: \text{parameters}, \quad
+\bm g_t=\nabla_{\!\bm x}f(\bm x_t)\!: \text{gradient},\quad
+\eta,\alpha : \text{base step / learning rate}.
+\]
+
+%=====================================================================
+\section{Adam}
+%---------------------------------------------------------------------
+\subsection*{Update rule}
+\begin{align}
+\bm g_t      &=\nabla_{\!\bm x}f(\bm x_t) \\
+\bm v_t      &=\beta_1 \bm v_{t-1} + (1-\beta_1)\,\bm g_t \\
+\bm s_t      &=\beta_2 \bm s_{t-1} + (1-\beta_2)\,\bm g_t^{\odot 2} \\
+\hat{\bm v}_t&=\bm v_t / (1-\beta_1^{t}),\quad
+\hat{\bm s}_t=\bm s_t / (1-\beta_2^{t}) \\[4pt]
+\bm x_{t+1}  &=\bm x_t-\eta\,\dfrac{\hat{\bm v}_t}{\sqrt{\hat{\bm s}_t}+\varepsilon}
+\end{align}
+
+\paragraph{Key ideas} First and second moments of the gradient are tracked,
+bias‐corrected, and combined to produce an RMSProp‐style adaptive step with
+momentum.
+
+\subsection*{Python implementation}
+\begin{lstlisting}
+def adam(x0, f, grad, niter=500, tol=1e-6,
+         eta=0.9, beta1=0.9, beta2=0.99):
+    epsilon = 1e-8
+    x = x0
+    s = np.zeros_like(x0)   # 2nd moment
+    v = np.zeros_like(x0)   # 1st moment
+    t = 1
+    while (t < niter) and (np.linalg.norm(grad(x)) > tol):
+        g  = grad(x)
+        v  = beta1 * v + (1 - beta1) * g
+        s  = beta2 * s + (1 - beta2) * g**2
+        vt = v / (1 - beta1**t)
+        st = s / (1 - beta2**t)
+        x  = x - eta * vt / (np.sqrt(st) + epsilon)
+        t += 1
+    return x
+\end{lstlisting}
+
+%=====================================================================
+\section{RMSProp}
+%---------------------------------------------------------------------
+\subsection*{Update rule}
+\begin{align}
+\bm g_t      &=\nabla_{\!\bm x}f(\bm x_t) \\
+\bm s_t      &=\gamma \bm s_{t-1} + (1-\gamma)\,\bm g_t^{\odot 2} \\
+\bm x_{t+1}  &=\bm x_t-\eta\,\dfrac{\bm g_t}{\sqrt{\bm s_t}+\varepsilon}
+\end{align}
+
+\paragraph{Key ideas} Maintains a decaying average of the squared gradient so
+each coordinate adapts its own effective learning rate.
+
+\subsection*{Python implementation}
+\begin{lstlisting}
+def rmsprop(x0, f, grad, niter=500, tol=1e-6,
+            eta=0.9, gamma=0.98):
+    epsilon = 1e-8
+    x = x0
+    s = np.zeros_like(x0)
+    for t in range(niter):
+        g = grad(x)
+        if np.linalg.norm(g) <= tol:
+            break
+        s = gamma * s + (1 - gamma) * g**2
+        x = x - eta * g / (np.sqrt(s) + epsilon)
+    return x
+\end{lstlisting}
+
+%=====================================================================
+\section{Gradient Descent with Momentum}
+%---------------------------------------------------------------------
+\subsection*{Update rule}
+\begin{align}
+\bm g_t  &= \nabla_{\!\bm x}f(\bm x_t) \\
+\bm v_t  &= \beta \bm v_{t-1} + \bm g_t \\
+\bm x_{t+1} &= \bm x_t - \eta \bm v_t
+\end{align}
+
+\paragraph{Key ideas} An \emph{exponential moving average} of past gradients
+($\bm v_t$) acts like “inertia,” accelerating descent along consistent
+directions and damping oscillations in steep valleys.
+
+\subsection*{Python implementation}
+\begin{lstlisting}
+def gradient_descent_momentum(x0, f, grad, niter=500, tol=1e-6,
+                              eta=0.9, beta=0.98):
+    x = x0
+    v = np.zeros_like(x0)
+    for t in range(niter):
+        g = grad(x)
+        if np.linalg.norm(g) <= tol:
+            break
+        v = beta * v + g
+        x = x - eta * v
+    return x
+\end{lstlisting}
+
+%=====================================================================
+\section{Vanilla Gradient Descent (Fixed Step)}
+%---------------------------------------------------------------------
+\subsection*{Update rule}
+\begin{align}
+\bm g_t      &=\nabla_{\!\bm x}f(\bm x_t), &
+\bm d_t &= -\bm g_t \\
+\bm x_{t+1}  &=\bm x_t+\alpha\,\bm d_t
+\end{align}
+where $\alpha$ is a user‐supplied constant step size.
+
+\paragraph{Key ideas} Simplest optimizer: moves opposite to the gradient with a
+fixed learning rate.
+
+\subsection*{Python implementation}
+\begin{lstlisting}
+def gradient_descent(x0, f, grad, step_size, niter=500, tol=1e-6):
+    x = x0
+    for t in range(niter):
+        g = grad(x)
+        if np.linalg.norm(g) <= tol:
+            break
+        x = x - step_size * g
+    return x
+\end{lstlisting}
+
+%=====================================================================
+\section{Gradient Descent with Adaptive Step\\(Backtracking Line Search)}
+%---------------------------------------------------------------------
+\subsection*{Update rule}
+\begin{enumerate}
+  \item \emph{Descent direction:} $\bm d_t = -\nabla_{\!\bm x}f(\bm x_t)$.
+  \item \emph{Step size selection:} starting from $\alpha_0$, repeatedly shrink
+        $\alpha\leftarrow\gamma\alpha$ ($0<\gamma<1$) until the Armijo
+        condition holds:
+        \[
+        f(\bm x_t+\alpha\bm d_t)\le f(\bm x_t).
+        \]
+  \item \emph{Update:} $\bm x_{t+1}=\bm x_t+\alpha\bm d_t$.
+\end{enumerate}
+
+\paragraph{Key ideas} Chooses the largest step that yields an immediate
+decrease in $f$, side‐stepping the need to tune a fixed learning rate.
+
+\subsection*{Python implementation}
+\begin{lstlisting}
+def gradient_descent_adaptive_step(x0, f, grad, step_size,
+                                   niter=500, tol=1e-6, gamma=0.98):
+    x = x0
+    for t in range(niter):
+        g = grad(x)
+        if np.linalg.norm(g) <= tol:
+            break
+        d = -g
+        alpha = step_size
+        while f(x + alpha * d) > f(x):
+            alpha *= gamma
+        x = x + alpha * d
+    return x
+\end{lstlisting}
+
+\end{document}

@@ -1,0 +1,224 @@
+% optimizers_explained_sorted.tex
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{bm}
+\usepackage{xcolor}
+\usepackage{listings}
+
+% --------------------------------------------------------------------
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  frame=single,
+  breaklines=true,
+  tabsize=2,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{orange}
+}
+% --------------------------------------------------------------------
+
+\title{Optimization Algorithms in Neural--Network Training\\(Ordered by Increasing Complexity)}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+The optimizers are presented from the \emph{least} to the \emph{most}
+sophisticated according to the amount of state they keep and the number of
+computations performed per iteration.
+
+%---------------------------------------------------------------------
+\section*{Common Notation}
+%---------------------------------------------------------------------
+\begin{itemize}
+  \item[$\bm x_t$] Parameter (weight) vector at iteration~$t$.
+  \item[$f(\bm x)$] Objective (loss) function to be minimised.
+  \item[$\nabla_{\!\bm x}f(\bm x)$] Gradient of $f$ with respect to~$\bm x$.
+  \item[$\bm g_t$] Shorthand for $\nabla_{\!\bm x}f(\bm x_t)$.
+  \item[$\alpha,\eta$] Base learning rate (step size).
+  \item[$\gamma$] Decay factor for the second--moment accumulator (RMSProp, backtracking).
+  \item[$\beta$] Momentum coefficient.
+  \item[$\beta_1,\beta_2$] Exponential decay rates for first and second moments (Adam).
+  \item[$\varepsilon$] Small constant to prevent division by~$0$.
+  \item[$\bm v_t$] Exponential moving average of past gradients (``momentum'').
+  \item[$\bm s_t$] Exponential moving average of squared gradients (``variance'').
+  \item[$\odot$] Hadamard (element--wise) product; $\bm g_t^{\odot 2}$ squares each coordinate.
+\end{itemize}
+
+%=====================================================================
+\section{Vanilla Gradient Descent (Fixed Step)}
+%---------------------------------------------------------------------
+\subsection*{Update rule}
+\begin{align}
+\bm g_t      &=\nabla_{\!\bm x}f(\bm x_t), &
+\bm d_t &= -\bm g_t \\
+\bm x_{t+1}  &=\bm x_t+\alpha\,\bm d_t
+\end{align}
+with constant step size $\alpha$.
+
+\subsection*{Rationale}
+A direct step opposite to the gradient.  Simplicity is its strength, but the
+fixed $\alpha$ must be carefully tuned: too small slows convergence, too large
+causes divergence.
+
+\subsection*{Python implementation}
+\begin{lstlisting}
+def gradient_descent(x0, f, grad, step_size,
+                     niter=500, tol=1e-6):
+    x = x0
+    for t in range(niter):
+        g = grad(x)
+        if np.linalg.norm(g) <= tol:
+            break
+        x = x - step_size * g
+    return x
+\end{lstlisting}
+
+%=====================================================================
+\section{Gradient Descent with Adaptive Step\\(Backtracking Line Search)}
+%---------------------------------------------------------------------
+\subsection*{Update rule}
+\begin{enumerate}
+  \item $\bm d_t = -\,\nabla_{\!\bm x}f(\bm x_t)$
+  \item Find $\alpha$ by backtracking:
+        \[
+        \text{while } f(\bm x_t+\alpha\bm d_t) > f(\bm x_t)
+        \text{ set } \alpha \leftarrow \gamma\alpha
+        \]
+  \item $\bm x_{t+1} = \bm x_t + \alpha \bm d_t$
+\end{enumerate}
+
+\subsection*{Rationale}
+Automatically shrinks the step until a decrease in the loss is observed,
+removing most of the learning--rate tuning burden while keeping the method
+conceptually simple.
+
+\subsection*{Python implementation}
+\begin{lstlisting}
+def gradient_descent_adaptive_step(x0, f, grad, step_size,
+                                   niter=500, tol=1e-6, gamma=0.98):
+    x = x0
+    for t in range(niter):
+        g = grad(x)
+        if np.linalg.norm(g) <= tol:
+            break
+        d = -g
+        alpha = step_size
+        while f(x + alpha * d) > f(x):
+            alpha *= gamma
+        x = x + alpha * d
+    return x
+\end{lstlisting}
+
+%=====================================================================
+\section{Gradient Descent with Momentum}
+%---------------------------------------------------------------------
+\subsection*{Update rule}
+\begin{align}
+\bm g_t  &= \nabla_{\!\bm x}f(\bm x_t) \\
+\bm v_t  &= \beta\,\bm v_{t-1} + \bm g_t \\
+\bm x_{t+1} &= \bm x_t - \eta\,\bm v_t
+\end{align}
+
+\subsection*{Rationale}
+The velocity $\bm v_t$ accumulates a decaying history of past gradients,
+acting like physical momentum.  This accelerates learning along consistent
+directions and dampens oscillations across steep ravines.
+
+\subsection*{Python implementation}
+\begin{lstlisting}
+def gradient_descent_momentum(x0, f, grad, niter=500, tol=1e-6,
+                              eta=0.9, beta=0.98):
+    x = x0
+    v = np.zeros_like(x0)
+    for t in range(niter):
+        g = grad(x)
+        if np.linalg.norm(g) <= tol:
+            break
+        v = beta * v + g
+        x = x - eta * v
+    return x
+\end{lstlisting}
+
+%=====================================================================
+\section{RMSProp}
+%---------------------------------------------------------------------
+\subsection*{Update rule}
+\begin{align}
+\bm g_t &= \nabla_{\!\bm x}f(\bm x_t) \\
+\bm s_t &= \gamma\,\bm s_{t-1} + (1-\gamma)\,\bm g_t^{\odot 2} \\
+\bm x_{t+1} &= \bm x_t - \eta\,\dfrac{\bm g_t}{\sqrt{\bm s_t}+\varepsilon}
+\end{align}
+
+\subsection*{Rationale}
+Keeps a moving average of squared gradients so each coordinate receives its
+own adaptive learning rate: large variances produce small effective steps and
+\emph{vice versa}.  Particularly effective in ``ravine'' landscapes with very
+different curvatures along different axes.
+
+\subsection*{Python implementation}
+\begin{lstlisting}
+def rmsprop(x0, f, grad, niter=500, tol=1e-6,
+            eta=0.9, gamma=0.98):
+    epsilon = 1e-8
+    x = x0
+    s = np.zeros_like(x0)
+    for t in range(niter):
+        g = grad(x)
+        if np.linalg.norm(g) <= tol:
+            break
+        s = gamma * s + (1 - gamma) * g**2
+        x = x - eta * g / (np.sqrt(s) + epsilon)
+    return x
+\end{lstlisting}
+
+%=====================================================================
+\section{Adam}
+%---------------------------------------------------------------------
+\subsection*{Update rule}
+\begin{align}
+\bm g_t      &= \nabla_{\!\bm x}f(\bm x_t) \\
+\bm v_t      &= \beta_1 \bm v_{t-1} + (1-\beta_1)\,\bm g_t \\
+\bm s_t      &= \beta_2 \bm s_{t-1} + (1-\beta_2)\,\bm g_t^{\odot 2} \\
+\hat{\bm v}_t&= \bm v_t / (1-\beta_1^{t}),\quad
+\hat{\bm s}_t= \bm s_t / (1-\beta_2^{t}) \\[4pt]
+\bm x_{t+1}  &= \bm x_t -
+               \eta\,\dfrac{\hat{\bm v}_t}{\sqrt{\hat{\bm s}_t}+\varepsilon}
+\end{align}
+
+\subsection*{Rationale}
+Combines momentum (first moment) and per--coordinate variance scaling (second
+moment) while correcting early--iteration bias.  Adam therefore adapts both
+direction and magnitude of updates, offering fast convergence with minimal
+hyperparameter tuning in practice.
+
+\subsection*{Python implementation}
+\begin{lstlisting}
+def adam(x0, f, grad, niter=500, tol=1e-6,
+         eta=0.9, beta1=0.9, beta2=0.99):
+    epsilon = 1e-8
+    x = x0
+    v = np.zeros_like(x0)
+    s = np.zeros_like(x0)
+    t = 1
+    while (t < niter) and (np.linalg.norm(grad(x)) > tol):
+        g  = grad(x)
+        v  = beta1 * v + (1 - beta1) * g
+        s  = beta2 * s + (1 - beta2) * g**2
+        vt = v / (1 - beta1**t)
+        st = s / (1 - beta2**t)
+        x  = x - eta * vt / (np.sqrt(st) + epsilon)
+        t += 1
+    return x
+\end{lstlisting}
+
+\end{document}
