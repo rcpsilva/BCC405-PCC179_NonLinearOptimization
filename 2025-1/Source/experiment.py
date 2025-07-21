@@ -40,15 +40,13 @@ x0 = np.array([-4.5,-4.5])
 prob_idx = 3
 niter = 5000
 
-_, gd1, f_gd1, _ = gradient_descent(x0,fs[prob_idx],gs[prob_idx],step_size=1e-10,niter=niter,tol=1e-6)
-#_, gc1, _, _ = gradient_cristiano(x0,fs[prob_idx],gs[prob_idx],step_size=0.05,niter=niter,tol=1e-6)
+#_, gd1, f_gd1, _ = gradient_descent(x0,fs[prob_idx],gs[prob_idx],step_size=1e-4,niter=niter,tol=1e-6)
 _, ga1, f_ga1, _ = gradient_adaptive(x0,fs[prob_idx],gs[prob_idx],step_size=0.9,niter=niter,tol=1e-6)
-#_, gm1, _, _ = gradient_momentum(x0,f,g,step_size=0.1,niter=niter,tol=1e-6,beta=0.9)
-#_, gm1, f_gm1, _ = gradient_momentum(x0,fs[prob_idx],gs[prob_idx],step_size=0.9,niter=niter,tol=1e-6,beta=0.9)
-_, rms, f_rms, _ = RMSProp(x0,fs[prob_idx],gs[prob_idx],step_size=0.9,niter=niter,tol=1e-6,beta=0.99)
+#_, gm1, f_gm1, _ = gradient_momentum(x0,fs[prob_idx],gs[prob_idx],step_size=1e-4,niter=niter,tol=1e-6,beta=0)
+#_, rms, f_rms, _ = RMSProp(x0,fs[prob_idx],gs[prob_idx],step_size=0.05,niter=niter,tol=1e-6,beta=0.2)
 _, ada, f_ada, _ = Adam(x0,fs[prob_idx],gs[prob_idx],step_size=0.9,niter=niter,tol=1e-6,beta1=0.9,beta2=0.99)
 
-res = [(ga1,f_ga1),(rms,f_rms),(ada, f_ada)]
+res = [(ada, f_ada),(ga1, f_ga1)]
 
 #res = [(ga1,f_ga1)]
 
