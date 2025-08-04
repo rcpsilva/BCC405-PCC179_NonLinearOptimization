@@ -1,0 +1,106 @@
+% tp2.tex — Trabalho Prático II
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[portuguese]{babel}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\small,
+  frame=single,
+  breaklines=true,
+  tabsize=2
+}
+
+\title{Trabalho Prático II — Pesquisa Aplicada\\Ataques por Inversão de Gradiente}
+\author{Disciplina de Otimização Não Linear}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Objetivo}
+
+Estender o conhecimento adquirido no TP1 propondo, desenvolvendo e avaliando uma \textbf{pesquisa aplicada} envolvendo \emph{ataques por inversão de gradiente} (Gradient Inversion Attacks, GIA). O trabalho pode ter natureza empírica, teórica ou metodológica.
+
+\section*{Possibilidades de Pesquisa}
+
+Você pode escolher uma das seguintes linhas de investigação (ou propor outra, mediante aprovação do professor):
+
+\begin{enumerate}[label=\textbf{\arabic*.}, nosep]
+  \item \textbf{Aplicação em tarefas diferentes:}
+        \begin{itemize}
+          \item Aplicar GIA em outros conjuntos de dados (ex: CIFAR-10, Fashion-MNIST).
+          \item Explorar GIA em tarefas não classificatórias (ex: regressão).
+        \end{itemize}
+  \item \textbf{Variação arquitetural:}
+        \begin{itemize}
+          \item Investigar o impacto da arquitetura do modelo (ex: redes convolucionais, redes mais profundas).
+          \item GIA em modelos com regularização (Dropout, BatchNorm etc.).
+        \end{itemize}
+  \item \textbf{Robustez e defesa:}
+        \begin{itemize}
+          \item Avaliar a eficácia de defesas conhecidas (ex: clipping, ruído de privacidade diferencial).
+          \item Propor novas técnicas de defesa contra GIA.
+        \end{itemize}
+  \item \textbf{Aprimoramento do ataque:}
+        \begin{itemize}
+          \item Substituir a função de perda ou adicionar termos auxiliares (TV-loss, latentes de GANs).
+          \item Propor inicializações ou otimizações alternativas.
+        \end{itemize}
+  \item \textbf{Estudo comparativo:}
+        \begin{itemize}
+          \item Comparar empiricamente diferentes variantes (DLG, iDLG, DLG-FB).
+          \item Analisar a influência de diferentes otimizadores (Adam, L-BFGS, SGD).
+        \end{itemize}
+\end{enumerate}
+
+\section*{Entregáveis (100 pts)}
+
+\begin{itemize}[nosep]
+  \item \textbf{Artigo (100 pts)} — entre 10 e 15 páginas, escrito em português ou inglês, usando o template disponível em:
+    \begin{center}
+      \url{https://github.com/rcpsilva/BCC405-PCC179_NonLinearOptimization/tree/main/2025-1}
+    \end{center}
+\end{itemize}
+
+O artigo deve conter:
+
+\begin{enumerate}[label=\textbf{\arabic*.}, nosep]
+  \item \textbf{Introdução} — contextualização do problema, motivação e objetivos do trabalho.
+  \item \textbf{Trabalhos Relacionados} — breve revisão dos principais trabalhos da literatura.
+  \item \textbf{Metodologia} — descrição da hipótese ou proposta investigada; detalhes do modelo, dados, métricas e configuração experimental.
+  \item \textbf{Resultados e Discussão} — análise quantitativa e qualitativa; comparação de abordagens e visualizações dos resultados.
+  \item \textbf{Conclusão} — principais achados, limitações e sugestões para trabalhos futuros.
+\end{enumerate}
+
+\section*{Critérios de Avaliação}
+
+\begin{itemize}[nosep]
+  \item \textbf{15 pts} — Clareza na definição da proposta e motivação.
+  \item \textbf{15 pts} — Fundamentação teórica e revisão de literatura.
+  \item \textbf{20 pts} — Qualidade metodológica e reprodutibilidade.
+  \item \textbf{20 pts} — Profundidade da análise de resultados.
+  \item \textbf{15 pts} — Escrita e organização do artigo.
+  \item \textbf{15 pts} — Criatividade/inovação e complexidade da proposta.
+\end{itemize}
+
+\section*{Datas Importantes}
+
+\begin{itemize}[nosep]
+  \item \textbf{Entrega do artigo:} 24/08/2025 - 23h59.
+\end{itemize}
+
+\section*{Observações Finais}
+
+Dúvidas ou propostas fora do escopo podem ser discutidas em horário de atendimento ou via e-mail. Encorajamos a criatividade, o pensamento crítico e a investigação rigorosa.
+
+\end{document}
