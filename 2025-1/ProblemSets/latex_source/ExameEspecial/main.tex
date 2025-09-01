@@ -1,0 +1,80 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1.2in]{geometry}
+\usepackage{hyperref}
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\newcommand{\x}{\mathbf{x}}
+
+\title{\vspace{-2 cm}Universidade Federal de Ouro Preto \\ BCC405 \\ Exame Especial}
+\author{Prof. Rodrigo Silva}
+%\date{}
+
+
+\begin{document}
+
+\maketitle
+
+% \begin{itemize}
+%     \item Implementar as atividades práticas em C++ é altamente recomendado.
+%     \item Utilize ao máximo os algoritmos e estruturas de dados da biblioteca STL. \url{https://www.geeksforgeeks.org/the-c-standard-template-library-stl/}. 
+%     \item Evite ao máximo a utilização de ponteiros, mas se precisar, utilizar ponteiros inteligentes \url{https://alandefreitas.github.io/moderncpp/basic-syntax/pointers/smart-pointers/}. 
+%     \item Quando precisar de uma estrutura de dados linear sempre avalie primeiro a utilização da classe \texttt{vector} (\url{https://en.cppreference.com/w/cpp/container/vector})
+% \end{itemize}
+
+
+
+\begin{enumerate}
+    \item Dado o gradiente da função objetivo, $\nabla f(\mathbf{x})$, defina matematicamente uma direção de descida. 
+    \item Dado o gradiente de uma função de restrição de igualdade, $\nabla h(\mathbf{x})$, defina matematicamente uma direção factível.
+    \item Dado o gradiente de uma função de restrição de desigualdade, $\nabla g(\mathbf{x})$, defina matematicamente uma direção factível.
+    \item Derive a expressão de atualização de $\mathbf{x}$ do método de segunda ordem de Newton utilizando Série de Taylor.
+    \item Considere o método de penalidade interior. O que precisa acontecer com $\lambda$ (peso da penalidade) para que o método converja para ótimo restrito? E para o método de penalidade exterior? Justifique em ambos os casos. 
+    \item Derive as condições de Karush-Khun-Tucker pela função lagrangeana. 
+\end{enumerate}
+
+
+
+%\footnotetext{Livro - \textit{Introduction to the Design and Analysis of Algorithms (3rd Edition)}}
+
+%\bibliographystyle{plain}
+%\bibliography{references}
+\end{document}
+
