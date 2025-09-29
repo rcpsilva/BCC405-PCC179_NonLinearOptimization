@@ -1,0 +1,358 @@
+\documentclass[12pt,a4paper]{article}
+
+% ======================
+% Packages
+% ======================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil,english]{babel} % remove 'brazil' if only English
+\usepackage{amsmath, amssymb}
+\usepackage{amsthm}
+\usepackage{geometry}
+\usepackage{enumitem}
+
+% Page setup
+\geometry{margin=2.5cm}
+
+% ======================
+% Custom environments
+% ======================
+\newtheorem{exercise}{Exercise}[section]
+
+\begin{document}
+
+\title{Mathematics review}
+\author{PCC179 - Nonlinear Optimization}
+\date{\today}
+\maketitle
+
+% Example exercise goes here
+
+\section{English Version}
+
+\begin{exercise}
+\textbf{Explainer.} 
+
+\begin{enumerate}
+  \item \textbf{Elementary transformations:} These are row operations that can be applied to the augmented matrix of a system of equations without changing its solution set. They include: (i) swapping two rows, (ii) multiplying a row by a nonzero constant, and (iii) adding a multiple of one row to another row.
+
+  \item \textbf{Row echelon form (REF) and reduced row echelon form (RREF):}
+  \begin{itemize}
+    \item A matrix is in \emph{row echelon form} if (a) all zero rows are at the bottom, (b) each leading entry (pivot) in a nonzero row is to the right of the leading entry in the row above, and (c) all entries below a pivot are zero.
+    \item A matrix is in \emph{reduced row echelon form} if, in addition, (d) each pivot is 1 and (e) each pivot is the only nonzero entry in its column.
+  \end{itemize}
+
+  \item \textbf{Procedure to solve a system in REF:} Starting from the bottom row, solve for the variables associated with pivots (back substitution). Free variables (those without pivots) can take arbitrary values. The solution set is then expressed in terms of these free variables.
+\end{enumerate}
+
+\bigskip
+
+\textbf{Task.} Solve the following system of linear equations (Example 2.7):
+
+\[
+\begin{aligned}
+x_1 + x_2 + x_3 &= 3, \\
+x_1 - x_2 + 2x_3 &= 2, \\
+2x_1 + 3x_3 &= 5.
+\end{aligned}
+\]
+
+\textbf{Hint:} Notice that one of the equations can be obtained as a linear combination of the others, leading to infinitely many solutions. Express the solution set in terms of a free variable.
+\end{exercise}
+
+
+\begin{exercise}
+\textbf{Explainer.}
+
+\begin{enumerate}
+  \item \textbf{Generating set and span:}  
+  A set of vectors $\{x_1, \ldots, x_m\}$ in $\mathbb{R}^n$ is called a \emph{generating set} of a subspace $U$ if every vector in $U$ can be expressed as a linear combination of these vectors. The set of all such linear combinations is called the \emph{span}, written as
+  \[
+  U = \mathrm{span}\{x_1, \ldots, x_m\}.
+  \]
+
+  \item \textbf{Basis:}  
+  A basis of a subspace $U$ is a set of vectors that (i) spans $U$ and (ii) is linearly independent. Every vector in $U$ can then be uniquely written as a linear combination of basis vectors.
+
+  \item \textbf{How to obtain a basis using Gaussian elimination:}  
+  To find a basis of $U = \mathrm{span}\{x_1, \ldots, x_m\}$, one can:
+  \begin{enumerate}[label=(\roman*)]
+    \item Arrange the vectors $x_1, \ldots, x_m$ as columns of a matrix $A$.  
+    \item Perform Gaussian elimination to bring $A$ to row echelon form.  
+    \item The pivot columns in the original matrix correspond to a linearly independent set of vectors that form a basis of $U$.  
+  \end{enumerate}
+
+  \item \textbf{Orthonormal basis:}  
+  A basis $\{u_1, \ldots, u_k\}$ of a subspace $U$ is \emph{orthonormal} if each vector has unit length ($\|u_i\| = 1$) and vectors are mutually orthogonal ($\langle u_i, u_j \rangle = 0$ for $i \neq j$).  
+\end{enumerate}
+
+\bigskip
+
+\textbf{Task.}  
+Consider the subspace
+\[
+U = \mathrm{span}\left\{ 
+\begin{bmatrix}1 \\ 1 \\ 0\end{bmatrix}, \;
+\begin{bmatrix}1 \\ 0 \\ 1\end{bmatrix}, \;
+\begin{bmatrix}2 \\ 1 \\ 1\end{bmatrix}
+\right\} \subset \mathbb{R}^3.
+\]
+\begin{enumerate}[label=(\alph*)]
+    \item Use Gaussian elimination to determine a basis that spans $U$.  
+    \item Check whether the basis you found is orthonormal. If it is not, explain why.  
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}
+\textbf{Explainer.}
+
+\begin{enumerate}
+  \item \textbf{Definition of eigenvalue and eigenvector:}  
+  Let $A \in \mathbb{R}^{n \times n}$ be a square matrix. A nonzero vector $v \in \mathbb{R}^n$ is called an \emph{eigenvector} of $A$ if there exists a scalar $\lambda \in \mathbb{R}$ such that
+  \[
+  Av = \lambda v.
+  \]
+  The scalar $\lambda$ is called the \emph{eigenvalue} corresponding to $v$.
+
+  \item \textbf{How to find eigenvalues:}  
+  To find eigenvalues, solve the \emph{characteristic equation}
+  \[
+  \det(A - \lambda I) = 0,
+  \]
+  where $I$ is the identity matrix. The roots of this polynomial are the eigenvalues of $A$.
+
+  \item \textbf{How to find eigenvectors:}  
+  For each eigenvalue $\lambda$, substitute it into the equation
+  \[
+  (A - \lambda I)v = 0
+  \]
+  and solve for the nonzero vectors $v$. The set of all such vectors forms the eigenspace associated with $\lambda$.
+\end{enumerate}
+
+\bigskip
+
+\textbf{Task.}  
+Consider the matrix
+\[
+A = \begin{bmatrix}
+2 & 1 & 0 \\
+1 & 2 & 0 \\
+0 & 0 & 3
+\end{bmatrix}.
+\]
+\begin{enumerate}[label=(\alph*)]
+    \item Find the eigenvalues of $A$.  
+    \item For each eigenvalue, determine a corresponding eigenvector.  
+    \item Verify that $Av = \lambda v$ holds for each pair $(\lambda, v)$.  
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}
+\textbf{Explainer.}
+
+\begin{enumerate}
+  \item \textbf{Definition of Taylor series:}  
+  Let $f(x)$ be a function that is infinitely differentiable at a point $a \in \mathbb{R}$. The \emph{Taylor series expansion} of $f$ around $a$ is given by
+  \[
+  f(x) = \sum_{k=0}^{\infty} \frac{f^{(k)}(a)}{k!}(x-a)^k,
+  \]
+  where $f^{(k)}(a)$ is the $k$-th derivative of $f$ evaluated at $a$.
+
+  \item \textbf{Taylor polynomial of order $n$:}  
+  In practice, we often approximate $f(x)$ by truncating the infinite series after $n$ terms:
+  \[
+  T_n(x) = \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}(x-a)^k.
+  \]
+
+  \item \textbf{Why this works for polynomials:}  
+  If $f(x)$ is itself a polynomial of degree $d$, then the Taylor series terminates after $d$ terms (since higher-order derivatives vanish). Thus, the Taylor expansion recovers the polynomial exactly.
+
+  \item \textbf{Procedure:}  
+  \begin{enumerate}[label=(\roman*)]
+    \item Compute derivatives $f'(x), f''(x), \ldots, f^{(n)}(x)$.  
+    \item Evaluate each derivative at $a$.  
+    \item Substitute into the Taylor formula and simplify.  
+  \end{enumerate}
+\end{enumerate}
+
+\bigskip
+
+\textbf{Task.}  
+Let 
+\[
+f(x) = x^4 - 2x^3 + 3x^2 - x + 5.
+\]
+\begin{enumerate}[label=(\alph*)]
+    \item Find the Taylor series expansion of $f(x)$ around $a = 1$.  
+    \item Write the Taylor polynomial explicitly up to order 4.  
+    \item Verify that the Taylor expansion coincides with $f(x)$ (since $f$ is a polynomial of degree 4).  
+\end{enumerate}
+\end{exercise}
+
+\newpage
+\selectlanguage{brazil}
+\section{Versão em Português}
+
+\begin{exercise}
+\textbf{Explicação.} 
+
+\begin{enumerate}
+  \item \textbf{Transformações elementares:} São operações de linha que podem ser aplicadas à matriz aumentada de um sistema de equações sem alterar o conjunto de soluções. Incluem: (i) trocar duas linhas, (ii) multiplicar uma linha por uma constante não nula e (iii) somar um múltiplo de uma linha a outra.
+
+  \item \textbf{Forma escalonada (REF) e forma escalonada reduzida (RREF):}
+  \begin{itemize}
+    \item Uma matriz está em \emph{forma escalonada} se (a) todas as linhas nulas ficam no final, (b) cada pivô em uma linha não nula aparece à direita do pivô da linha acima e (c) todos os elementos abaixo de um pivô são nulos.
+    \item Uma matriz está em \emph{forma escalonada reduzida} se, além disso, (d) cada pivô é igual a 1 e (e) cada pivô é o único elemento não nulo em sua coluna.
+  \end{itemize}
+
+  \item \textbf{Procedimento para resolver um sistema em forma escalonada:} Começando da última linha, resolvem-se as variáveis associadas aos pivôs (substituição regressiva). As variáveis livres podem assumir valores arbitrários. O conjunto solução é então expresso em função dessas variáveis livres.
+\end{enumerate}
+
+\bigskip
+
+\textbf{Tarefa.} Resolva o seguinte sistema de equações lineares (Exemplo 2.7):
+
+\[
+\begin{aligned}
+x_1 + x_2 + x_3 &= 3, \\
+x_1 - x_2 + 2x_3 &= 2, \\
+2x_1 + 3x_3 &= 5.
+\end{aligned}
+\]
+
+\textbf{Dica:} Note que uma das equações pode ser obtida como combinação linear das outras, levando a infinitas soluções. Expresse o conjunto solução em termos de uma variável livre.
+\end{exercise}
+
+
+\begin{exercise}
+\textbf{Explicação.}
+
+\begin{enumerate}
+  \item \textbf{Conjunto gerador e span:}  
+  Um conjunto de vetores $\{x_1, \ldots, x_m\}$ em $\mathbb{R}^n$ é chamado de \emph{conjunto gerador} de um subespaço $U$ se todo vetor em $U$ pode ser escrito como combinação linear desses vetores. O conjunto de todas essas combinações é o \emph{span}, denotado
+  \[
+  U = \mathrm{span}\{x_1, \ldots, x_m\}.
+  \]
+
+  \item \textbf{Base:}  
+  Uma base de um subespaço $U$ é um conjunto de vetores que (i) gera $U$ e (ii) é linearmente independente. Todo vetor em $U$ pode ser escrito de forma única como combinação linear de vetores da base.
+
+  \item \textbf{Como obter uma base usando eliminação de Gauss:}  
+  Para encontrar uma base de $U = \mathrm{span}\{x_1, \ldots, x_m\}$:
+  \begin{enumerate}[label=(\roman*)]
+    \item Organize os vetores $x_1, \ldots, x_m$ como colunas de uma matriz $A$.  
+    \item Aplique eliminação de Gauss para reduzir $A$ à forma escalonada.  
+    \item As colunas-pivô da matriz original correspondem a um subconjunto linearmente independente que forma uma base de $U$.  
+  \end{enumerate}
+
+  \item \textbf{Base ortonormal:}  
+  Uma base $\{u_1, \ldots, u_k\}$ de um subespaço $U$ é \emph{ortonormal} se cada vetor tem norma 1 ($\|u_i\| = 1$) e se são mutuamente ortogonais ($\langle u_i, u_j \rangle = 0$ para $i \neq j$).  
+\end{enumerate}
+
+\bigskip
+
+\textbf{Tarefa.}  
+Considere o subespaço
+\[
+U = \mathrm{span}\left\{ 
+\begin{bmatrix}1 \\ 1 \\ 0\end{bmatrix}, \;
+\begin{bmatrix}1 \\ 0 \\ 1\end{bmatrix}, \;
+\begin{bmatrix}2 \\ 1 \\ 1\end{bmatrix}
+\right\} \subset \mathbb{R}^3.
+\]
+\begin{enumerate}[label=(\alph*)]
+    \item Use a eliminação de Gauss para determinar uma base que gera $U$.  
+    \item Verifique se a base encontrada é ortonormal. Se não for, explique por quê.  
+\end{enumerate}
+\end{exercise}
+
+
+\begin{exercise}
+\textbf{Explicação.}
+
+\begin{enumerate}
+  \item \textbf{Definição de autovalor e autovetor:}  
+  Seja $A \in \mathbb{R}^{n \times n}$ uma matriz quadrada. Um vetor não nulo $v \in \mathbb{R}^n$ é chamado de \emph{autovetor} de $A$ se existir um escalar $\lambda \in \mathbb{R}$ tal que
+  \[
+  Av = \lambda v.
+  \]
+  O escalar $\lambda$ é chamado de \emph{autovalor} correspondente a $v$.
+
+  \item \textbf{Como encontrar autovalores:}  
+  Resolva a \emph{equação característica}
+  \[
+  \det(A - \lambda I) = 0,
+  \]
+  cujas raízes são os autovalores de $A$.
+
+  \item \textbf{Como encontrar autovetores:}  
+  Para cada autovalor $\lambda$, resolva
+  \[
+  (A - \lambda I)v = 0,
+  \]
+  obtendo os vetores não nulos $v$ que formam o autoespaço associado a $\lambda$.
+\end{enumerate}
+
+\bigskip
+
+\textbf{Tarefa.}  
+Considere a matriz
+\[
+A = \begin{bmatrix}
+2 & 1 & 0 \\
+1 & 2 & 0 \\
+0 & 0 & 3
+\end{bmatrix}.
+\]
+\begin{enumerate}[label=(\alph*)]
+    \item Encontre os autovalores de $A$.  
+    \item Para cada autovalor, determine um autovetor correspondente.  
+    \item Verifique que $Av = \lambda v$ para cada par $(\lambda, v)$.  
+\end{enumerate}
+\end{exercise}
+
+
+\begin{exercise}
+\textbf{Explicação.}
+
+\begin{enumerate}
+  \item \textbf{Definição de série de Taylor:}  
+  Seja $f(x)$ uma função infinitamente diferenciável em torno de um ponto $a \in \mathbb{R}$. A \emph{série de Taylor} de $f$ em torno de $a$ é
+  \[
+  f(x) = \sum_{k=0}^{\infty} \frac{f^{(k)}(a)}{k!}(x-a)^k,
+  \]
+  onde $f^{(k)}(a)$ é a $k$-ésima derivada de $f$ avaliada em $a$.
+
+  \item \textbf{Polinômio de Taylor de ordem $n$:}  
+  Na prática, truncamos a série após $n$ termos:
+  \[
+  T_n(x) = \sum_{k=0}^{n} \frac{f^{(k)}(a)}{k!}(x-a)^k.
+  \]
+
+  \item \textbf{Por que funciona para polinômios:}  
+  Se $f(x)$ é um polinômio de grau $d$, então a série termina após $d$ termos (pois as derivadas de ordem superior se anulam). Assim, a expansão de Taylor recupera exatamente o polinômio.
+
+  \item \textbf{Procedimento:}  
+  \begin{enumerate}[label=(\roman*)]
+    \item Calcule as derivadas $f'(x), f''(x), \ldots, f^{(n)}(x)$.  
+    \item Avalie cada derivada em $a$.  
+    \item Substitua na fórmula da série de Taylor e simplifique.  
+  \end{enumerate}
+\end{enumerate}
+
+\bigskip
+
+\textbf{Tarefa.}  
+Seja 
+\[
+f(x) = x^4 - 2x^3 + 3x^2 - x + 5.
+\]
+\begin{enumerate}[label=(\alph*)]
+    \item Encontre a expansão em série de Taylor de $f(x)$ em torno de $a = 1$.  
+    \item Escreva o polinômio de Taylor explicitamente até ordem 4.  
+    \item Verifique que a expansão coincide com $f(x)$ (pois $f$ é um polinômio de grau 4).  
+\end{enumerate}
+\end{exercise}
+
+
+\end{document}
