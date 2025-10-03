@@ -1,9 +1,9 @@
 # Fdb version 4
-["pdflatex"] 1759511386.39239 "c:/Users/rcpsi/Downloads/codigos/BCC405-PCC179_NonLinearOptimization/2025-2/RoteiroDasAulas/LaTeXSource/Roteiro1/Rodteiro1.tex" "Rodteiro1.pdf" "Rodteiro1" 1759511388.07663 0
-  "Rodteiro1.aux" 1759511387 1924 036c1536dc5e3b66cdda559bad1c3bd4 "pdflatex"
-  "Rodteiro1.out" 1759511387 1296 2fcc471c5e9e488da2338d139e68a758 "pdflatex"
-  "Rodteiro1.tex" 1759511385 15375 94110d3a6c2c99c63dae59d4b275fff0 ""
-  "c:/Users/rcpsi/Downloads/codigos/BCC405-PCC179_NonLinearOptimization/2025-2/RoteiroDasAulas/LaTeXSource/Roteiro1/Rodteiro1.tex" 1759511385 15375 94110d3a6c2c99c63dae59d4b275fff0 ""
+["pdflatex"] 1759516566.92355 "c:/Users/rcpsi/Downloads/codigos/BCC405-PCC179_NonLinearOptimization/2025-2/RoteiroDasAulas/LaTeXSource/Roteiro1/Rodteiro1.tex" "Rodteiro1.pdf" "Rodteiro1" 1759516568.68697 0
+  "Rodteiro1.aux" 1759516568 1924 2af4d91f6d5ad9112c7831f4ca8b870c "pdflatex"
+  "Rodteiro1.out" 1759516568 1296 2fcc471c5e9e488da2338d139e68a758 "pdflatex"
+  "Rodteiro1.tex" 1759516566 15413 7ab964f07689e751d84fe2682250b5c1 ""
+  "c:/Users/rcpsi/Downloads/codigos/BCC405-PCC179_NonLinearOptimization/2025-2/RoteiroDasAulas/LaTeXSource/Roteiro1/Rodteiro1.tex" 1759516566 15413 7ab964f07689e751d84fe2682250b5c1 ""
   "c:/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1730312644 2971 def0b6c1f0b107b3b936def894055589 ""
   "c:/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1730312644 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "c:/texlive/2024/texmf-dist/fonts/map/fontname/texfonts.map" 1730314164 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -102,6 +102,7 @@
   "c:/texlive/2024/texmf-dist/tex/latex/base/inputenc.sty" 1730315375 5048 7ebf0f2edf1ef6783e8fe2201a95d0e8 ""
   "c:/texlive/2024/texmf-dist/tex/latex/base/t1cmtt.fd" 1730315375 2443 790016d75def8d3127df5c216a45abcc ""
   "c:/texlive/2024/texmf-dist/tex/latex/booktabs/booktabs.sty" 1730312379 6078 f1cb470c9199e7110a27851508ed7a5c ""
+  "c:/texlive/2024/texmf-dist/tex/latex/enumitem/enumitem.sty" 1730313684 51697 f8f08183cd2080d9d18a41432d651dfb ""
   "c:/texlive/2024/texmf-dist/tex/latex/etoolbox/etoolbox.sty" 1730313828 46845 3b58f70c6e861a13d927bff09d35ecbc ""
   "c:/texlive/2024/texmf-dist/tex/latex/extsizes/extarticle.cls" 1730313944 20602 3112294ba237d94ce4a1502cfef3594f ""
   "c:/texlive/2024/texmf-dist/tex/latex/extsizes/size9.clo" 1730313944 6172 b9daf86befd6903b2699dddbd6fb97c1 ""
