@@ -1,0 +1,403 @@
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{parskip}
+
+
+% ======================
+% Packages
+% ======================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{amsthm}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+
+
+
+\geometry{margin=2.5cm}
+
+% ======================
+% Listings setup (Python code)
+% ======================
+\definecolor{codebg}{rgb}{0.95,0.95,0.95}
+\lstset{
+    language=Python,
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red!70!black},
+    showstringspaces=false,
+    frame=single,
+    breaklines=true,
+    inputencoding=utf8
+}
+
+% ======================
+% Document
+% ======================
+\begin{document}
+
+\title{Roteiro de Aula -- Otimização Não Linear}
+\author{Disciplina: PCC179 -- Otimização Não Linear}
+\date{\today}
+\maketitle
+
+\section{Formulação Geral de um Problema de Otimização Não Linear}
+
+Um problema geral de otimização não linear pode ser formulado da seguinte forma:
+
+\[
+\begin{aligned}
+\min_{x \in \mathbb{R}^n} \quad & f(x) \\
+\text{sujeito a} \quad & g_i(x) \leq 0, \quad i = 1,\dots,m, \\
+& h_j(x) = 0, \quad j = 1,\dots,p,
+\end{aligned}
+\]
+
+onde:
+\begin{itemize}
+    \item $x = (x_1, x_2, \dots, x_n)^\top \in \mathbb{R}^n$ é o \textbf{vetor de variáveis de decisão};
+    \item cada $x_i$ representa uma variável individual;
+    \item $f(x)$ é a \textbf{função objetivo}, possivelmente não linear;
+    \item $g_i(x)$ representam as \textbf{restrições de desigualdade};
+    \item $h_j(x)$ representam as \textbf{restrições de igualdade}.
+\end{itemize}
+
+\subsection*{Interpretações de $x$ em aplicações reais}
+\begin{itemize}
+    \item Em \textbf{finanças}: $x$ pode representar os pesos de ativos em um portfólio.
+    \item Em \textbf{engenharia}: $x$ pode representar dimensões de uma estrutura (espessura, comprimento, etc.).
+    \item Em \textbf{machine learning}: $x$ pode representar parâmetros ou hiperparâmetros de um modelo.
+\end{itemize}
+
+\section{Exemplos de Problemas Reais}
+
+\subsection*{Exemplo 1: Ajuste de Curvas (Regressão Não Linear)}
+Minimizar o erro quadrático entre uma curva não linear e dados experimentais:
+
+\[
+\min_{\theta} \; \sum_{i=1}^N \big(y_i - f(x_i;\theta)\big)^2
+\]
+
+\subsection*{Exemplo 2: Portfólio de Investimentos (Markowitz)}
+
+O problema de otimização de portfólio de Markowitz busca alocar capital entre $n$ ativos de forma a equilibrar \textbf{retorno esperado} e \textbf{risco}.
+
+\paragraph{Formulação}
+\begin{itemize}
+    \item Vetor de decisão:
+    \[
+    w = (w_1, w_2, \dots, w_n)^\top, \quad w_i \geq 0, \quad \sum_{i=1}^n w_i = 1
+    \]
+    onde $w_i$ é a fração do capital investida no ativo $i$.
+    \item Retorno esperado do portfólio:
+    \[
+    \mu_p = w^\top \mu
+    \]
+    onde $\mu = (\mu_1, \dots, \mu_n)^\top$ são os retornos esperados dos ativos.
+    \item Risco (variância do portfólio):
+    \[
+    \sigma_p^2 = w^\top \Sigma w
+    \]
+    onde $\Sigma$ é a matriz de covariâncias dos retornos.
+\end{itemize}
+
+\paragraph{Problema de otimização}
+\[
+\begin{aligned}
+\min_{w \in \mathbb{R}^n} \quad & w^\top \Sigma w \\
+\text{sujeito a} \quad & w^\top \mu \geq \mu_{min}, \\
+& \sum_{i=1}^n w_i = 1, \\
+& w_i \geq 0, \quad i=1,\dots,n.
+\end{aligned}
+\]
+
+\paragraph{Interpretação}
+\begin{itemize}
+    \item O objetivo é minimizar o risco do portfólio.
+    \item As restrições garantem: (i) retorno mínimo desejado, (ii) todo o capital investido, (iii) proibição de posições vendidas.
+    \item O conjunto de soluções ótimas forma a \textbf{fronteira eficiente}.
+\end{itemize}
+
+\subsection*{Exemplo 3: Engenharia Estrutural -- Dimensionamento de uma viga}
+
+Um engenheiro deseja projetar uma viga retangular de largura $b$ e altura $h$ para suportar um momento fletor máximo $M$.  
+O objetivo é \textbf{minimizar a área da seção transversal} (e, portanto, o peso da viga), sujeita à restrição de que a tensão máxima não ultrapasse o limite admissível $\sigma_{adm}$.
+
+\[
+\begin{aligned}
+\min_{b,h > 0} \quad & A(b,h) = b \cdot h \\
+\text{sujeito a} \quad & \sigma(b,h) = \frac{M \cdot (h/2)}{I(b,h)} \leq \sigma_{adm},
+\end{aligned}
+\]
+
+onde $I(b,h) = \tfrac{b h^3}{12}$ é o momento de inércia da seção.
+
+Substituindo:
+\[
+\sigma(b,h) = \frac{6M}{b h^2}.
+\]
+
+O problema final fica:
+\[
+\begin{aligned}
+\min_{b,h > 0} \quad & b \cdot h \\
+\text{sujeito a} \quad & \frac{6M}{b h^2} \leq \sigma_{adm}.
+\end{aligned}
+\]
+
+\section{\texttt{scipy.optimize} para otimização}
+
+\subsection{Problemas de Otimização sem Restrições}
+
+Nesta seção vamos explorar métodos de otimização não linear para problemas \textbf{sem restrições}, usando a função \texttt{minimize} do \texttt{scipy.optimize}. Para isso, utilizaremos a \textbf{função de Rosenbrock} (banana function), um benchmark clássico em otimização.
+
+\subsection*{1) Função de Exemplo}
+
+A função de Rosenbrock em duas variáveis é dada por:
+\[
+f(x,y) = (1-x)^2 + 100(y-x^2)^2
+\]
+
+Ela possui um mínimo global em $(1,1)$, onde $f(1,1)=0$. É conhecida por seu \textbf{vale estreito e curvo}, que desafia algoritmos de otimização.
+
+\begin{lstlisting}
+import numpy as np
+import matplotlib.pyplot as plt
+
+def rosenbrock(x):
+    return (1-x[0])**2 + 100*(x[1]-x[0]**2)**2
+
+X, Y = np.meshgrid(np.linspace(-2, 2, 400),
+                   np.linspace(-1, 3, 400))
+Z = (1-X)**2 + 100*(Y-X**2)**2
+
+plt.contour(X, Y, Z, levels=np.logspace(-0.5, 3.5, 20))
+plt.scatter(1,1,c='red',marker='x')
+plt.title("Funcao de Rosenbrock (banana)")
+plt.show()
+\end{lstlisting}
+
+\subsection*{2) Método Nelder-Mead}
+
+Método baseado em um \textbf{simplex}, não usa derivadas. Adequado para funções não suaves ou ruidosas, mas pode ser lento.
+
+\begin{lstlisting}
+from scipy.optimize import minimize
+
+x0 = [0, 0]  # chute inicial
+res = minimize(rosenbrock, x0, method='Nelder-Mead')
+print(res)
+\end{lstlisting}
+
+\subsection*{3) Método BFGS (com gradiente)}
+
+Método quasi-Newton que atualiza uma aproximação da Hessiana usando o gradiente.  
+Mais eficiente quando derivadas estão disponíveis.
+
+\begin{lstlisting}
+grad = lambda x: np.array([
+    -2*(1-x[0]) - 400*x[0]*(x[1]-x[0]**2),
+    200*(x[1]-x[0]**2)
+])
+
+res = minimize(rosenbrock, x0, method='BFGS', jac=grad)
+print(res)
+\end{lstlisting}
+
+\subsection*{4) Newton-CG (com Hessiana)}
+
+Método Newton-CG usa gradiente e Hessiana para acelerar a convergência, sendo indicado para funções suaves.
+
+\begin{lstlisting}
+hess = lambda x: np.array([
+    [2 - 400*(x[1]-x[0]**2) + 800*x[0]**2, -400*x[0]],
+    [-400*x[0], 200]
+])
+
+res = minimize(rosenbrock, x0, method='Newton-CG',
+               jac=grad, hess=hess)
+print(res)
+\end{lstlisting}
+
+\subsection*{5) Newton-CG com Trust Region}
+
+Variação que utiliza \textbf{regiões de confiança}, mais robusta quando a Hessiana não é positiva definida.
+
+\begin{lstlisting}
+res = minimize(rosenbrock, x0, method='trust-ncg',
+               jac=grad, hess=hess)
+print(res)
+\end{lstlisting}
+
+\subsection*{Resumo dos Métodos}
+\begin{itemize}
+    \item \textbf{Nelder-Mead}: não requer derivadas, útil em funções não suaves, mas mais lento.
+    \item \textbf{BFGS}: método quasi-Newton eficiente quando gradiente está disponível.
+    \item \textbf{Newton-CG}: usa gradiente + Hessiana, rápido em funções suaves.
+    \item \textbf{Trust Region (Newton-CG)}: mais estável, adequado para casos em que a Hessiana pode ser indefinida.
+\end{itemize}
+
+\paragraph{Notas de documenta\c c\~ao.}
+Para detalhes completos, consulte:
+\begin{itemize}
+  \item \texttt{Nelder-Mead} (método simplex, sem derivadas)\footnote{\url{https://docs.scipy.org/doc/scipy/reference/optimize.minimize-neldermead.html}}
+  \item \texttt{BFGS} (quasi-Newton, requer gradiente)\footnote{\url{https://docs.scipy.org/doc/scipy/reference/optimize.minimize-bfgs.html}}
+  \item \texttt{Newton-CG} (usa gradiente e Hessiana, ou produto Hessiano-vetor)\footnote{\url{https://docs.scipy.org/doc/scipy/reference/optimize.minimize-newtoncg.html}}
+  \item \texttt{trust-ncg} (Newton conjugado dentro de regi\~oes de confian\c ca)\footnote{\url{https://docs.scipy.org/doc/scipy/reference/optimize.minimize-trustncg.html}}
+  \item \texttt{trust-krylov}, \texttt{trust-exact} (varia\c c\~oes do esquema de regi\~oes de confian\c ca)\footnote{\url{https://docs.scipy.org/doc/scipy/reference/optimize.minimize-trustregion.html}}
+\end{itemize}
+
+\begin{table}[h]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}lccccp{7cm}@{}}
+\toprule
+\textbf{M\'etodo} & \textbf{Grad} & \textbf{Hess} & \textbf{Tipo} & \textbf{Conv.} & \textbf{Observa\c c\~oes} \\
+\midrule
+Nelder-Mead & n\~ao & n\~ao & simplex (direto) & lenta & Bom p/ fun\c c\~oes n\~ao suaves; robusto mas ineficiente em alta dim. \\
+BFGS        & sim  & n\~ao & quasi-Newton & r\'apida & Usa aproxima\c c\~ao da Hessiana; bom compromisso entre custo e converg\^encia. \\
+Newton-CG   & sim  & sim (ou Hv) & Newton conjugado & r\'apida & Usa grad e Hess; requer fun\c c\~oes suaves; converg\^encia quadr\'atica. \\
+trust-ncg   & sim  & sim (ou Hv) & regi\~ao de confian\c ca & robusta & Mais est\'avel que Newton-CG puro; lida melhor com Hessianas indefinidas. \\
+\bottomrule
+\end{tabular}
+\caption{Resumo de m\'etodos sem restri\c c\~ao no \texttt{scipy.optimize.minimize}.}
+\end{table}
+
+
+
+\subsection{Problemas de Otimização com Restrições}
+
+Nesta seção seguimos com a função de Rosenbrock (banana) e adicionamos restrições:
+\[
+f(x,y) = (1-x)^2 + 100(y-x^2)^2, \quad
+\begin{cases}
+x + y \ge 1 \quad (\text{desigualdade}) \\
+x - y = 0 \quad (\text{igualdade})
+\end{cases}
+\]
+
+\begin{lstlisting}
+import numpy as np
+from scipy.optimize import minimize
+from scipy.optimize import LinearConstraint, NonlinearConstraint
+
+# Objetivo (Rosenbrock)
+def f(x):
+    return (1-x[0])**2 + 100*(x[1]-x[0]**2)**2
+
+# Gradiente e Hessiana (para metodos que aceitam)
+def grad(x):
+    return np.array([
+        -2*(1-x[0]) - 400*x[0]*(x[1]-x[0]**2),
+        200*(x[1]-x[0]**2)
+    ])
+
+def hess(x):
+    return np.array([
+        [2 - 400*(x[1]-x[0]**2) + 800*x[0]**2, -400*x[0]],
+        [-400*x[0], 200]
+    ])
+
+# ---------- Restricoes ----------
+# Linear: x + y >= 1 e x - y = 0
+# Matriz A e limites [lb, ub] por linha
+A = np.array([[1.0,  1.0],   # x + y
+              [1.0, -1.0]])  # x - y
+lb = np.array([1.0, 0.0])    # [ >=1, =0 ]
+ub = np.array([np.inf, 0.0]) # [ inf,  0 ]
+
+lincon = LinearConstraint(A, lb, ub)
+
+# Para SLSQP/COBYLA (dicionarios):
+cons_slsqp = [
+    {'type': 'ineq', 'fun': lambda z: z[0] + z[1] - 1.0},  # x+y-1 >= 0
+    {'type': 'eq',   'fun': lambda z: z[0] - z[1]}         # x - y = 0
+]
+
+# COBYLA aceita apenas INEQ: aproximamos x=y por duas ineqs
+cons_cobyla = [
+    {'type': 'ineq', 'fun': lambda z: z[0] + z[1] - 1.0},  # x+y-1 >= 0
+    {'type': 'ineq', 'fun': lambda z:  z[0] - z[1]},       # x - y >= 0
+    {'type': 'ineq', 'fun': lambda z:  z[1] - z[0]}        # y - x >= 0
+]
+
+x0 = np.array([-1.2, 1.0])  # chute inicial classico
+\end{lstlisting}
+
+\subsection*{1) trust-constr (regiões de confiança com restrições)}
+Método robusto e geral para restrições não lineares e lineares. Aceita gradiente e Hessiana; usa regiões de confiança para passos estáveis.
+
+\begin{lstlisting}
+res_tc = minimize(f, x0, method='trust-constr',
+                  jac=grad, hess=hess,
+                  constraints=[lincon],
+                  options={'maxiter': 300, 'gtol': 1e-8, 'xtol': 1e-12})
+print(res_tc.x, res_tc.fun, res_tc.success)
+\end{lstlisting}
+
+\subsection*{2) SLSQP (programação quadrática sequencial)}
+Aceita diretamente igualdade e desigualdade via dicionários. Usa gradiente se fornecido; costuma ser eficiente em problemas suaves.
+
+\begin{lstlisting}
+res_slsqp = minimize(f, x0, method='SLSQP',
+                     jac=grad, constraints=cons_slsqp,
+                     options={'maxiter': 300, 'ftol': 1e-12})
+print(res_slsqp.x, res_slsqp.fun, res_slsqp.success)
+\end{lstlisting}
+
+\subsection*{3) COBYLA (sem derivadas; só desigualdades)}
+Aproxima as restrições por aproximações lineares; útil quando derivadas não estão disponíveis. Igualdades precisam ser reescritas como duas desigualdades.
+
+\begin{lstlisting}
+res_cobyla = minimize(f, x0, method='COBYLA',
+                      constraints=cons_cobyla,
+                      options={'maxiter': 1000, 'rhobeg': 0.5, 'tol': 1e-6})
+print(res_cobyla.x, res_cobyla.fun, res_cobyla.success)
+\end{lstlisting}
+
+\subsection*{Resumo (restritos)}
+\begin{itemize}
+    \item \textbf{trust-constr}: interface com \texttt{LinearConstraint}/\texttt{NonlinearConstraint}; robusto; se beneficiar de grad/Hess.
+    \item \textbf{SLSQP}: dicionários (\texttt{eq}/\texttt{ineq}); eficiente e prático para restrições suaves.
+    \item \textbf{COBYLA}: dicionários, apenas \texttt{ineq}; não usa derivadas; bom quando grad/Hess não estão disponíveis.
+\end{itemize}
+
+\paragraph{Notas de documenta\c c\~ao.}
+Para detalhes completos, consulte:
+\begin{itemize}
+  \item \texttt{trust-constr} (restri\c c\~oes via \texttt{LinearConstraint}/\texttt{NonlinearConstraint})\footnote{\url{https://docs.scipy.org/doc/scipy/reference/optimize.minimize-trustconstr.html}}
+  \item \texttt{SLSQP} (restri\c c\~oes como dicion\'arios \texttt{eq}/\texttt{ineq})\footnote{\url{https://docs.scipy.org/doc/scipy/reference/optimize.minimize-slsqp.html}}
+  \item \texttt{COBYLA} (apenas desigualdades, sem derivadas)\footnote{\url{https://docs.scipy.org/doc/scipy/reference/optimize.minimize-cobyla.html}}
+  \item \texttt{LinearConstraint} / \texttt{NonlinearConstraint}\footnote{\url{https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.LinearConstraint.html}}\footnote{\url{https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.NonlinearConstraint.html}}
+\end{itemize}
+
+\begin{table}[h]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}lcccccp{4cm}@{}}
+\toprule
+\textbf{M\'etodo} & \textbf{Grad} & \textbf{Hess} & \textbf{Eq} & \textbf{Ineq} & \textbf{Formato restr.} & \textbf{Estrat./Observa\c c\~oes} \\
+\midrule
+trust-constr & opcional & opcional & Sim & Sim & \texttt{Linear/NonlinearConstraint} & Regi\~oes de confian\c ca; robusto; bom p/ n\~ao lineares \\
+SLSQP        & opcional & n\~ao     & Sim & Sim & dicion\'arios \texttt{eq}/\texttt{ineq} & SQP; eficiente em suaves; sens\'ivel a mal condicionamento \\
+COBYLA       & n\~ao    & n\~ao     & N\~ao (reformular) & Sim & dicion\'arios \texttt{ineq} & Sem derivadas; lineariza restr.; pode exigir mais itera\c c\~oes \\
+\bottomrule
+\end{tabular}
+\caption{Resumo de m\'etodos com restri\c c\~oes no \texttt{scipy.optimize.minimize}.}
+\end{table}
+
+
+
+\end{document}
