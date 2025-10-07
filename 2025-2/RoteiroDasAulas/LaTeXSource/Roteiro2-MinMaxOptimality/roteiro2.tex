@@ -1,0 +1,324 @@
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{parskip}
+
+% ======================
+% Packages
+% ======================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{amsthm}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{enumitem}
+
+\setlist{nosep}
+\geometry{margin=2cm}
+
+% ======================
+% Listings setup (Python)
+% ======================
+\definecolor{codebg}{rgb}{0.95,0.95,0.95}
+\lstset{
+    language=Python,
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red!70!black},
+    showstringspaces=false,
+    frame=single,
+    breaklines=true,
+    inputencoding=utf8
+}
+
+% ======================
+% Document
+% ======================
+\begin{document}
+
+\title{Roteiro de Aula 2 -- Conceitos Fundamentais e Condições de Otimalidade}
+\author{Disciplina: PCC179 -- Otimização Não Linear}
+\date{\today}
+\maketitle
+
+\section{Mínimos e Máximos Globais}
+
+\subsection*{Definição}
+Seja $f:\mathbb{R}^n \to \mathbb{R}$ uma função.  
+Um ponto $x^\star \in \mathbb{R}^n$ é dito:
+\begin{itemize}
+    \item um \textbf{mínimo global} se
+    \[
+    f(x^\star) \le f(x), \quad \forall x \in \mathbb{R}^n;
+    \]
+    \item um \textbf{máximo global} se
+    \[
+    f(x^\star) \ge f(x), \quad \forall x \in \mathbb{R}^n.
+    \]
+\end{itemize}
+
+\paragraph{Interpretação:}
+O ponto ótimo global é aquele que apresenta o melhor valor da função objetivo em todo o domínio — não apenas em torno de $x^\star$, mas em qualquer ponto possível.
+
+\subsection*{Exemplo geométrico}
+A função quadrática $f(x) = (x-2)^2 + 1$ tem um único mínimo global em $x^\star = 2$, pois $f(x) \ge 1$ para todo $x$.
+
+\begin{lstlisting}
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(-1, 5, 400)
+f = (x - 2)**2 + 1
+plt.plot(x, f)
+plt.scatter(2, 1, c='red', label='Minimo global (x=2)')
+plt.title("f(x) = (x-2)^2 + 1")
+plt.legend()
+plt.xlabel("x"); plt.ylabel("f(x)")
+plt.grid(True); plt.show()
+\end{lstlisting}
+
+\section{Mínimos e Máximos Locais}
+
+\subsection*{Definição}
+Um ponto $x^\star$ é um \textbf{mínimo local} de $f$ se existir $\epsilon > 0$ tal que:
+\[
+f(x^\star) \le f(x), \quad \forall x \in B_\epsilon(x^\star),
+\]
+onde $B_\epsilon(x^\star) = \{ x \in \mathbb{R}^n : \|x - x^\star\| < \epsilon \}$ é a vizinhança de raio $\epsilon$ em torno de $x^\star$.
+
+Analogamente, $x^\star$ é um \textbf{máximo local} se:
+\[
+f(x^\star) \ge f(x), \quad \forall x \in B_\epsilon(x^\star).
+\]
+
+\subsection*{Observação}
+- Um ponto pode ser mínimo local, mas não global.  
+- Em funções não convexas, geralmente há múltiplos mínimos locais.  
+- Se $f$ é convexa, todo mínimo local é também global.
+
+\paragraph{Exemplo}
+Considere:
+\[
+f(x) = x^4 - 3x^2 + 2.
+\]
+Esta função tem dois mínimos locais e um máximo local.
+
+\begin{lstlisting}
+x = np.linspace(-3, 3, 400)
+f = x**4 - 3*x**2 + 2
+plt.plot(x, f)
+plt.title("f(x) = x^4 - 3x^2 + 2 (multiplos minimos locais)")
+plt.xlabel("x"); plt.ylabel("f(x)")
+plt.grid(True)
+plt.show()
+\end{lstlisting}
+
+\section{Condições de Otimalidade de Primeira Ordem}
+
+\subsection*{Teorema (Condição Necessária de Primeira Ordem)}
+
+Se $f:\mathbb{R}^n \to \mathbb{R}$ é diferenciável e $x^\star$ é um ponto de mínimo ou máximo local, então:
+\[
+\nabla f(x^\star) = 0.
+\]
+Esse ponto $x^\star$ é chamado de \textbf{ponto crítico} ou \textbf{estacionário}.
+
+\subsection*{Interpretação Geométrica}
+No ponto crítico, a taxa de variação direcional de $f$ em qualquer direção $d$ é zero:
+\[
+\nabla f(x^\star)^\top d = 0, \quad \forall d.
+\]
+Ou seja, a tangente do gráfico é horizontal (em 1D) ou o gradiente é o vetor nulo (em $n$D).
+
+\subsection*{Exemplo}
+Para $f(x) = x^3 - 3x$, temos:
+\[
+f'(x) = 3x^2 - 3 = 3(x^2 - 1) \implies f'(x)=0 \Rightarrow x = \pm 1.
+\]
+
+\begin{lstlisting}
+x = np.linspace(-2, 2, 400)
+f = x**3 - 3*x
+plt.plot(x, f)
+plt.axvline(0, color='k', linewidth=0.8)
+plt.scatter([-1,1], [-2,2], c='red', label='Pontos criticos')
+plt.legend(); plt.grid(True)
+plt.title("Condicao de 1a ordem: f'(x)=0 em x = +-1")
+plt.show()
+\end{lstlisting}
+
+\section{Condições de Otimalidade de Segunda Ordem}
+
+\subsection*{Teorema (Condição Suficiente de Segunda Ordem)}
+Suponha que $f:\mathbb{R}^n \to \mathbb{R}$ seja duas vezes diferenciável e que $\nabla f(x^\star) = 0$. Então:
+\begin{itemize}
+    \item Se $\nabla^2 f(x^\star)$ é \textbf{definida positiva}, $x^\star$ é um \textbf{mínimo local estrito}.
+    \item Se $\nabla^2 f(x^\star)$ é \textbf{definida negativa}, $x^\star$ é um \textbf{máximo local estrito}.
+    \item Se $\nabla^2 f(x^\star)$ é \textbf{indefinida}, $x^\star$ é um \textbf{ponto de sela}.
+\end{itemize}
+
+\paragraph{Em 1 dimensão:}
+\[
+f''(x^\star) > 0 \Rightarrow \text{mínimo local}, \quad
+f''(x^\star) < 0 \Rightarrow \text{máximo local}.
+\]
+
+\subsection*{Exemplo}
+Para $f(x) = x^3 - 3x$, temos:
+\[
+f''(x) = 6x.
+\]
+Logo:
+\[
+f''(-1) = -6 < 0 \Rightarrow \text{máximo local}, \quad
+f''(1) = 6 > 0 \Rightarrow \text{mínimo local}.
+\]
+
+\subsection*{Visualização 2D (ponto de sela)}
+A função $f(x,y) = x^2 - y^2$ tem gradiente nulo em $(0,0)$, mas Hessiana indefinida:
+\[
+\nabla^2 f(0,0) =
+\begin{bmatrix}
+2 & 0 \\ 0 & -2
+\end{bmatrix}.
+\]
+Logo, $(0,0)$ é um ponto de sela.
+
+\begin{lstlisting}
+from mpl_toolkits.mplot3d import Axes3D
+X, Y = np.meshgrid(np.linspace(-2,2,100), np.linspace(-2,2,100))
+Z = X**2 - Y**2
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.plot_surface(X, Y, Z, cmap='coolwarm', alpha=0.8)
+ax.scatter(0, 0, 0, c='k', s=40)
+ax.set_title("f(x,y) = x^2 - y^2 (ponto de sela)")
+plt.show()
+\end{lstlisting}
+
+\pagebreak
+
+\section{Resumo das Condições de Otimalidade}
+
+\begin{table}[!ht]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}lcl@{}}
+\toprule
+\textbf{Condição} & \textbf{Formulação} & \textbf{Interpretação} \\
+\midrule
+1ª Ordem (necessária) & $\nabla f(x^\star) = 0$ & Nenhuma direção reduz $f$ localmente. \\
+2ª Ordem (suficiente) & $\nabla^2 f(x^\star)$ definida positiva & Mínimo local estrito. \\
+2ª Ordem (suficiente) & $\nabla^2 f(x^\star)$ definida negativa & Máximo local estrito. \\
+Ponto de sela & $\nabla^2 f(x^\star)$ indefinida & Nem mínimo nem máximo. \\
+\bottomrule
+\end{tabular}
+\caption{Resumo das condições de otimalidade (problemas sem restrições).}
+\end{table}
+
+
+\section{Expansão em Série de Taylor}
+
+A expansão em série de Taylor é uma ferramenta fundamental em otimização, pois permite aproximar funções diferenciáveis por polinômios, revelando o comportamento local de $f$ em torno de um ponto $x^\star$. Essa aproximação é a base teórica das condições de otimalidade e de muitos algoritmos (como métodos de Newton).
+
+\subsection*{Definição (Série de Taylor de Primeira e Segunda Ordem)}
+
+Seja $f:\mathbb{R}^n \to \mathbb{R}$ uma função com derivadas contínuas até segunda ordem.  
+A expansão de $f$ em torno de um ponto $x^\star$ é dada por:
+
+\[
+f(x) = f(x^\star) 
++ \nabla f(x^\star)^\top (x - x^\star)
++ \tfrac{1}{2}(x - x^\star)^\top \nabla^2 f(x^\star) (x - x^\star)
++ o(\|x - x^\star\|^2),
+\]
+
+onde:
+\begin{itemize}
+    \item $\nabla f(x^\star)$ é o \textbf{vetor gradiente} em $x^\star$;
+    \item $\nabla^2 f(x^\star)$ é a \textbf{matriz Hessiana} em $x^\star$;
+    \item $o(\|x - x^\star\|^2)$ representa termos de ordem superior que se tornam desprezíveis para $x$ próximo de $x^\star$.
+\end{itemize}
+
+\subsection*{Interpretação Geométrica}
+
+- O termo \textbf{linear} $\nabla f(x^\star)^\top (x - x^\star)$ representa o plano tangente de $f$ em $x^\star$.  
+- O termo \textbf{quadrático} $\tfrac{1}{2}(x - x^\star)^\top \nabla^2 f(x^\star)(x - x^\star)$ descreve a curvatura local.  
+- Em 1D, temos:
+  \[
+  f(x) \approx f(x^\star) + f'(x^\star)(x - x^\star) + \tfrac{1}{2}f''(x^\star)(x - x^\star)^2.
+  \]
+
+\paragraph{Observação:}
+A partir dessa expansão, podemos entender:
+\begin{itemize}
+    \item Se o termo linear é nulo ($\nabla f(x^\star)=0$), o ponto é estacionário.
+    \item O termo quadrático (Hessiana) determina se esse ponto é mínimo, máximo ou sela.
+\end{itemize}
+
+\subsection*{Exemplo Numérico (1D)}
+Considere $f(x) = e^x$ e $x^\star = 0$.  
+A expansão de Taylor até segunda ordem é:
+\[
+f(x) \approx f(0) + f'(0)x + \tfrac{1}{2} f''(0)x^2 = 1 + x + \tfrac{x^2}{2}.
+\]
+
+\begin{lstlisting}
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(-2, 2, 400)
+f = np.exp(x)
+taylor = 1 + x + 0.5*x**2
+
+plt.plot(x, f, label='f(x) = e^x')
+plt.plot(x, taylor, '--', label='Aproximacao de Taylor (2a ordem)')
+plt.legend(); plt.grid(True)
+plt.title("Expansao de Taylor de f(x)=e^x em torno de x=0")
+plt.xlabel("x"); plt.ylabel("f(x)")
+plt.show()
+\end{lstlisting}
+
+\subsection*{Exemplo Multidimensional}
+Para $f(x,y) = x^2 + xy + y^2$, em torno de $(0,0)$:
+\[
+\nabla f(0,0) =
+\begin{bmatrix} 0 \\ 0 \end{bmatrix},
+\quad
+\nabla^2 f(0,0) =
+\begin{bmatrix}
+2 & 1 \\
+1 & 2
+\end{bmatrix}.
+\]
+Logo, a expansão até segunda ordem é:
+\[
+f(x,y) \approx x^2 + xy + y^2.
+\]
+Nesse caso, a função é puramente quadrática e a expansão coincide exatamente com a função original.
+
+\subsection*{Resumo Intuitivo}
+\begin{itemize}
+    \item A série de Taylor permite \textbf{linearizar} e \textbf{aproximar} $f$ localmente.
+    \item Em algoritmos de otimização, essa aproximação serve para definir a direção e o tamanho do passo.
+    \item As condições de primeira e segunda ordem derivam diretamente dessa expansão.
+\end{itemize}
+
+\section*{Referências}
+\begin{itemize}
+    \item Beck, A. (2017). \textit{Introduction to Nonlinear Optimization: Theory, Algorithms, and Applications with MATLAB}, 2nd Edition. Springer.
+    \item Nocedal, J., Wright, S. J. (2006). \textit{Numerical Optimization}. Springer.
+\end{itemize}
+
+
+\end{document}
