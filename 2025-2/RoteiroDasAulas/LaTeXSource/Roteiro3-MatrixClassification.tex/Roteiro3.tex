@@ -1,0 +1,439 @@
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{parskip}
+
+% ======================
+% Packages
+% ======================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+
+\geometry{margin=2cm}
+
+% ======================
+% Listings (Python)
+% ======================
+\definecolor{codebg}{rgb}{0.95,0.95,0.95}
+\lstset{
+  language=Python,
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{red!70!black},
+  showstringspaces=false,
+  frame=single,
+  breaklines=true,
+  inputencoding=utf8
+}
+
+% ======================
+% Title
+% ======================
+\begin{document}
+
+\title{Roteiro de Aula --- Classifica\c c\~ao de Matrizes via Forma Quadr\'atica}
+\author{Disciplina: PCC179/BCC405 --- Otimiza\c c\~ao N\~ao Linear}
+\date{\today}
+\maketitle
+
+\section{Motiva\c c\~ao}
+Em otimiza\c c\~ao n\~ao linear, a \textbf{Hessiana} $\nabla^2 f(x^\ast)$ em um ponto cr\'itico $x^\ast$ determina a natureza do ponto:
+\begin{itemize}
+  \item positiva definida $\Rightarrow$ m\'inimo estrito;
+  \item negativa definida $\Rightarrow$ m\'aximo estrito;
+  \item indefinida $\Rightarrow$ ponto de \textit{sela};
+  \item semidefinida $\Rightarrow$ casos degenerados (an\'alise adicional).
+\end{itemize}
+Isso motiva a \textbf{classifica\c c\~ao de matrizes sim\'etricas} reais $A \in \mathbb{R}^{n\times n}$ via o sinal da forma quadr\'atica $q_A(x)=x^\top A x$.
+
+\section{Forma Quadr\'atica e Defini\c c\~oes}
+Seja $A=A^\top \in \mathbb{R}^{n\times n}$. Definimos:
+\[
+q_A(x) = x^\top A x, \quad x\in\mathbb{R}^n.
+\]
+\begin{itemize}
+  \item \textbf{Positiva definida (PD):} $x^\top A x>0$ para todo $x\neq 0$.
+  \item \textbf{Positiva semidefinida (PSD):} $x^\top A x\ge 0$ para todo $x$.
+  \item \textbf{Negativa definida (ND):} $x^\top A x<0$ para todo $x\neq 0$.
+  \item \textbf{Negativa semidefinida (NSD):} $x^\top A x\le 0$ para todo $x$.
+  \item \textbf{Indefinida:} existem $u,v$ tais que $u^\top A u>0$ e $v^\top A v<0$.
+\end{itemize}
+
+\section{Crit\'erios de Classifica\c c\~ao}
+\subsection{Crit\'erio dos Autovalores}
+
+\subsection*{1) Conceito e C\'alculo}
+Para uma matriz sim\'etrica $A \in \mathbb{R}^{n\times n}$, os \textbf{autovalores} $\lambda_i$ e \textbf{autovetores} $v_i$ s\~ao definidos por:
+\[
+A v_i = \lambda_i v_i, \quad i=1,\dots,n.
+\]
+Os autovalores s\~ao obtidos resolvendo o \textbf{polin\^omio caracter\'istico}:
+\[
+\det(A - \lambda I) = 0.
+\]
+Cada raiz $\lambda_i$ representa um fator de escala associado ao autovetor $v_i$, indicando quanto a transforma\c c\~ao linear $A$ alonga ou contrai essa dire\c c\~ao.
+
+\paragraph{M\'etodos de c\'alculo.}
+Para matrizes pequenas, pode-se resolver simbolicamente o determinante.  
+Em pr\'atica, algoritmos num\'ericos (como os baseados em decomposi\c c\~oes QR ou Jacobi) s\~ao usados, e bibliotecas como o \texttt{NumPy} oferecem fun\c c\~oes eficientes (ex.: \texttt{np.linalg.eigvalsh} para matrizes sim\'etricas).  
+
+\begin{itemize}
+  \item Se $A$ \'e real e sim\'etrica, todos os autovalores $\lambda_i$ s\~ao reais.
+  \item Os autovetores formam uma base ortogonal do espa\c co.
+\end{itemize}
+
+\subsection*{2) Exemplo Num\'erico}
+
+Considere a matriz:
+\[
+A = 
+\begin{bmatrix}
+2 & -1 & 0 \\
+-1 & 2 & -1 \\
+0 & -1 & 2
+\end{bmatrix}.
+\]
+O polin\^omio caracter\'istico \'e:
+\[
+\det(A - \lambda I) =
+\begin{vmatrix}
+2-\lambda & -1 & 0 \\
+-1 & 2-\lambda & -1 \\
+0 & -1 & 2-\lambda
+\end{vmatrix}
+= (2-\lambda)\big[(2-\lambda)^2 - 1\big] - (-1)[(-1)(2-\lambda)].
+\]
+Simplificando:
+\[
+\det(A - \lambda I) = (2-\lambda)^3 - 2(2-\lambda) = (2-\lambda)\big[(2-\lambda)^2 - 2\big].
+\]
+As ra\'izes s\~ao:
+\[
+\lambda_1 = 2, \quad \lambda_2 = 2+\sqrt{2}, \quad \lambda_3 = 2-\sqrt{2}.
+\]
+Como todos $\lambda_i > 0$, conclu\'imos que $A$ \'e \textbf{positiva definida}.
+
+\subsection*{3) Interpreta\c c\~ao e Rela\c c\~ao com a Forma Quadr\'atica}
+
+A forma quadr\'atica associada a uma matriz sim\'etrica $A$ \'e
+\[
+q_A(x) = x^\top A x.
+\]
+Ela mede como a transforma\c c\~ao linear $A$ atua sobre o vetor $x$, combinando sua dire\c c\~ao e magnitude.  
+A an\'alise de $q_A(x)$ \'e central na classifica\c c\~ao de pontos cr\'iticos em otimiza\c c\~ao e na determina\c c\~ao da curvatura local de superf\'icies.
+
+\paragraph{Decomposi\c c\~ao espectral.}
+Se $A$ \'e sim\'etrica, existe uma matriz ortogonal $Q$ e uma matriz diagonal $\Lambda = \mathrm{diag}(\lambda_1, \dots, \lambda_n)$ tais que:
+\[
+A = Q \Lambda Q^\top, \quad \text{com } Q^\top Q = I.
+\]
+Substituindo em $q_A(x)$:
+\[
+x^\top A x = x^\top Q \Lambda Q^\top x.
+\]
+Definindo $y = Q^\top x$ (ou seja, uma mudan\c ca de base para o sistema de autovetores de $A$), temos:
+\[
+q_A(x) = y^\top \Lambda y = \sum_{i=1}^n \lambda_i y_i^2.
+\]
+
+\paragraph{Significado.}
+Essa express\~ao mostra que, no sistema de coordenadas formado pelos autovetores de $A$, a forma quadr\'atica se decomp\~oe em uma soma de termos independentes, cada um ponderado por um autovalor $\lambda_i$:
+\[
+q_A(x) = \lambda_1 y_1^2 + \lambda_2 y_2^2 + \cdots + \lambda_n y_n^2.
+\]
+Assim, o sinal de $q_A(x)$ depende exclusivamente dos sinais dos $\lambda_i$, pois $y_i^2 \ge 0$.
+
+\paragraph{Consequ\^encia imediata.}
+\begin{itemize}
+  \item Se todos $\lambda_i > 0$, ent\~ao $q_A(x) > 0$ para todo $x \ne 0$ $\Rightarrow$ $A$ \'e \textbf{positiva definida}.
+  \item Se todos $\lambda_i < 0$, ent\~ao $q_A(x) < 0$ para todo $x \ne 0$ $\Rightarrow$ $A$ \'e \textbf{negativa definida}.
+  \item Se alguns $\lambda_i > 0$ e outros $< 0$, o sinal de $q_A(x)$ varia conforme a dire\c c\~ao $\Rightarrow$ $A$ \'e \textbf{indefinida}.
+  \item Se todos $\lambda_i \ge 0$ mas algum \'e zero, ent\~ao $q_A(x)\ge0$ $\Rightarrow$ $A$ \'e \textbf{positiva semidefinida}.
+\end{itemize}
+
+\paragraph{Intui\c c\~ao geom\'etrica.}
+Cada autovetor $v_i$ define um \textbf{eixo principal} da superf\'icie descrita por $z = q_A(x)$.  
+O autovalor correspondente $\lambda_i$ controla a \textbf{curvatura} (ou “abertura”) da par\'abola nessa dire\c c\~ao:
+\begin{itemize}
+  \item $\lambda_i > 0$: a superf\'icie curva para cima — dire\c c\~ao de m\'inimo (vale de paraboloide).
+  \item $\lambda_i < 0$: a superf\'icie curva para baixo — dire\c c\~ao de m\'aximo (c\'upula invertida).
+  \item mistura de sinais: a superf\'icie tem \textbf{curvatura de sela}, positiva em algumas dire\c c\~oes e negativa em outras.
+\end{itemize}
+
+\paragraph{Conex\~ao com otimiza\c c\~ao.}
+No contexto da an\'alise de uma fun\c c\~ao $f(x)$ em um ponto cr\'itico $x^\ast$, a Hessiana $H = \nabla^2 f(x^\ast)$ desempenha o papel de $A$.  
+\begin{itemize}
+  \item Se $H$ \'e positiva definida, $f$ tem um m\'inimo local estrito em $x^\ast$.
+  \item Se $H$ \'e negativa definida, $f$ tem um m\'aximo local estrito.
+  \item Se $H$ \'e indefinida, $x^\ast$ \'e um ponto de sela.
+\end{itemize}
+Assim, a classifica\c c\~ao de matrizes via autovalores fornece uma ponte direta entre \textbf{\'algebra linear} e \textbf{otimiza\c c\~ao n\~ao linear}.
+
+
+\subsection{Crit\'erio de Sylvester (Menores Principais)}
+
+\subsection*{1) Motiva\c c\~ao}
+Embora o crit\'erio dos autovalores seja o mais direto numericamente, ele nem sempre \'e conveniente em demonstra\c c\~oes anal\'iticas.  
+O \textbf{Crit\'erio de Sylvester} fornece uma maneira puramente alg\'ebrica de verificar a definitude de uma matriz sim\'etrica $A$, analisando os \textbf{determinantes dos menores principais}.
+
+Esse m\'etodo evita o c\'alculo expl\'icito dos autovalores e \'e amplamente usado em \textbf{an\'alise te\'orica}, \textbf{provas formais} e \textbf{verifica\c c\~ao simb\'olica} de positividade.
+
+\subsection*{2) Defini\c c\~ao Formal}
+Seja $A \in \mathbb{R}^{n\times n}$ uma matriz sim\'etrica.  
+Definimos seus \textbf{menores principais} $A_k$ como as submatrizes $k\times k$ obtidas pelos primeiros $k$ elementos das linhas e colunas:
+\[
+A_k = 
+\begin{bmatrix}
+a_{11} & \dots & a_{1k} \\
+\vdots & \ddots & \vdots \\
+a_{k1} & \dots & a_{kk}
+\end{bmatrix}.
+\]
+O determinante de cada $A_k$, denotado $\Delta_k = \det(A_k)$, \'e chamado de \textbf{menor principal de ordem $k$}.
+
+O Crit\'erio de Sylvester afirma:
+
+\begin{center}
+\begin{tabular}{ll}
+$A$ positiva definida (PD) & $\iff$ $\Delta_k > 0$ para todo $k=1,\dots,n$.\\[3pt]
+$A$ negativa definida (ND) & $\iff$ os sinais de $\Delta_k$ alternam: $\Delta_1 < 0$, $\Delta_2 > 0$, $\Delta_3 < 0$, etc.
+\end{tabular}
+\end{center}
+
+\paragraph{Casos semidefinidos:}
+\begin{itemize}
+  \item Se todos $\Delta_k \ge 0$, $A$ pode ser \textbf{positiva semidefinida}, mas n\~ao necessariamente (o crit\'erio n\~ao \'e suficiente nesse caso).  
+  \item Analogamente, $\Delta_k$ alternando em $\le 0, \ge 0, \le 0, \dots$ pode indicar \textbf{negativa semidefinida}.
+\end{itemize}
+
+\subsection*{3) Exemplo Num\'erico}
+Considere:
+\[
+A =
+\begin{bmatrix}
+2 & -1 & 0 \\
+-1 & 2 & -1 \\
+0 & -1 & 2
+\end{bmatrix}.
+\]
+Calculamos os menores principais:
+\[
+\begin{aligned}
+A_1 &= [2], & \quad \Delta_1 &= 2,\\
+A_2 &= 
+\begin{bmatrix}
+2 & -1\\
+-1 & 2
+\end{bmatrix}, & \quad \Delta_2 &= (2)(2) - (-1)^2 = 3,\\
+A_3 &= A, & \quad \Delta_3 &= \det(A) = 4.
+\end{aligned}
+\]
+Todos os determinantes s\~ao positivos:
+\[
+\Delta_1 = 2 > 0, \quad \Delta_2 = 3 > 0, \quad \Delta_3 = 4 > 0.
+\]
+Portanto, pelo Crit\'erio de Sylvester, $A$ \'e \textbf{positiva definida}.  
+Esse resultado coincide com a classifica\c c\~ao obtida via autovalores.
+
+\subsection*{4) Por que o Crit\'erio de Sylvester funciona}
+
+A ideia central vem da decomposi\c c\~ao de Cholesky:  
+uma matriz sim\'etrica $A$ \'e positiva definida se, e somente se, ela pode ser escrita como
+\[
+A = L L^\top,
+\]
+onde $L$ \'e triangular inferior com diagonais positivas.
+
+Durante o processo de fatora\c c\~ao, cada $\Delta_k = \det(A_k)$ representa o produto dos quadrados dos primeiros $k$ elementos diagonais de $L$:
+\[
+\Delta_k = (l_{11} l_{22} \cdots l_{kk})^2.
+\]
+Portanto:
+\[
+\Delta_k > 0 \ \forall k \quad \Longleftrightarrow \quad l_{ii} > 0 \ \forall i \quad \Longleftrightarrow \quad A = L L^\top \text{ com } L \text{ n\~ao singular.}
+\]
+Assim, o sinal dos menores principais reflete diretamente a \textbf{positividade das curvaturas parciais} da forma quadr\'atica $x^\top A x$, medida ao longo das primeiras $k$ dire\c c\~oes coordenadas.
+
+\paragraph{Interpreta\c c\~ao geom\'etrica:}
+Cada $\Delta_k$ corresponde ao “volume” (ou \textit{determinante}) da elips\'oide definida pela restri\c c\~ao de $A$ ao subespa\c co gerado pelas primeiras $k$ vari\'aveis.  
+Se algum $\Delta_k \le 0$, significa que a forma quadr\'atica n\~ao \'e positiva em todas as dire\c c\~oes desse subespa\c co — indicando perda de convexidade parcial.
+
+\subsection*{5) Comparativo com o crit\'erio dos autovalores}
+\begin{itemize}
+  \item Ambos caracterizam positividade, mas o de Sylvester evita c\'alculo espectral.
+  \item O de autovalores \'e mais direto computacionalmente (usado em pr\'atica).
+  \item O de Sylvester \'e mais pr\'atico em demonstra\c c\~oes anal\'iticas e provas simb\'olicas.
+\end{itemize}
+
+\subsection*{S\'intese dos Crit\'erios de Classifica\c c\~ao}
+
+A Tabela~\ref{tab:comparacao-criterios} resume as principais caracter\'isticas dos tr\^es crit\'erios mais utilizados para determinar a definitude de uma matriz sim\'etrica: o dos autovalores, o de Sylvester e o baseado na fatora\c c\~ao de Cholesky.
+
+\begin{table}[h]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{@{}lXXXX@{}}
+\toprule
+\textbf{Crit\'erio} &
+\textbf{Base te\'orica} &
+\textbf{Informa\c c\~ao usada} &
+\textbf{Vantagens} &
+\textbf{Limita\c c\~oes} \\
+\midrule
+\textbf{Autovalores} &
+Decomposi\c c\~ao espectral $A = Q\Lambda Q^\top$ &
+Sinais dos autovalores $\lambda_i$ &
+Interpreta\c c\~ao geom\'etrica direta; base para classifica\c c\~ao via Hessiana &
+Requer c\'alculo espectral; mais pesado simbolicamente \\
+
+\textbf{Sylvester} &
+Menores principais $\det(A_k)$ &
+Determinantes dos subblocos superiores &
+Alg\'ebrico e simb\'olico; ideal em provas anal\'iticas &
+N\~ao conclusivo em casos semidefinidos \\
+
+\textbf{Cholesky} &
+Fatora\c c\~ao $A = L L^\top$ &
+Elementos diagonais de $L$ &
+Computacionalmente eficiente; confirma positividade direta &
+Apenas aplic\'avel se $A$ for positiva definida \\
+\bottomrule
+\end{tabularx}
+\caption{Comparativo entre os crit\'erios de classifica\c c\~ao de matrizes sim\'etricas.}
+\label{tab:comparacao-criterios}
+\end{table}
+
+\paragraph{Resumo.}
+Os tr\^es crit\'erios s\~ao equivalentes para matrizes positivas definidas, mas diferem em prop\'osito:
+\begin{itemize}
+  \item \textbf{Autovalores:} fornece interpreta\c c\~ao geom\'etrica e liga\c c\~ao direta com curvatura e Hessianas;
+  \item \textbf{Sylvester:} \'util para demonstra\c c\~oes formais e verifica\c c\~ao simb\'olica;
+  \item \textbf{Cholesky:} preferido em implementa\c c\~oes num\'ericas e verifica\c c\~ao computacional.
+\end{itemize}
+
+
+\section{Exemplo Num\'erico (3$\times$3)}
+Considere
+\[
+A=\begin{bmatrix}
+4 & 1 & -1\\
+1 & 3 & 0\\
+-1& 0 & 2
+\end{bmatrix}.
+\]
+Podemos (i) computar autovalores para classificar, (ii) visualizar $q_A(x)=x^\top A x$ em $\mathbb{R}^2$ fixando $x=(u,v,0)$, e (iii) aplicar Sylvester.
+
+\section{Exemplo pr\'atico em Python (autovalores, Sylvester e gr\'afico 3D)}
+\noindent
+O c\'odigo abaixo:
+\begin{enumerate}
+  \item classifica $A$ via autovalores com toler\^ancia num\'erica;
+  \item reporta menores principais (Sylvester);
+  \item plota $z = [u,v,0]^\top A [u,v,0]$ em uma malha 2D (gr\'afico 3D) para intui\c c\~ao geom\'etrica.
+\end{enumerate}
+
+\begin{lstlisting}
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 (ensures 3D projection is registered)
+
+# ---- Matrix (3x3) ----
+A = np.array([[4.0, 1.0, -1.0],
+              [1.0, 3.0,  0.0],
+              [-1.0, 0.0, 2.0]])
+
+# ---- Classification via eigenvalues ----
+def classify_definiteness(A, tol=1e-10):
+    lam = np.linalg.eigvalsh(A)  # symmetric eigenvalues
+    pos = np.all(lam >  tol)
+    nonneg = np.all(lam >= -tol)
+    neg = np.all(lam < -tol)
+    nonpos = np.all(lam <=  tol)
+    if pos:
+        return "Positiva definida (PD)", lam
+    if nonneg and not pos:
+        return "Positiva semidefinida (PSD)", lam
+    if neg:
+        return "Negativa definida (ND)", lam
+    if nonpos and not neg:
+        return "Negativa semidefinida (NSD)", lam
+    return "Indefinida", lam
+
+label, eigvals = classify_definiteness(A)
+print("Classificacao:", label)
+print("Autovalores  :", eigvals)
+
+# ---- Sylvester: leading principal minors ----
+def leading_principal_minors(A):
+    dets = []
+    for k in range(1, A.shape[0]+1):
+        dets.append(np.linalg.det(A[:k, :k]))
+    return dets
+
+dets = leading_principal_minors(A)
+print("Menores principais (det A_k):", dets)
+
+# ---- 3D plot of z = x^T A x with x=(u,v,0) ----
+u = np.linspace(-2.5, 2.5, 200)
+v = np.linspace(-2.5, 2.5, 200)
+U, V = np.meshgrid(u, v)
+
+# x = [u, v, 0]; z = [u,v,0]^T A [u,v,0]
+Z = (A[0,0]*U**2 + 2*A[0,1]*U*V + A[1,1]*V**2)  # terms with the third comp zero
+# Cross terms with third coord vanish because x3=0
+
+fig = plt.figure(figsize=(7,5))
+ax = fig.add_subplot(111, projection='3d')
+ax.plot_surface(U, V, Z, alpha=0.7, linewidth=0, antialiased=True)
+ax.set_xlabel('u')
+ax.set_ylabel('v')
+ax.set_zlabel('z = x^T A x (x3=0)')
+ax.set_title(f"Forma quadratica (x3=0) --- {label}")
+plt.tight_layout()
+plt.show()
+\end{lstlisting}
+
+\paragraph{Observa\c c\~ao.}
+Para visualizar cortes diferentes, altere a proje\c c\~ao (ex.: $x=(u,0,w)$ ou $x=(0,v,w)$) trocando os \'indices correspondentes na express\~ao de $Z$.
+
+
+\section{Resumo (tabela de bolso)}
+
+\begin{table}[!ht]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\textwidth}{@{}lccX@{}}
+\toprule
+\textbf{Classe} & \textbf{Sinal de $x^\top A x$} & \textbf{Autovalores (sim\'etrica)} & \textbf{Crit\'erio de Sylvester (ment. principais)} \\
+\midrule
+PD & $>0$ para $x\ne 0$ & todos $>0$ & $\det(A_k)>0,\ \forall k$ \\
+PSD & $\ge 0$ & todos $\ge 0$ & n\~ao conclusivo isoladamente (ver autovalores) \\
+ND & $<0$ para $x\ne 0$ & todos $<0$ & sinais alternados: $-,+,-,\dots$ \\
+NSD & $\le 0$ & todos $\le 0$ & n\~ao conclusivo isoladamente (ver autovalores) \\
+Indefinida & sinais opostos & autovalores de sinais mistos & n/a \\
+\bottomrule
+\end{tabularx}
+\caption{Classifica\c c\~ao de matrizes sim\'etricas via forma quadr\'atica.}
+\end{table}
+
+\section{Dicas Pr\'aticas}
+\begin{itemize}
+  \item Em c\'alculo computacional, use toler\^ancia ($\sim 10^{-10}$) ao decidir sinais de autovalores.
+  \item Para Hessianas, prefira autovalores (via \texttt{eigvalsh}); Sylvester \'e \'util para prova anal\'itica.
+  \item Em otimiza\c c\~ao, a definitude da Hessiana no \'otimo influencia a taxa de converg\^encia (Newton/quasi-Newton).
+\end{itemize}
+
+\end{document}
