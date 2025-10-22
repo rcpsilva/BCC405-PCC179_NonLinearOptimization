@@ -1,0 +1,131 @@
+
+\documentclass[10pt,a4paper]{extarticle}
+\usepackage{parskip}
+
+% ======================
+% Pacotes e configuração
+% ======================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\geometry{margin=2.5cm}
+\setlist{nosep}
+
+\begin{document}
+
+\begin{center}
+{\Large \textbf{Estudo Dirigido — Condições de Otimalida para Problemas sem Restrições}}\\[4pt]
+\textit{Classificação de Matrizes, Formas Quadráticas e Condições de Segunda Ordem}\\[6pt]
+\end{center}
+
+\noindent\textbf{Observação:} Você pode consultar tudo o que estiver escrito de próprio punho no caderno da disciplina. 
+
+\bigskip
+
+\begin{enumerate}[label=\textbf{Q\arabic*.}]
+
+\item Seja \( f:\mathbb{R}^2 \to \mathbb{R} \) uma função contínua e diferenciável, com domínio \( D \subseteq \mathbb{R}^2 \).Defina formalmente o que significa dizer que \( x^\star \in D \) é um \textbf{mínimo local}, um \textbf{máximo local}, um \textbf{mínimo global} e um \textbf{máximo global} de \( f \).
+
+\item Utilize as definições de mínimo e máximo global para mostrar que \texttt{min }\(f(x) \), \( f:\mathbb{R}^2 \to \mathbb{R} \) equivale a \texttt{max }\(1/f(x)\), se possível.
+
+% Q1
+\item Considere a matriz simétrica
+\[
+A = \begin{bmatrix}
+4 & -2 & 0\\
+-2 & 3 & -1\\
+0 & -1 & 2
+\end{bmatrix}.
+\]
+\begin{enumerate}[label=(\alph*)]
+\item Calcule o polinômio característico $\chi_A(\lambda)=\det(A-\lambda I)$ e seus autovalores.
+\item Classifique $A$ quanto à definitude (PD, PSD, ND, NSD, indefinida), com base no sinal dos autovalores.
+\item Escreva a forma quadrática $q(x)=x^\top A x$ e discuta o sinal de $q(x)$ para $x\neq 0$ à luz da sua classificação.
+\end{enumerate}
+
+\bigskip
+
+% Q2
+\item Seja
+\[
+B(t)=\begin{bmatrix}
+2 & t & 0\\
+t & 3 & 1\\
+0 & 1 & 1
+\end{bmatrix},\qquad t\in\mathbb{R}.
+\]
+Usando o critério de Sylvester (menores principais líderes), determine os valores de $t$ para os quais $B(t)$ é:
+\begin{enumerate}[label=(\alph*)]
+\item definida positiva (PD);
+\item semidefinida positiva (PSD);
+\item indefinida.
+\end{enumerate}
+
+\bigskip
+
+% Q4
+\item Sejam
+\[
+f(x,y)= x^4 + y^4 - 4x^2 + 2xy + 1.
+\]
+\begin{enumerate}[label=(\alph*)]
+\item Encontre todos os pontos críticos resolvendo $\nabla f(x,y)=0$.
+\item Compute a Hessiana $\nabla^2 f(x,y)$ e, em cada ponto crítico, classifique-o (mínimo local estrito, máximo local estrito ou ponto de sela) usando a definitude da Hessiana.
+\item Explique, com base nas notas teóricas, por que a definitude da Hessiana em $x^\star$ determina a natureza do ponto crítico.
+\end{enumerate}
+
+\bigskip
+
+% Q5
+\item Seja $A\in\mathbb{R}^{n\times n}$ simétrica. Prove \emph{ou esboce uma prova rigorosa} da equivalência abaixo:
+
+\texttt{$A$ é definida positiva $\iff$ todos os autovalores de $A$ são estritamente positivos.}
+
+\item Considere uma função \( f:\mathbb{R}^2 \to \mathbb{R} \) cuja análise em um ponto \( x^\star = (1, -1) \) revelou:
+\[
+\nabla f(x^\star) =
+\begin{bmatrix}
+0\\
+0
+\end{bmatrix},
+\qquad
+\nabla^2 f(x^\star) =
+\begin{bmatrix}
+2 & -1\\
+-1 & 3
+\end{bmatrix}.
+\]
+\begin{enumerate}[label=(\alph*)]
+\item O que podemos concluir sobre o ponto \( x^\star \)?
+\item Justifique com base nos autovalores da Hessiana.
+\item Interprete o comportamento local de \( f \) em torno de \( x^\star \) utilizando uma expansão em série de Taylor.
+\end{enumerate}
+
+\item Considere uma função \( f:\mathbb{R}^2 \to \mathbb{R} \) cuja análise em um ponto \( x^\star = (0, -1) \) revelou:
+\[
+\nabla f(x^\star) =
+\begin{bmatrix}
+-0.5\\
+0.1
+\end{bmatrix},
+\qquad
+\nabla^2 f(x^\star) =
+\begin{bmatrix}
+1 & 0\\
+0 & 1
+\end{bmatrix}.
+\]
+\begin{enumerate}[label=(\alph*)]
+\item O que podemos concluir sobre o ponto \( x^\star \)?
+\item Interprete o comportamento local de \( f \) em torno de \( x^\star \) utilizando uma expansão em série de Taylor.
+\end{enumerate}
+
+\end{enumerate}
+
+
+\end{document}
