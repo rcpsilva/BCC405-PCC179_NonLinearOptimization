@@ -1,0 +1,500 @@
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{parskip}
+
+% =====================
+% Codificação, idioma e layout
+% =====================
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{margin=2cm}
+\usepackage{microtype}
+
+% =====================
+% Matemática e símbolos
+% =====================
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{bm}
+
+% =====================
+% Figuras, tabelas, links
+% =====================
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+
+% =====================
+% Código-fonte
+% =====================
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{codebg}{rgb}{0.96,0.96,0.96}
+\definecolor{codekw}{RGB}{33,96,171}
+\definecolor{codecmt}{RGB}{120,120,120}
+\definecolor{codestr}{RGB}{163,21,21}
+\lstdefinestyle{pystyle}{
+  language=Python,
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{codekw}\bfseries,
+  commentstyle=\color{codecmt}\itshape,
+  stringstyle=\color{codestr},
+  showstringspaces=false,
+  frame=single,
+  breaklines=true,
+  tabsize=2,
+  inputencoding=utf8,
+  extendedchars=true
+}
+\lstset{style=pystyle}
+
+\lstset{
+    literate=
+     {á}{{\'a}}1 {à}{{\`a}}1 {ã}{{\~a}}1 {â}{{\^a}}1
+     {é}{{\'e}}1 {ê}{{\^e}}1
+     {í}{{\'i}}1
+     {ó}{{\'o}}1 {õ}{{\~o}}1 {ô}{{\^o}}1
+     {ú}{{\'u}}1
+     {ç}{{\c{c}}}1
+     {Á}{{\'A}}1 {Ã}{{\~A}}1
+     {É}{{\'E}}1 {Ê}{{\^E}}1
+     {Í}{{\'I}}1
+     {Ó}{{\'O}}1 {Õ}{{\~O}}1 {Ô}{{\^O}}1
+     {Ú}{{\'U}}1
+     {Ç}{{\c{C}}}1,
+}
+
+
+% =====================
+% Título
+% =====================
+\title{\textbf{TP — Parte II: Aprendizagem Contínua via Otimização Min--Max}\\\large Disciplina de Otimização Não Linear}
+\author{\textbf{Entrega}: Código (repositório), Relatório ($\leq$ 5 págs.), Apresentação (5 min)}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Motivação}
+Treinar um modelo sequencialmente em tarefas distintas (A depois B) leva a \emph{esquecimento catastrófico}. A tensão entre \textbf{estabilidade} (reter A) e \textbf{plasticidade} (aprender B) pode ser modelada como um \textbf{problema min--max}. Neste trabalho, você implementa essa formulação com \textbf{passos alternados} e métodos obrigatórios de estabilização: \emph{OGDA} (Optimistic Gradient Descent--Ascent) e \emph{Extragradient}.
+
+Usaremos \textbf{Split--MNIST}: Tarefa A = dígitos \{0--4\}, Tarefa B = \{5--9\}. O modelo base fornecido é uma CNN pequena.
+
+\section*{Formulação de Otimização}
+Denote por $\bm{\theta}$ os parâmetros e por $\bm{\theta}_A$ a solução após treinar a Tarefa A. Durante o aprendizado da Tarefa B, limitamos o esquecimento com a medida diferenciável de \textbf{deriva de parâmetros}:
+\begin{equation}
+F_{\text{drift}}(\bm{\theta};\bm{\theta}_A)=\tfrac{1}{2}\,\lVert \bm{\theta}-\bm{\theta}_A\rVert_2^2.
+\end{equation}
+Seja $\mathcal{L}_B(\bm{\theta})$ a perda em B. O jogo min--max é:
+\begin{equation}
+\min_{\bm{\theta}}\;\max_{\lambda\ge 0}\;\; \mathcal{L}_B(\bm{\theta})-\lambda\,F_{\text{drift}}(\bm{\theta};\bm{\theta}_A).
+\label{eq:minmax}
+\end{equation}
+O minimizador busca baixo erro em B sem se afastar demais de $\bm{\theta}_A$; o maximizador $\lambda$ amplifica a penalização quando a deriva cresce. Após cada passo, projete $\lambda\leftarrow\max(0,\lambda)$.
+
+\paragraph{OGDA (Obrigatório).}
+Com $f(\bm{\theta},\lambda)=\mathcal{L}_B(\bm{\theta})-\lambda F_{\text{drift}}(\bm{\theta})$, o OGDA usa passo \emph{otimista} com gradiente corrente e anterior:
+\begin{align}
+\bm{\theta}_{t+1} &= \bm{\theta}_t - \eta_\theta\bigl(2\nabla_{\bm{\theta}} f_t - \nabla_{\bm{\theta}} f_{t-1}\bigr),\\
+\lambda_{t+1} &= \bigl[\lambda_t + \eta_\lambda\bigl(2\nabla_{\lambda} f_t - \nabla_{\lambda} f_{t-1}\bigr)\bigr]_+.
+\end{align}
+
+\paragraph{Extragradient (Obrigatório).}
+Método de duas etapas: (i) extrapolação com gradiente em $(\bm{\theta}_t,\lambda_t)$; (ii) correção usando gradiente no ponto extrapolado:
+\begin{align}
+(\hat{\bm{\theta}},\hat{\lambda}) &= (\bm{\theta}_t,\lambda_t) - (\eta_\theta,-\eta_\lambda)\odot \nabla f(\bm{\theta}_t,\lambda_t),\\
+(\bm{\theta}_{t+1},\lambda_{t+1}) &= (\bm{\theta}_t,\lambda_t) - (\eta_\theta,-\eta_\lambda)\odot \nabla f(\hat{\bm{\theta}},\hat{\lambda}),\quad \lambda_{t+1}\leftarrow[\lambda_{t+1}]_+.
+\end{align}
+
+\section*{Objetivos de Aprendizagem}
+\begin{itemize}
+  \item Formular aprendizagem contínua como min--max.
+  \item Implementar OGDA e Extragradient com projeção de $\lambda$.
+  \item Quantificar e visualizar a frente \emph{estabilidade--plasticidade}.
+\end{itemize}
+
+\section*{Tarefas}
+\begin{enumerate}
+  \item \textbf{Dados e Modelo}: dividir MNIST em A:\,\{0--4\} e B:\,\{5--9\}; usar a CNN pequena fornecida.
+  \item \textbf{Treino em A}: treinar por épocas fixas ou até acurácia-alvo; salvar $\bm{\theta}_A$ e um pequeno $\mathcal{V}_A$ (validação de A) para monitorar.
+  \item \textbf{Treino Min--Max em B}: implementar \eqref{eq:minmax} com OGDA \emph{e} Extragradient, passos alternados e projeção de $\lambda$.
+  \item \textbf{Métricas e Gráficos}: acurácia em A e B ao longo das iterações; $\lVert\bm{\theta}-\bm{\theta}_A\rVert$; trajetória de $\lambda$; curva estabilidade--plasticidade (acurácia final em B vs. esquecimento).
+  \item \textbf{Ablações}: comparar OGDA vs. Extragradient; variar $\eta_\theta$, $\eta_\lambda$ e $\lambda_0$.
+  \item \textbf{Baselines}: \emph{fine-tuning} ingênuo em B; regularização L2 com $\lambda$ fixo (sem jogo adversarial).
+\end{enumerate}
+
+\section*{Entrega e Avaliação (100 pts)}
+\textbf{Código (45)}: implementação limpa PyTorch com flags; OGDA e Extragradient; semente determinística; plots salvos; README com comandos.\\
+\textbf{Relatório (45)}: formulação, métodos, experimentos, plots, análise da frente e comportamento OGDA vs. Extragradient.\\
+\textbf{Slides (10)}: apresentação de 5 min com figuras e conclusões.
+
+\section*{Ética}
+Usar apenas os dados e modelos fornecidos para a disciplina.
+
+\section*{Como rodar}
+\begin{verbatim}
+python baseline_minmax.py --ogda --epochsA 3 --epochsB 3 --theta_lr 1e-3 --lambda_lr 1e-2
+python baseline_minmax.py --extragrad --epochsA 3 --epochsB 3 --theta_lr 1e-3 --lambda_lr 1e-2
+python run_experiments.py  # varredura simples
+\end{verbatim}
+
+\section*{Resumo Teórico (1 página)}
+\textbf{Por que min--max?} Diferente de regularização com $\lambda$ fixo, o jogo permite que $\lambda$ se adapte via ascensão em resposta à deriva real. \textbf{OGDA} reduz ciclos usando passo otimista com gradientes corrente e anterior. \textbf{Extragradient} faz extrapolação e correção, estabilizando dinâmicas rotacionais típicas de jogos.\\
+\textbf{O que plotar?} Acurácias em A/B, $\lVert\bm{\theta}-\bm{\theta}_A\rVert$, trajetória de $\lambda$ e a frente estabilidade--plasticidade ao variar hiperparâmetros.\\
+\textbf{Mensagem-chave:} min--max transforma estabilidade vs. plasticidade em jogo de otimização; OGDA e Extragradient trazem estabilidade prática.
+
+% =====================
+% APÊNDICES COM CÓDIGO
+% =====================
+\clearpage
+\appendix
+
+\section*{Apêndice A: baseline\_minmax.py}
+\begin{lstlisting}
+# baseline_minmax.py
+import math, os, random, argparse
+from dataclasses import dataclass
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+from torch.utils.data import DataLoader, Subset
+from torchvision import datasets, transforms
+import matplotlib.pyplot as plt
+
+# -----------------------------
+# Reproducibilidade
+# -----------------------------
+def set_seed(seed: int = 42):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+# -----------------------------
+# Dados
+# -----------------------------
+class SplitMNIST(torch.utils.data.Dataset):
+    def __init__(self, root, train, digits, transform=None, download=True):
+        self.base = datasets.MNIST(root=root, train=train,
+                                   transform=transform, download=download)
+        self.idx = [i for i, (_, y) in enumerate(self.base) if y in digits]
+        self.digits = set(digits)
+    def __len__(self):
+        return len(self.idx)
+    def __getitem__(self, i):
+        x, y = self.base[self.idx[i]]
+        return x, y
+
+# -----------------------------
+# Modelo
+# -----------------------------
+class SmallCNN(nn.Module):
+    def __init__(self, num_classes=10):
+        super().__init__()
+        self.conv1 = nn.Conv2d(1, 16, 3, padding=1)
+        self.conv2 = nn.Conv2d(16, 32, 3, padding=1)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.fc1 = nn.Linear(32 * 7 * 7, 128)
+        self.fc2 = nn.Linear(128, num_classes)
+    def forward(self, x):
+        x = self.pool(F.relu(self.conv1(x)))  # 28->14
+        x = self.pool(F.relu(self.conv2(x)))  # 14->7
+        x = x.view(x.size(0), -1)
+        x = F.relu(self.fc1(x))
+        return self.fc2(x)
+
+# -----------------------------
+# Utilitários
+# -----------------------------
+@torch.no_grad()
+def evaluate(model, loader, device):
+    model.eval()
+    correct, total, loss_sum = 0, 0, 0.0
+    ce = nn.CrossEntropyLoss()
+    for x, y in loader:
+        x, y = x.to(device), y.to(device)
+        logits = model(x)
+        loss = ce(logits, y)
+        loss_sum += loss.item() * x.size(0)
+        pred = logits.argmax(1)
+        correct += (pred == y).sum().item()
+        total += x.size(0)
+    return loss_sum / total, correct / total
+
+# Flatten parâmetros
+def flatten_params(model):
+    return torch.cat([p.detach().view(-1) for p in model.parameters()])
+
+def flatten_params_grad(model):
+    return torch.cat([p.grad.view(-1) if p.grad is not None else
+                      torch.zeros_like(p).view(-1) for p in model.parameters()])
+
+# Medida de deriva: 0.5 * ||theta - theta_A||^2
+@torch.no_grad()
+def param_drift(model, theta_A):
+    theta = flatten_params(model)
+    return 0.5 * torch.sum((theta - theta_A) ** 2).item()
+
+# -----------------------------
+# Treino na Tarefa A
+# -----------------------------
+def train_task_A(model, loader, device, epochs=3, lr=1e-3):
+    opt = optim.Adam(model.parameters(), lr=lr)
+    ce = nn.CrossEntropyLoss()
+    for ep in range(epochs):
+        model.train()
+        for x, y in loader:
+            x, y = x.to(device), y.to(device)
+            opt.zero_grad()
+            loss = ce(model(x), y)
+            loss.backward()
+            opt.step()
+    theta_A = flatten_params(model).clone().detach()
+    return theta_A
+
+# -----------------------------
+# Min  Max na Tarefa B
+# -----------------------------
+@dataclass
+class MinMaxConfig:
+    theta_lr: float = 1e-3
+    lambda_lr: float = 1e-2
+    epochs: int = 3
+    ogda: bool = True  # se False, usa Extragradient
+    batch_size: int = 128
+    lambda_init: float = 0.0
+    log_every: int = 100
+
+class LambdaParam(torch.nn.Module):
+    def __init__(self, init=0.0, device='cpu'):
+        super().__init__()
+        self.raw = nn.Parameter(torch.tensor([init], dtype=torch.float32,
+                                             device=device))
+    def value(self):
+        return torch.clamp(self.raw, min=0.0)
+
+# OGDA
+def minmax_train_task_B_ogda(model, loader_B, loader_val_A, device, theta_A, cfg: MinMaxConfig):
+    ce = nn.CrossEntropyLoss()
+    lam = LambdaParam(cfg.lambda_init, device).to(device)
+    opt_theta = optim.Adam(model.parameters(), lr=cfg.theta_lr)
+    opt_lambda = optim.SGD(lam.parameters(), lr=cfg.lambda_lr)
+
+    g_theta_prev = [torch.zeros_like(p) for p in model.parameters()]
+    g_lambda_prev = torch.zeros(1, device=device)
+
+    logs = []
+    it = 0
+    for ep in range(cfg.epochs):
+        for xB, yB in loader_B:
+            model.train()
+            xB, yB = xB.to(device), yB.to(device)
+
+            opt_theta.zero_grad(set_to_none=True)
+            opt_lambda.zero_grad(set_to_none=True)
+
+            logits_B = model(xB)
+            L_B = ce(logits_B, yB)
+            theta_vec = flatten_params(model)
+            F_drift = 0.5 * torch.sum((theta_vec - theta_A) ** 2)
+            obj = L_B - lam.value() * F_drift
+
+            obj.backward()
+            g_theta = [p.grad.detach().clone() if p.grad is not None
+                       else torch.zeros_like(p) for p in model.parameters()]
+            g_lambda = -F_drift.detach().clone().unsqueeze(0)  # grad ascendente
+
+            with torch.no_grad():
+                for p, gt, gtp in zip(model.parameters(), g_theta, g_theta_prev):
+                    p.add_( -cfg.theta_lr * (2*gt - gtp) )
+                lam.raw.add_( cfg.lambda_lr * (2*g_lambda - g_lambda_prev) )
+                lam.raw.data.clamp_(min=0.0)
+
+            g_theta_prev = [gt.detach().clone() for gt in g_theta]
+            g_lambda_prev = g_lambda.detach().clone()
+
+            if it % cfg.log_every == 0:
+                model.eval()
+                lossA, accA = evaluate(model, loader_val_A, device)
+                logs.append({
+                    'iter': it, 'ep': ep,
+                    'L_B': L_B.item(), 'F_drift': F_drift.item(),
+                    'lambda': lam.value().item(),
+                    'valA_loss': lossA, 'valA_acc': accA,
+                })
+            it += 1
+    return logs
+
+# Extragradient
+def minmax_train_task_B_extragradient(model, loader_B, loader_val_A, device, theta_A, cfg: MinMaxConfig):
+    ce = nn.CrossEntropyLoss()
+    lam = LambdaParam(cfg.lambda_init, device).to(device)
+    theta_lr = cfg.theta_lr
+    lambda_lr = cfg.lambda_lr
+    logs = []
+    it = 0
+
+    for ep in range(cfg.epochs):
+        for xB, yB in loader_B:
+            model.train()
+            xB, yB = xB.to(device), yB.to(device)
+
+            # 1) Gradiente no ponto atual
+            logits_B = model(xB)
+            L_B = ce(logits_B, yB)
+            theta_vec = flatten_params(model)
+            F_drift = 0.5 * torch.sum((theta_vec - theta_A) ** 2)
+            obj = L_B - lam.value() * F_drift
+
+            g_theta = torch.autograd.grad(obj, list(model.parameters()),
+                                          retain_graph=True, allow_unused=True)
+            g_lambda = torch.autograd.grad(obj, lam.raw, retain_graph=True)[0]
+
+            # 2) Extrapolação
+            with torch.no_grad():
+                for p, gt in zip(model.parameters(), g_theta):
+                    if gt is not None:
+                        p.copy_(p - theta_lr * gt)
+                lam.raw.add_(lambda_lr * g_lambda)
+                lam.raw.data.clamp_(min=0.0)
+
+            # 3) Gradiente no ponto extrapolado
+            logits_B2 = model(xB)
+            L_B2 = ce(logits_B2, yB)
+            theta_vec2 = flatten_params(model)
+            F_drift2 = 0.5 * torch.sum((theta_vec2 - theta_A) ** 2)
+            obj2 = L_B2 - lam.value() * F_drift2
+
+            # 4) Correção
+            g_theta2 = torch.autograd.grad(obj2, list(model.parameters()),
+                                           retain_graph=False, allow_unused=True)
+            g_lambda2 = torch.autograd.grad(obj2, lam.raw)[0]
+            with torch.no_grad():
+                for p, gt in zip(model.parameters(), g_theta2):
+                    if gt is not None:
+                        p.add_( -theta_lr * gt )
+                lam.raw.add_( lambda_lr * g_lambda2 )
+                lam.raw.data.clamp_(min=0.0)
+
+            if it % cfg.log_every == 0:
+                model.eval()
+                lossA, accA = evaluate(model, loader_val_A, device)
+                logs.append({
+                    'iter': it, 'ep': ep,
+                    'L_B': L_B2.item(), 'F_drift': F_drift2.item(),
+                    'lambda': lam.value().item(),
+                    'valA_loss': lossA, 'valA_acc': accA,
+                })
+            it += 1
+    return logs
+
+# -----------------------------
+# Pipeline
+# -----------------------------
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--seed', type=int, default=42)
+    parser.add_argument('--epochsA', type=int, default=3)
+    parser.add_argument('--epochsB', type=int, default=3)
+    parser.add_argument('--batch', type=int, default=128)
+    parser.add_argument('--theta_lr', type=float, default=1e-3)
+    parser.add_argument('--lambda_lr', type=float, default=1e-2)
+    parser.add_argument('--ogda', action='store_true')
+    parser.add_argument('--extragrad', action='store_true')
+    parser.add_argument('--device', type=str,
+                        default='cuda' if torch.cuda.is_available() else 'cpu')
+    args = parser.parse_args()
+
+    assert not (args.ogda and args.extragrad), 'Escolha um: --ogda ou --extragrad'
+    if not args.ogda and not args.extragrad:
+        args.ogda = True
+
+    set_seed(args.seed)
+    device = torch.device(args.device)
+
+    transform = transforms.Compose([transforms.ToTensor()])
+    trainA = SplitMNIST(root='./data', train=True, digits={0,1,2,3,4}, transform=transform)
+    trainB = SplitMNIST(root='./data', train=True, digits={5,6,7,8,9}, transform=transform)
+    valA_full = datasets.MNIST(root='./data', train=False, transform=transform, download=True)
+    valA_idx = [i for i, (_, y) in enumerate(valA_full) if y in {0,1,2,3,4}]
+    valA = Subset(valA_full, valA_idx)
+
+    loaderA = DataLoader(trainA, batch_size=args.batch, shuffle=True, num_workers=2)
+    loaderB = DataLoader(trainB, batch_size=args.batch, shuffle=True, num_workers=2)
+    loaderValA = DataLoader(valA, batch_size=256, shuffle=False, num_workers=2)
+
+    model = SmallCNN().to(device)
+
+    print('Treinando Tarefa A...')
+    theta_A = train_task_A(model, loaderA, device, epochs=args.epochsA, lr=1e-3)
+    lossA, accA = evaluate(model, loaderValA, device)
+    print(f'Após A: valA loss {lossA:.4f}, acc {accA:.4f}')
+
+    cfg = MinMaxConfig(theta_lr=args.theta_lr, lambda_lr=args.lambda_lr,
+                       epochs=args.epochsB, ogda=args.ogda, batch_size=args.batch)
+
+    print('Treinando Tarefa B (min--max)...')
+    if args.ogda:
+        logs = minmax_train_task_B_ogda(model, loaderB, loaderValA, device, theta_A, cfg)
+    else:
+        logs = minmax_train_task_B_extragradient(model, loaderB, loaderValA, device, theta_A, cfg)
+
+    os.makedirs('outputs', exist_ok=True)
+    iters = [d['iter'] for d in logs]
+    for key in ['L_B', 'F_drift', 'lambda', 'valA_loss', 'valA_acc']:
+        plt.figure()
+        plt.plot(iters, [d[key] for d in logs])
+        plt.xlabel('iteration'); plt.ylabel(key); plt.title(key)
+        plt.tight_layout()
+        plt.savefig(os.path.join('outputs', f'{key}.png'))
+        plt.close()
+
+    print('Concluído. Plots em outputs/.')
+if __name__ == '__main__':
+    main()
+\end{lstlisting}
+
+\section*{Apêndice B: run\_experiments.py}
+\begin{lstlisting}
+# run_experiments.py
+import os, subprocess
+
+GRID = {
+    'ogda': [True, False],      # True -> OGDA, False -> Extragradient
+    'theta_lr': [5e-4, 1e-3, 2e-3],
+    'lambda_lr': [5e-3, 1e-2, 2e-2],
+}
+EPOCHS_A = 3
+EPOCHS_B = 3
+
+os.makedirs('runs', exist_ok=True)
+
+for ogda in GRID['ogda']:
+    for tlr in GRID['theta_lr']:
+        for llr in GRID['lambda_lr']:
+            tag = f"{'ogda' if ogda else 'extragrad'}_tlr{tlr}_llr{llr}"
+            cmd = [
+                'python', 'baseline_minmax.py',
+                '--epochsA', str(EPOCHS_A),
+                '--epochsB', str(EPOCHS_B),
+                '--theta_lr', str(tlr),
+                '--lambda_lr', str(llr),
+                '--batch', '128',
+            ]
+            if ogda:
+                cmd.append('--ogda')
+            else:
+                cmd.append('--extragrad')
+            print('Running', tag)
+            subprocess.run(cmd, check=True)
+\end{lstlisting}
+
+\end{document}

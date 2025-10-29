@@ -1,0 +1,356 @@
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{parskip}
+
+% =====================
+% Codificação, idioma e layout
+% =====================
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{margin=2cm}
+\usepackage{microtype}
+
+% =====================
+% Matemática e símbolos
+% =====================
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{bm}
+
+% =====================
+% Links
+% =====================
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+
+% =====================
+% Código-fonte
+% =====================
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{codebg}{rgb}{0.96,0.96,0.96}
+\definecolor{codekw}{RGB}{33,96,171}
+\definecolor{codecmt}{RGB}{120,120,120}
+\definecolor{codestr}{RGB}{163,21,21}
+\lstdefinestyle{pystyle}{
+  language=Python,
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{codekw}\bfseries,
+  commentstyle=\color{codecmt}\itshape,
+  stringstyle=\color{codestr},
+  showstringspaces=false,
+  frame=single,
+  breaklines=true,
+  tabsize=2,
+  inputencoding=utf8,
+  extendedchars=true,
+  % torna acentuação mais robusta dentro do listings (se usar comentários em pt)
+  literate=
+   {á}{{\'a}}1 {à}{{\`a}}1 {ã}{{\~a}}1 {â}{{\^a}}1
+   {é}{{\'e}}1 {ê}{{\^e}}1
+   {í}{{\'i}}1
+   {ó}{{\'o}}1 {õ}{{\~o}}1 {ô}{{\^o}}1
+   {ú}{{\'u}}1
+   {ç}{{\c{c}}}1
+   {Á}{{\'A}}1 {Ã}{{\~A}}1
+   {É}{{\'E}}1 {Ê}{{\^E}}1
+   {Í}{{\'I}}1
+   {Ó}{{\'O}}1 {Õ}{{\~O}}1 {Ô}{{\^O}}1
+   {Ú}{{\'U}}1
+   {Ç}{{\c{C}}}1
+}
+\lstset{style=pystyle}
+
+% =====================
+% Título
+% =====================
+\title{\textbf{TP — Continual Learning em Duas Partes}\\\large Disciplina de Otimização Não Linear}
+\author{Entrega: Código, Relatório curto, Slides}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Visão geral}
+Aprendizagem contínua lida com treinar um modelo em tarefas sequenciais. Ao aprender B depois de A, o modelo tende a esquecer A. Estudaremos de forma incremental:
+\begin{itemize}
+  \item \textbf{Parte 1} mede o \emph{trade-off} estabilidade–plasticidade com uma penalização fixa de deriva em relação a $\bm{\theta}_A$.
+  \item \textbf{Parte 2} transforma a penalização em um jogo min–max com $\lambda$ adaptativo e estabilização numérica.
+\end{itemize}
+
+\subsection*{Dados e modelo}
+\textbf{Split–MNIST}: A = dígitos \{0–4\}, B = dígitos \{5–9\}.  
+Modelo sugerido: MLP ou CNN pequena. Perda: cross-entropy.
+
+\subsection*{Notação}
+Parâmetros atuais $\bm{\theta}$, solução após A: $\bm{\theta}_A$.  
+Medida de deriva:
+\[
+F_{\text{drift}}(\bm{\theta};\bm{\theta}_A)=\tfrac{1}{2}\,\|\bm{\theta}-\bm{\theta}_A\|_2^2.
+\]
+
+% ======================================================
+% PARTE 1
+% ======================================================
+\section*{Parte 1 — Trade-off com penalização fixa (sem min–max)}
+\textbf{Objetivo.} Quantificar e visualizar o conflito entre aprender B e reter A, variando a intensidade da penalização.
+
+\subsection*{Formulação de otimização}
+Após treinar A e congelar $\bm{\theta}_A$, otimize em B:
+\[
+\min_{\bm{\theta}}\; \mathcal{L}_B(\bm{\theta}) \;+\; \lambda\,F_{\text{drift}}(\bm{\theta};\bm{\theta}_A),
+\]
+com $\lambda \in \{0,10^{-4},10^{-3},10^{-2},10^{-1}\}$ como varredura inicial.
+
+\subsection*{Procedimento}
+\begin{enumerate}
+  \item \textbf{Treinar em A} até um número fixo de épocas ou até atingir uma acurácia de validação alvo. Salvar $\bm{\theta}_A$. Separar um pequeno conjunto $\mathcal{V}_A$ para monitorar A.
+  \item \textbf{Treinar em B} para cada $\lambda$ da grade. Usar o mesmo otimizador e esquema de treino para permitir comparação justa.
+  \item \textbf{Rastrear por época ou por iteração}: 
+    \begin{itemize}
+      \item Acurácia em A e em B.
+      \item Deriva $\|\bm{\theta}_t-\bm{\theta}_A\|_2$.
+      \item Esquecimento em A: $\Delta\mathrm{acc}_A = \mathrm{acc}_A^{\text{após A}} - \mathrm{acc}_A^{\text{após B}}$.
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{Plots obrigatórios}
+\begin{itemize}
+  \item Curvas de \textbf{acc(A)} e \textbf{acc(B)} vs. iteração.
+  \item Curva de \textbf{deriva} $\|\bm{\theta}_t-\bm{\theta}_A\|_2$ vs. iteração.
+  \item \textbf{Trade-off}: ponto final de cada $\lambda$ em um plano Esquecimento (x) vs. acc(B) (y).
+  \item \textbf{Fronteira Pareto-like}: destacar pontos não dominados.
+\end{itemize}
+
+\subsection*{Baseline avançado obrigatório (escolher 1)}
+\paragraph{EWC.}
+Estimativa de importância por parâmetro após A:
+\[
+F_i \approx \frac{1}{|\mathcal{D}_A|}\sum_{(x,y)\in\mathcal{D}_A}
+\Big(\frac{\partial}{\partial \theta_i}\,\ell(f_{\theta}(x),y)\Big)^2\Big|_{\theta=\theta_A}.
+\]
+Objetiva em B:
+\[
+\mathcal{L}_B(\bm{\theta}) + \lambda \sum_i F_i\,(\theta_i-\theta_{A,i})^2.
+\]
+
+\paragraph{Synaptic Intelligence (SI).}
+Durante A, acumule $\omega_i \leftarrow \omega_i + \Delta\theta_i \cdot g_i$.  
+Ao final, $\Omega_i=\frac{\omega_i}{(\Delta\theta_i)^2+\xi}$ com $\xi\approx 10^{-3}$.  
+Objetiva em B:
+\[
+\mathcal{L}_B(\bm{\theta}) + \lambda \sum_i \Omega_i\,(\theta_i-\theta_{A,i})^2.
+\]
+
+\subsection*{Relatório curto da Parte 1}
+\begin{itemize}
+  \item Explique a função objetivo com $\lambda$ fixo.
+  \item Discuta por que há conflito entre aprender B e reter A.
+  \item Interprete os gráficos e a fronteira Pareto (gráfico das soluçãoes não-dominadas).
+\end{itemize}
+
+% ======================================================
+% PARTE 2
+% ======================================================
+\section*{Parte 2 — Min–max com passos alternados e estabilização}
+\textbf{Objetivo.} Substituir o $\lambda$ fixo por um jogo adaptativo:
+\[
+\min_{\bm{\theta}}\;\max_{\lambda\ge 0}\;\; \mathcal{L}_B(\bm{\theta}) - \lambda\,F(\bm{\theta};\bm{\theta}_A),
+\]
+com $F = F_{\text{drift}}$ para começar. Implementar \textbf{passos alternados} em $\bm{\theta}$ e $\lambda$ e estabilizar com \textbf{OGDA} ou \textbf{Extragradient}. Projetar $\lambda \leftarrow \max(0,\lambda)$ a cada atualização.
+
+\subsection*{Atualizações obrigatórias}
+\paragraph{Alternating steps.}
+Em cada iteração:
+\begin{enumerate}
+  \item Atualize $\bm{\theta}$ por descida no objetivo.
+  \item Atualize $\lambda$ por subida no mesmo objetivo.
+  \item Projete $\lambda$ para o semieixo positivo.
+\end{enumerate}
+
+\paragraph{OGDA.}
+Seja $f(\bm{\theta},\lambda)=\mathcal{L}_B(\bm{\theta})-\lambda F(\bm{\theta};\bm{\theta}_A)$.  
+Use gradientes corrente e anterior:
+\[
+\bm{\theta}_{t+1} = \bm{\theta}_{t} - \eta_\theta\big(2\nabla_{\bm{\theta}} f_t - \nabla_{\bm{\theta}} f_{t-1}\big),\quad
+\lambda_{t+1} = \big[\lambda_{t} + \eta_\lambda\big(2\nabla_{\lambda} f_t - \nabla_{\lambda} f_{t-1}\big)\big]_+.
+\]
+
+\paragraph{Extragradient.}
+Dois estágios:
+\[
+(\hat{\bm{\theta}},\hat{\lambda}) = (\bm{\theta}_{t},\lambda_t) - (\eta_\theta,-\eta_\lambda)\odot \nabla f(\bm{\theta}_t,\lambda_t),
+\]
+\[
+(\bm{\theta}_{t+1},\lambda_{t+1}) = (\bm{\theta}_{t},\lambda_t) - (\eta_\theta,-\eta_\lambda)\odot \nabla f(\hat{\bm{\theta}},\hat{\lambda}),
+\quad \lambda_{t+1}\leftarrow[\lambda_{t+1}]_+.
+\]
+
+\subsection*{Métricas e comparação}
+Além das métricas da Parte 1, registre a trajetória de $\lambda$. Compare OGDA e Extragradient em estabilidade das curvas, tempo até convergir para uma região estável e qualidade final.
+
+\subsection*{Relatório curto da Parte 2}
+\begin{itemize}
+  \item Explique a formulação min–max e por que min e max competem.
+  \item Compare OGDA vs. Extragradient visualmente e textualmente.
+  \item Relacione com os resultados da Parte 1.
+\end{itemize}
+
+% ======================================================
+% COMO RODAR
+% ======================================================
+\section*{Como rodar}
+\textbf{Parte 1} (penalização fixa, exemplo simples de deriva):
+\begin{verbatim}
+python simple_drift_example.py --epochsA 3 --epochsB 3 --lambda_reg 1e-3
+\end{verbatim}
+
+\textbf{Parte 2} deve ser implementada em arquivo próprio, por exemplo:
+\begin{verbatim}
+python game_minmax.py --ogda --theta_lr 1e-3 --lambda_lr 1e-2
+python game_minmax.py --extragrad --theta_lr 1e-3 --lambda_lr 1e-2
+\end{verbatim}
+
+% ======================================================
+% APÊNDICE: EXEMPLO DE CÓDIGO SIMPLES (Parte 1)
+% ======================================================
+\clearpage
+\appendix
+\section*{Apêndice A — Exemplo mínimo: $\min_\theta \mathcal{L}_B(\theta)+\lambda F_{\text{drift}}(\theta;\theta_A)$}
+\noindent
+\textit{Observação:} comentários do código estão em inglês para evitar problemas de acentuação dentro do \texttt{listings}.
+
+\begin{lstlisting}
+# simple_drift_example.py
+# Minimal example: train on Task A, then fine-tune on Task B with fixed lambda
+# Objective:  L_B(theta) + lambda * 0.5 * ||theta - theta_A||^2
+
+import argparse, os, random
+import numpy as np
+import torch, torch.nn as nn, torch.nn.functional as F
+import torch.optim as optim
+from torch.utils.data import DataLoader, Subset
+from torchvision import datasets, transforms
+
+def set_seed(seed=42):
+    random.seed(seed); np.random.seed(seed)
+    torch.manual_seed(seed); torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+class SplitMNIST(torch.utils.data.Dataset):
+    def __init__(self, root, train, digits, transform, download=True):
+        self.base = datasets.MNIST(root=root, train=train,
+                                   transform=transform, download=download)
+        self.idx = [i for i, (_, y) in enumerate(self.base) if y in digits]
+    def __len__(self): return len(self.idx)
+    def __getitem__(self, i):
+        return self.base[self.idx[i]]
+
+class MLP(nn.Module):
+    def __init__(self, hidden=256, num_classes=10):
+        super().__init__()
+        self.fc1 = nn.Linear(28*28, hidden)
+        self.fc2 = nn.Linear(hidden, num_classes)
+    def forward(self, x):
+        x = x.view(x.size(0), -1)
+        x = F.relu(self.fc1(x))
+        return self.fc2(x)
+
+@torch.no_grad()
+def evaluate(model, loader, device):
+    model.eval(); ce = nn.CrossEntropyLoss()
+    total, correct, loss_sum = 0, 0, 0.0
+    for x, y in loader:
+        x, y = x.to(device), y.to(device)
+        logits = model(x); loss = ce(logits, y)
+        loss_sum += loss.item() * x.size(0)
+        pred = logits.argmax(1); correct += (pred == y).sum().item()
+        total += x.size(0)
+    return loss_sum/total, correct/total
+
+def flatten_params(model):
+    return torch.cat([p.detach().view(-1) for p in model.parameters()])
+
+def train_task_A(model, loader, device, epochs=3, lr=1e-3):
+    ce = nn.CrossEntropyLoss()
+    opt = optim.Adam(model.parameters(), lr=lr)
+    for ep in range(epochs):
+        model.train()
+        for x, y in loader:
+            x, y = x.to(device), y.to(device)
+            opt.zero_grad()
+            loss = ce(model(x), y)
+            loss.backward()
+            opt.step()
+    theta_A = flatten_params(model).clone().detach()
+    return theta_A
+
+def finetune_task_B_with_drift(model, loaderB, device, theta_A, lam=1e-3, epochs=3, lr=1e-3):
+    ce = nn.CrossEntropyLoss()
+    opt = optim.Adam(model.parameters(), lr=lr)
+    for ep in range(epochs):
+        model.train()
+        for x, y in loaderB:
+            x, y = x.to(device), y.to(device)
+            opt.zero_grad()
+            logits = model(x); L_B = ce(logits, y)
+            # drift = 0.5 * ||theta - theta_A||^2
+            theta = flatten_params(model)
+            F_drift = 0.5 * torch.sum((theta - theta_A)**2)
+            obj = L_B + lam * F_drift
+            obj.backward()
+            opt.step()
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--seed', type=int, default=42)
+    ap.add_argument('--epochsA', type=int, default=3)
+    ap.add_argument('--epochsB', type=int, default=3)
+    ap.add_argument('--batch', type=int, default=128)
+    ap.add_argument('--lr', type=float, default=1e-3)
+    ap.add_argument('--lambda_reg', type=float, default=1e-3)
+    ap.add_argument('--device', type=str,
+        default='cuda' if torch.cuda.is_available() else 'cpu')
+    args = ap.parse_args()
+
+    set_seed(args.seed)
+    device = torch.device(args.device)
+    tfm = transforms.ToTensor()
+
+    trainA = SplitMNIST('./data', train=True, digits={0,1,2,3,4}, transform=tfm)
+    trainB = SplitMNIST('./data', train=True, digits={5,6,7,8,9}, transform=tfm)
+    testA_full = datasets.MNIST('./data', train=False, transform=tfm, download=True)
+    idxA = [i for i, (_, y) in enumerate(testA_full) if y in {0,1,2,3,4}]
+    testA = Subset(testA_full, idxA)
+    testB_full = datasets.MNIST('./data', train=False, transform=tfm, download=True)
+    idxB = [i for i, (_, y) in enumerate(testB_full) if y in {5,6,7,8,9}]
+    testB = Subset(testB_full, idxB)
+
+    loaderA = DataLoader(trainA, batch_size=args.batch, shuffle=True, num_workers=2)
+    loaderB = DataLoader(trainB, batch_size=args.batch, shuffle=True, num_workers=2)
+    loaderTestA = DataLoader(testA, batch_size=256, shuffle=False, num_workers=2)
+    loaderTestB = DataLoader(testB, batch_size=256, shuffle=False, num_workers=2)
+
+    model = MLP().to(device)
+
+    print('Training Task A...')
+    theta_A = train_task_A(model, loaderA, device, epochs=args.epochsA, lr=args.lr)
+    lossA0, accA0 = evaluate(model, loaderTestA, device)
+    print(f'After A:  lossA={lossA0:.4f} accA={accA0:.4f}')
+
+    print('Fine-tuning on Task B with fixed lambda (drift penalty)...')
+    finetune_task_B_with_drift(model, loaderB, device, theta_A,
+                               lam=args.lambda_reg, epochs=args.epochsB, lr=args.lr)
+    lossA1, accA1 = evaluate(model, loaderTestA, device)
+    lossB1, accB1 = evaluate(model, loaderTestB, device)
+    print(f'After B:  accA={accA1:.4f}, accB={accB1:.4f}, forgetting={accA0-accA1:.4f}')
+
+if __name__ == '__main__':
+    main()
+\end{lstlisting}
+
+\end{document}
