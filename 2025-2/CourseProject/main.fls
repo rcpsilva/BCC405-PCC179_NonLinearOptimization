@@ -175,10 +175,10 @@ INPUT ./main.out
 INPUT ./main.out
 INPUT main.out
 INPUT main.out
+OUTPUT main.pdf
 INPUT ./main.out
 INPUT ./main.out
 OUTPUT main.out
-OUTPUT main.pdf
 INPUT c:/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 INPUT c:/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 INPUT c:/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
@@ -272,11 +272,11 @@ INPUT c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc
 INPUT c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc
 INPUT c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc
 INPUT c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc
-INPUT c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc
 INPUT c:/texlive/2024/texmf-dist/tex/latex/lm/t1lmtt.fd
 INPUT c:/texlive/2024/texmf-dist/tex/latex/lm/t1lmtt.fd
 INPUT c:/texlive/2024/texmf-dist/tex/latex/lm/t1lmtt.fd
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/lm/ec-lmtt9.tfm
+INPUT c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/lm/rm-lmr10.tfm
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/lm/rm-lmr8.tfm
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/lm/lmmi10.tfm

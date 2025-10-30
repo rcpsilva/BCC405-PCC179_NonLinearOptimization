@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.30)  28 OCT 2025 21:07
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.30)  29 OCT 2025 18:20
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -558,20 +558,20 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) (c:/texlive/2024/texmf-dist/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 83.
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 85.
  (c:/texlive/2024/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <9> on input line 84.
+(Font)              <9> on input line 86.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 84.
+(Font)              <6> on input line 86.
 
 
 [1
 
-{c:/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}]
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 197.
+{c:/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}]
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 222.
  (c:/texlive/2024/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
@@ -581,40 +581,42 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             See the microtype manual for details.
 
 
-[2]
+[2{c:/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}]
+
+[3]
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 212.
+(Font)              <10.95> on input line 237.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 212.
+(Font)              <8> on input line 237.
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <7> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 221.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 246.
 
 
-[3
+[4
 
 ]
 
-[4] (./main.aux)
+[5] (./main.aux)
  ***********
 LaTeX2e <2024-06-01> patch level 2
 L3 programming layer <2024-10-09>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
+(rerunfilecheck)             Checksum: 9A46823D65EC4DA7CA1B3E65401304B0;355.
  ) 
 Here is how much of TeX's memory you used:
- 17178 strings out of 473577
- 267290 string characters out of 5732224
+ 17206 strings out of 473577
+ 267554 string characters out of 5732224
  1600053 words of memory out of 5000000
- 39538 multiletter control sequences out of 15000+600000
- 662755 words of font info for 175 fonts, out of 8000000 for 9000
+ 39544 multiletter control sequences out of 15000+600000
+ 663685 words of font info for 184 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  69i,6n,79p,1091b,2148s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmbx8.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmbx9.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmmi5.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmmi6.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmmi8.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmmi9.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmmib10.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmmib7.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr5.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr6.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr9.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmri9.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmsy6.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmsy9.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtk10.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtt8.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtt9.pfb><c:/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on main.pdf (4 pages, 409816 bytes).
+Output written on main.pdf (5 pages, 416154 bytes).
 PDF statistics:
- 346 PDF objects out of 1000 (max. 8388607)
- 285 compressed objects within 3 object streams
- 155 named destinations out of 1000 (max. 500000)
- 61441 words of extra memory for PDF output out of 61914 (max. 10000000)
+ 365 PDF objects out of 1000 (max. 8388607)
+ 302 compressed objects within 4 object streams
+ 159 named destinations out of 1000 (max. 500000)
+ 61465 words of extra memory for PDF output out of 61914 (max. 10000000)
 

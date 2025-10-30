@@ -67,7 +67,7 @@
 % =====================
 % Título
 % =====================
-\title{\textbf{TP — Aprendizagem Contínua em Duas Partes}\\\large Disciplina de Otimização Não Linear}
+\title{\textbf{TP — Aprendizagem Contínua}\\\large Disciplina de Otimização Não Linear}
 \author{Entrega: Código, Relatório curto, Slides}
 \date{\today}
 
@@ -77,32 +77,54 @@
 % ======================================================
 % VISÃO GERAL E SETUP
 % ======================================================
-\section*{Visão geral}
-Ao treinar sequencialmente em A e depois em B, modelos tendem a esquecer A. Estudaremos o \emph{trade-off} estabilidade–plasticidade em duas etapas complementares:
+\section{Visão geral}
+O \textit{Continual Learning} (ou aprendizado contínuo) é um paradigma de aprendizado de máquina que busca desenvolver modelos capazes de aprender de forma sequencial, incorporando novos conhecimentos sem esquecer o que foi previamente aprendido. Diferentemente do aprendizado tradicional, em que o modelo é treinado uma única vez sobre um conjunto fixo de dados, o aprendizado contínuo enfrenta o desafio do \textit{catastrophic forgetting}, isto é, a perda drástica de desempenho em tarefas anteriores ao aprender novas. Para mitigar esse problema, diversas abordagens têm sido propostas, incluindo regularização dos parâmetros, uso de memória exemplar e arquiteturas dinâmicas que se adaptam ao longo do tempo.
+
+Ao treinar sequencialmente em um tarefa A e depois em B, modelos tendem a esquecer A. Estudaremos o \emph{trade-off} estabilidade–plasticidade em duas etapas complementares:
 \begin{itemize}
   \item \textbf{Parte 1} (minimização): penalização fixa de deriva para controlar o esquecimento.
-  \item \textbf{Parte 2} (min–max): penalização adaptativa via jogo entre parâmetros e um multiplicador~$\lambda$.
+  \item \textbf{Parte 2} (min–max): penalização adaptativa via jogo entre parâmetros (abordagem min-max) e um multiplicador~$\lambda$.
 \end{itemize}
 
-\subsection*{Dados e modelo}
-\textbf{Split--MNIST}: A = \{0–4\}, B = \{5–9\}.  
-Modelo sugerido: MLP simples ou CNN pequena. Perda: cross-entropy.
+\subsection{Dados e modelo}
+
+\textbf{Split--MNIST}: neste experimento, o conjunto MNIST é dividido em duas tarefas disjuntas: 
+A = \{0–4\} e B = \{5–9\}. Cada tarefa é tratada como um problema de classificação independente, 
+permitindo avaliar a capacidade do modelo em reter o conhecimento adquirido na tarefa A 
+após o treinamento sequencial na tarefa B.  
+
+O modelo pode ser um \textit{Multi-Layer Perceptron} (MLP) simples, com uma ou duas camadas ocultas e ativação ReLU, 
+ou uma pequena \textit{Convolutional Neural Network} (CNN) adequada à natureza visual do MNIST. 
+A função de perda utilizada é a \textit{cross-entropy}, 
+e a otimização é realizada via \textit{stochastic gradient descent} (SGD) ou Adam.  
+Durante o treinamento sequencial, são registradas métricas de desempenho nas duas tarefas 
+para avaliar o grau de esquecimento (\textit{forgetting}) e a capacidade de transferência (\textit{transfer}).
 
 \subsection*{Notação}
-Parâmetros atuais $\bm{\theta}$; solução após treinar A: $\bm{\theta}_A$.  
-Medida de deriva:
+
+Seja $\bm{\theta}$ o vetor de parâmetros atuais do modelo e $\bm{\theta}_A$ 
+a solução obtida após o treinamento completo na tarefa A.  
+A quantidade abaixo mede o quanto os parâmetros se afastaram da solução anterior, 
+caracterizando a \textbf{deriva dos pesos} ao longo do aprendizado contínuo:
 \[
-F_{\text{drift}}(\bm{\theta};\bm{\theta}_A)=\tfrac{1}{2}\,\|\bm{\theta}-\bm{\theta}_A\|_2^2.
+F_{\text{drift}}(\bm{\theta};\bm{\theta}_A)
+= \tfrac{1}{2}\,\|\bm{\theta}-\bm{\theta}_A\|_2^2.
 \]
+Essa medida serve tanto como diagnóstico quanto como termo de regularização 
+em abordagens que buscam equilibrar \textit{plasticidade} (adaptação à nova tarefa) 
+e \textit{estabilidade} (retenção do conhecimento anterior).
+
 
 % ======================================================
 % PARTE 1
 % ======================================================
+\section{Desenvolvimento}
+
 \section*{Parte 1 — Trade-off com penalização fixa (sem min–max)}
 \textbf{Objetivo.} Quantificar e visualizar o conflito entre aprender B e reter A, variando a intensidade da penalização.
 
 \subsection*{Formulação de otimização}
-Após treinar A e congelar $\bm{\theta}_A$, otimize na Tarefa B:
+Após treinar A e salvar $\bm{\theta}_A$, otimize na Tarefa B:
 \[
 \min_{\bm{\theta}}\; \mathcal{L}_B(\bm{\theta}) \;+\; \lambda\,F_{\text{drift}}(\bm{\theta};\bm{\theta}_A),
 \]
@@ -111,7 +133,7 @@ com grade inicial $\lambda \in \{0,10^{-4},10^{-3},10^{-2},10^{-1}\}$.
 \subsection*{Procedimento}
 \begin{enumerate}
   \item \textbf{Treino em A} até um número fixo de épocas ou acurácia-alvo; salve $\bm{\theta}_A$ e separe um conjunto de validação $\mathcal{V}_A$.
-  \item \textbf{Treino em B} para cada $\lambda$ da grade, usando o mesmo otimizador e esquema de treino.
+  \item \textbf{Treino em B} para cada $\lambda$, usando o mesmo otimizador e esquema de treino.
   \item \textbf{Rastreio por iteração/época}:
     \begin{itemize}
       \item Acurácia em A e em B.
@@ -125,7 +147,6 @@ com grade inicial $\lambda \in \{0,10^{-4},10^{-3},10^{-2},10^{-1}\}$.
   \item Curvas \textbf{acc(A)} e \textbf{acc(B)} vs. iteração.
   \item \textbf{Deriva} $\|\bm{\theta}_t-\bm{\theta}_A\|_2$ vs. iteração.
   \item \textbf{Trade-off}: pontos finais de cada $\lambda$ no plano Esquecimento (x) vs. acc(B) (y).
-  \item \textbf{Fronteira Pareto-like}: destaque dos pontos não dominados.
 \end{itemize}
 
 \subsection*{Baseline avançado obrigatório (escolher um)}
@@ -181,7 +202,11 @@ Dois estágios:
 Além das métricas da Parte 1, registre a trajetória de $\lambda$. Compare OGDA e Extragradient em estabilidade das curvas, tempo até entrar em regime estável e desempenho final.
 
 \subsection*{Relatório curto — Parte 2}
-Explique a formulação min–max e por que min e max competem; compare OGDA vs. Extragradient visualmente e textualmente; relacione com os resultados da Parte~1.
+\begin{enumerate}
+    \item Explique a formulação min–max e por que min e max competem; 
+    \item compare OGDA vs. Extragradient visualmente e textualmente; 
+relacione com os resultados da Parte~1.
+\end{enumerate}
 
 % ======================================================
 % SEÇÃO EXTRA: OTIMIZADORES ALTERNATIVOS
