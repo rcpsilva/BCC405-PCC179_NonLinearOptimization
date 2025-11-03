@@ -165,8 +165,14 @@ Durante A, acumule $\omega_i \leftarrow \omega_i + \Delta\theta_i \cdot g_i$. Ao
 $\Omega_i=\frac{\omega_i}{(\Delta\theta_i)^2+\xi}$, $\xi\approx 10^{-3}$, e use
 $\mathcal{L}_B(\bm{\theta}) + \lambda \sum_i \Omega_i\,(\theta_i-\theta_{A,i})^2$.
 
+\section*{Otimizadores alternativos}
+Os alunos devem variar o otimizador subjacente para estudar efeitos em estabilidade, velocidade e retenção.
+
 \subsection*{Relatório curto — Parte 1}
-Explique a objetiva com $\lambda$ fixo, discuta por que há conflito entre aprender B e reter A, e interprete os gráficos e a fronteira Pareto-like.
+\begin{enumerate}
+    \item Explique a função objetivo com $\lambda$ fixo, discuta por que há conflito entre aprender B e reter A, e interprete os gráficos.
+    \item Faça uma comparação entre otimizadores. 
+\end{enumerate}
 
 % ======================================================
 % PARTE 2
@@ -202,18 +208,19 @@ Dois estágios:
 \subsection*{Métricas e comparação}
 Além das métricas da Parte 1, registre a trajetória de $\lambda$. Compare OGDA e Extragradient em estabilidade das curvas, tempo até entrar em regime estável e desempenho final.
 
-\subsection*{Relatório curto — Parte 2}
-\begin{enumerate}
-    \item Explique a formulação min–max e por que min e max competem; 
-    \item compare OGDA vs. Extragradient visualmente e textualmente; 
-relacione com os resultados da Parte~1.
-\end{enumerate}
-
 % ======================================================
 % SEÇÃO EXTRA: OTIMIZADORES ALTERNATIVOS
 % ======================================================
-\section*{Seção extra — Otimizadores alternativos}
+\section*{Otimizadores alternativos}
 Além de OGDA/Extragradient para estabilizar o \emph{jogo}, os alunos podem variar o otimizador subjacente em cada variável (ex.: Adam para $\theta$ e SGD para $\lambda$) para estudar efeitos em estabilidade, velocidade e retenção.
+
+\subsection*{Relatório curto — Parte 2}
+\begin{enumerate}
+    \item Explique a formulação min–max e por que min e max competem; 
+    \item Compare OGDA vs. Extragradient visualmente e textualmente; 
+    \item Relacione com os resultados da Parte~1.
+    \item Apresente uma análise sobre o comportamento dos diferentes algoritmos de otimização.
+\end{enumerate}
 
 % ======================================================
 % COMO RODAR
