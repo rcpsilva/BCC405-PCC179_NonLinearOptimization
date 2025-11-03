@@ -1,0 +1,390 @@
+\documentclass[9pt,a4paper]{extarticle}
+
+% ======================
+% Codificação, idioma e layout
+% ======================
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{geometry}
+\geometry{margin=2cm}
+\usepackage{parskip}
+\usepackage{setspace}
+\usepackage{microtype}
+
+% ======================
+% Matemática e símbolos
+% ======================
+\usepackage{amsmath, amssymb, amsthm, bm}
+
+% ======================
+% Figuras e tabelas
+% ======================
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+
+% ======================
+% Hiperlinks
+% ======================
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue
+}
+
+% ======================
+% Início do documento
+% ======================
+\begin{document}
+
+\begin{center}
+  \Large \textbf{Roteiro de Aula – Condições de Primeira e Segunda Ordem com Restrições} \\[4pt]
+  \normalsize Disciplina: Otimização Não Linear
+\end{center}
+
+\section*{1. Direções factíveis e direções de melhora}
+
+Considere o problema geral:
+\[
+\begin{aligned}
+\min_{\bm{x} \in \mathbb{R}^n} \quad & f(\bm{x}) \\
+\text{sujeito a} \quad & g_i(\bm{x}) = 0, \quad i = 1, \dots, m,\\
+& h_j(\bm{x}) \le 0, \quad j = 1, \dots, p.
+\end{aligned}
+\]
+
+\subsection*{Direções factíveis}
+
+Uma \textbf{direção factível} em um ponto $\bm{x}$ é um vetor $\bm{d}$ tal que existe $\epsilon > 0$ para o qual os pontos $\bm{x} + t\bm{d}$ permanecem dentro do conjunto de restrições, ao menos até primeira ordem, para todo $t \in [0,\epsilon)$.  
+
+Para as restrições \textit{ativas} (ou seja, aquelas satisfeitas com igualdade), a direção $\bm{d}$ deve satisfazer:
+\[
+\nabla g_i(\bm{x})^\top \bm{d} = 0, \qquad 
+\nabla h_j(\bm{x})^\top \bm{d} \le 0.
+\]
+
+Essas condições expressam que o deslocamento infinitesimal $\bm{d}$ não viola as restrições no entorno imediato de $\bm{x}$.
+
+\paragraph{Interpretação geométrica.}
+Cada restrição de igualdade $g_i(\bm{x})=0$ define uma \textit{superfície} no espaço das variáveis.  
+O vetor normal a essa superfície é o gradiente $\nabla g_i(\bm{x})$.  
+Logo, a condição $\nabla g_i(\bm{x})^\top \bm{d}=0$ significa que $\bm{d}$ é \textit{tangente} à superfície — um movimento ao longo da fronteira factível.  
+
+Para as restrições de desigualdade ativas $h_j(\bm{x}) = 0$, a condição $\nabla h_j(\bm{x})^\top \bm{d} \le 0$ garante que o movimento é \textit{para dentro} da região permitida, evitando violar a restrição.
+
+O conjunto de todas as direções factíveis em $\bm{x}$ forma um \textbf{cone tangente} ao conjunto viável.  
+Esse cone representa todas as variações admissíveis que respeitam as restrições localmente.
+
+\paragraph{Ideia da demonstração.}
+A definição decorre da expansão de primeira ordem das restrições.  
+Para uma restrição de igualdade:
+\[
+g_i(\bm{x}+t\bm{d}) = g_i(\bm{x}) + t\nabla g_i(\bm{x})^\top \bm{d} + o(t).
+\]
+Como $g_i(\bm{x})=0$, para permanecer factível é necessário que o termo linear se anule:
+\[
+\nabla g_i(\bm{x})^\top \bm{d} = 0.
+\]
+De modo análogo, para uma desigualdade $h_j(\bm{x}) \le 0$, temos:
+\[
+h_j(\bm{x}+t\bm{d}) \approx h_j(\bm{x}) + t\nabla h_j(\bm{x})^\top \bm{d} \le 0.
+\]
+Se $h_j(\bm{x})=0$, isso implica $\nabla h_j(\bm{x})^\top \bm{d} \le 0$.  
+Essas condições são, portanto, \textbf{necessárias e suficientes} para que o movimento infinitesimal não viole as restrições até primeira ordem.
+
+\vspace{1em}
+
+\subsection*{Direções de melhora}
+
+Uma \textbf{direção de melhora} é uma direção factível que reduz o valor da função objetivo:
+\[
+\nabla f(\bm{x})^\top \bm{d} < 0.
+\]
+Essa desigualdade indica que, para pequenos passos $t>0$,
+\[
+f(\bm{x}+t\bm{d}) \approx f(\bm{x}) + t\nabla f(\bm{x})^\top \bm{d} < f(\bm{x}),
+\]
+ou seja, o deslocamento $\bm{d}$ leva a uma diminuição do valor de $f$ — é uma direção de \textit{descida admissível}.
+
+\paragraph{Interpretação geométrica.}
+A direção de melhora é uma direção factível que aponta \textit{para dentro do cone tangente} e, simultaneamente, faz um ângulo agudo com o gradiente de $f$, pois:
+\[
+\nabla f(\bm{x})^\top \bm{d} = \|\nabla f(\bm{x})\| \, \|\bm{d}\| \cos\theta < 0
+\]
+implica $\theta > 90^\circ$.  
+Portanto, o gradiente $\nabla f(\bm{x})$ aponta para fora da região de melhora (na direção de crescimento de $f$), e o vetor $\bm{d}$ é orientado em sentido oposto, dentro da região factível.
+
+\paragraph{Consequência.}
+Se existir uma direção de melhora factível em $\bm{x}$, então $\bm{x}$ não pode ser um ponto ótimo local, pois há um deslocamento admissível que reduz o valor de $f$.  
+Assim, um ponto ótimo \textbf{não admite direção factível de melhora}.  
+Essa propriedade é a base para as condições de otimalidade de primeira ordem que serão discutidas nas próximas seções.
+
+
+\section*{2. Condições de primeira ordem para restrições de igualdade}
+
+Considere o problema:
+\[
+\min_{\bm{x}} f(\bm{x}) \quad \text{sujeito a } g_i(\bm{x}) = 0, \; i=1,\dots,m.
+\]
+
+\subsection*{Ideia geral}
+
+Em um ponto ótimo $\bm{x}^*$, não deve existir nenhuma direção factível $\bm{d}$ que seja também uma direção de melhora, isto é,
+\[
+\nabla g_i(\bm{x}^*)^\top \bm{d} = 0 \quad \text{e} \quad \nabla f(\bm{x}^*)^\top \bm{d} < 0
+\]
+não podem ocorrer simultaneamente.
+
+Logo, o vetor gradiente $\nabla f(\bm{x}^*)$ precisa ser \textit{ortogonal a todo vetor tangente factível}.  
+Mas os vetores tangentes factíveis são exatamente aqueles ortogonais aos gradientes das restrições $g_i(\bm{x}^*)$.  
+Consequentemente, $\nabla f(\bm{x}^*)$ deve pertencer ao espaço gerado por esses gradientes:
+\[
+\nabla f(\bm{x}^*) \in \text{span}\{\nabla g_1(\bm{x}^*), \dots, \nabla g_m(\bm{x}^*)\}.
+\]
+
+\subsection*{Forma analítica}
+
+Essa condição equivale a afirmar que existem multiplicadores escalares $\lambda_1, \dots, \lambda_m$ tais que:
+\[
+\nabla f(\bm{x}^*) = \sum_{i=1}^{m} \lambda_i \, \nabla g_i(\bm{x}^*),
+\]
+ou, de forma compacta:
+\[
+\nabla f(\bm{x}^*) + G(\bm{x}^*)^\top \bm{\lambda} = 0,
+\]
+onde $G(\bm{x}^*) = [\,\nabla g_1(\bm{x}^*), \dots, \nabla g_m(\bm{x}^*)\,]^\top$ e $\bm{\lambda} = (\lambda_1,\dots,\lambda_m)^\top$.
+
+Os valores $\lambda_i$ são chamados de \textbf{multiplicadores de Lagrange} e medem como cada restrição influencia a condição de equilíbrio do gradiente.
+
+\subsection*{Interpretação geométrica}
+
+Cada restrição $g_i(\bm{x})=0$ define uma \textit{superfície de nível} no espaço das variáveis, com vetor normal dado por $\nabla g_i(\bm{x})$.  
+O ponto ótimo $\bm{x}^*$ está na interseção dessas superfícies.
+
+A condição acima afirma que o vetor $\nabla f(\bm{x}^*)$ é uma \textbf{combinação linear} dos vetores normais às restrições — portanto, ele também é normal ao espaço tangente factível.  
+Isso significa que qualquer pequeno deslocamento $\bm{d}$ dentro da superfície (isto é, tangente a todas as restrições) não altera o valor de primeira ordem de $f$:
+\[
+\nabla f(\bm{x}^*)^\top \bm{d} = 0.
+\]
+Geometricamente, $f$ não pode diminuir nem aumentar ao longo da região admissível — caracterizando um ponto estacionário sujeito às restrições.
+
+\subsection*{Ideia da demonstração}
+
+A prova se baseia no método das direções factíveis.  
+Se $\bm{x}^*$ é ótimo, então para toda direção $\bm{d}$ satisfazendo $\nabla g_i(\bm{x}^*)^\top \bm{d}=0$, deve valer:
+\[
+\nabla f(\bm{x}^*)^\top \bm{d} \ge 0.
+\]
+Isso é possível apenas se $\nabla f(\bm{x}^*)$ for ortogonal ao subespaço tangente gerado pelas direções factíveis.  
+Como o complemento ortogonal desse subespaço é o espaço gerado pelos gradientes das restrições, obtemos:
+\[
+\nabla f(\bm{x}^*) \in \text{span}\{\nabla g_i(\bm{x}^*)\}.
+\]
+Essa é a ideia central que conduz à condição de primeira ordem:
+\[
+\nabla f(\bm{x}^*) + G(\bm{x}^*)^\top \bm{\lambda} = 0.
+\]
+
+\subsection*{Resumo}
+
+Essas são as \textbf{condições de primeira ordem (necessárias)} para otimalidade em problemas com restrições de igualdade.  
+Elas asseguram que o gradiente de $f$ está alinhado com os gradientes das restrições, garantindo que não exista direção factível de descida.
+
+
+
+\vspace{1em}
+
+\section*{3. Condições de primeira ordem para restrições de desigualdade}
+
+Agora considere o problema geral:
+\[
+\min_{\bm{x}} f(\bm{x}) 
+\quad \text{sujeito a } 
+g_i(\bm{x}) = 0, \; i=1,\dots,m, \quad
+h_j(\bm{x}) \le 0, \; j=1,\dots,p.
+\]
+
+\subsection*{Ideia geral}
+
+As restrições de desigualdade introduzem uma diferença essencial: algumas delas podem estar \textit{ativas} no ponto ótimo (satisfeitas com igualdade) e outras podem estar \textit{inativas} (estritamente satisfeitas).  
+
+As direções factíveis devem respeitar tanto as restrições de igualdade quanto as desigualdades ativas:
+\[
+\nabla g_i(\bm{x}^*)^\top \bm{d} = 0, 
+\qquad
+\nabla h_j(\bm{x}^*)^\top \bm{d} \le 0 
+\quad \text{para } j \text{ ativo.}
+\]
+O raciocínio é o mesmo: se existe uma direção factível $\bm{d}$ tal que $\nabla f(\bm{x}^*)^\top \bm{d} < 0$, então $\bm{x}^*$ não é ótimo.  
+Portanto, no ponto ótimo, $\nabla f(\bm{x}^*)$ deve ser ortogonal a todas as direções factíveis de melhora.
+
+\subsection*{Construção dos multiplicadores}
+
+Para que isso ocorra, o gradiente $\nabla f(\bm{x}^*)$ deve pertencer ao cone gerado pelos gradientes das restrições ativas.  
+Em outras palavras, existem escalares $\lambda_i$ (para as restrições de igualdade) e $\mu_j \ge 0$ (para as restrições de desigualdade ativas) tais que:
+\[
+\nabla f(\bm{x}^*) + \sum_{i=1}^{m} \lambda_i \nabla g_i(\bm{x}^*) + \sum_{j=1}^{p} \mu_j \nabla h_j(\bm{x}^*) = 0.
+\]
+O sinal de não negatividade $\mu_j \ge 0$ é necessário porque as restrições $h_j(\bm{x}) \le 0$ delimitam o conjunto viável pelo “lado de dentro” — o gradiente $\nabla h_j$ aponta para fora da região admissível, e o equilíbrio só é possível se $\nabla f$ for compensado por combinações não negativas dessas normais.
+
+\subsection*{Condições de complementaridade}
+
+Além das igualdades acima, deve valer a condição de \textbf{complementaridade}:
+\[
+\mu_j \, h_j(\bm{x}^*) = 0, \quad j = 1, \dots, p.
+\]
+Isso significa:
+- Se uma restrição é \textbf{ativa} ($h_j(\bm{x}^*)=0$), então o multiplicador pode ser positivo ($\mu_j>0$).
+- Se uma restrição é \textbf{inativa} ($h_j(\bm{x}^*)<0$), então $\mu_j=0$.
+
+Portanto, apenas as restrições ativas influenciam o equilíbrio dos gradientes.
+
+\subsection*{Interpretação geométrica}
+
+O ponto ótimo $\bm{x}^*$ pertence à interseção de superfícies de restrição.  
+Os gradientes $\nabla g_i$ e $\nabla h_j$ das restrições ativas formam o conjunto de vetores normais à região admissível.  
+A condição
+\[
+\nabla f(\bm{x}^*) + \sum_i \lambda_i \nabla g_i(\bm{x}^*) + \sum_j \mu_j \nabla h_j(\bm{x}^*) = 0
+\]
+diz que o vetor $\nabla f(\bm{x}^*)$ está no cone gerado por esses vetores normais, equilibrando-se de modo que não haja direção de descida admissível.  
+
+Geometricamente:
+- O gradiente $\nabla f(\bm{x}^*)$ aponta para fora da região de menor valor de $f$.  
+- Cada $\nabla h_j$ ativo aponta para fora do conjunto viável.  
+- O ponto ótimo ocorre quando $\nabla f(\bm{x}^*)$ pode ser escrito como combinação linear dessas normais, com coeficientes não negativos — garantindo que o plano tangente à fronteira do conjunto viável é também tangente a uma superfície de nível de $f$.
+
+\subsection*{Ideia da demonstração}
+
+O argumento é análogo ao caso de restrições de igualdade, mas com cuidado adicional quanto ao sinal das desigualdades.  
+A partir da condição de inexistência de direção de melhora factível:
+\[
+\nabla f(\bm{x}^*)^\top \bm{d} \ge 0, \quad \forall \bm{d} \text{ factível.}
+\]
+Pelo Teorema da Alternativa (Farkas), essa condição é equivalente à existência de multiplicadores $\lambda_i$ e $\mu_j \ge 0$ tais que:
+\[
+\nabla f(\bm{x}^*) + \sum_i \lambda_i \nabla g_i(\bm{x}^*) + \sum_j \mu_j \nabla h_j(\bm{x}^*) = 0.
+\]
+Essa é a essência da demonstração das condições KKT de primeira ordem.
+
+\subsection*{Resumo}
+
+As relações
+\[
+\begin{cases}
+\nabla f(\bm{x}^*) + \sum_i \lambda_i \nabla g_i(\bm{x}^*) + \sum_j \mu_j \nabla h_j(\bm{x}^*) = 0,\\[4pt]
+g_i(\bm{x}^*) = 0, \\[2pt]
+h_j(\bm{x}^*) \le 0, \\[2pt]
+\mu_j \ge 0, \\[2pt]
+\mu_j h_j(\bm{x}^*) = 0,
+\end{cases}
+\]
+constituem as \textbf{Condições de Karush–Kuhn–Tucker (KKT)} de primeira ordem, necessárias para otimalidade em problemas com restrições de desigualdade (sob hipóteses regulares).
+
+
+\vspace{1em}
+
+\section*{4. Lagrangeana}
+
+A \textbf{função Lagrangeana} associa a função objetivo e as restrições em uma única expressão que pondera o quanto cada restrição influencia a direção de otimalidade.  
+Ela é definida por:
+\[
+\mathcal{L}(\bm{x}, \bm{\lambda}, \bm{\mu}) 
+= f(\bm{x}) 
++ \sum_{i=1}^{m} \lambda_i g_i(\bm{x}) 
++ \sum_{j=1}^{p} \mu_j h_j(\bm{x}),
+\]
+onde $\lambda_i$ e $\mu_j$ são os multiplicadores de Lagrange correspondentes às restrições de igualdade e desigualdade, respectivamente.
+
+\subsection*{Relação com as condições de primeira ordem}
+
+Nos casos anteriores, vimos que:
+- Para restrições de igualdade, o gradiente $\nabla f(\bm{x}^*)$ deve ser combinação linear dos gradientes $\nabla g_i(\bm{x}^*)$.
+- Para restrições de desigualdade, $\nabla f(\bm{x}^*)$ deve pertencer ao cone gerado pelos gradientes das restrições ativas $\nabla h_j(\bm{x}^*)$, com pesos não negativos.
+
+Essas relações podem ser expressas de forma unificada através da Lagrangeana.  
+De fato, a condição de equilíbrio dos gradientes,
+\[
+\nabla f(\bm{x}^*) 
++ \sum_i \lambda_i \nabla g_i(\bm{x}^*) 
++ \sum_j \mu_j \nabla h_j(\bm{x}^*) = 0,
+\]
+é equivalente a
+\[
+\nabla_{\bm{x}} \mathcal{L}(\bm{x}^*, \bm{\lambda}^*, \bm{\mu}^*) = 0.
+\]
+Essa igualdade indica que, no ponto ótimo, o gradiente da função Lagrangeana em relação às variáveis $\bm{x}$ se anula — ou seja, $\bm{x}^*$ é um ponto estacionário da Lagrangeana.
+
+\subsection*{Sistema KKT reescrito via Lagrangeana}
+
+Usando a Lagrangeana, as condições KKT podem ser expressas de forma compacta:
+\[
+\begin{cases}
+\nabla_{\bm{x}} \mathcal{L}(\bm{x}^*, \bm{\lambda}^*, \bm{\mu}^*) = 0, \\[4pt]
+g_i(\bm{x}^*) = 0, \quad i=1,\dots,m, \\[2pt]
+h_j(\bm{x}^*) \le 0, \quad \mu_j^* \ge 0, \quad \mu_j^* h_j(\bm{x}^*) = 0, \quad j=1,\dots,p.
+\end{cases}
+\]
+Esse sistema resume as condições de primeira ordem de otimalidade, incluindo:
+- \textbf{Estacionariedade}: não há direção de melhora admissível;
+- \textbf{Viabilidade primária}: o ponto $\bm{x}^*$ satisfaz todas as restrições;
+- \textbf{Viabilidade dual e complementaridade}: os multiplicadores respeitam o sinal das desigualdades e ativam apenas as restrições relevantes.
+
+\subsection*{Interpretação geométrica e conceitual}
+
+A Lagrangeana fornece uma maneira de interpretar a otimalidade como um \textit{equilíbrio de forças} entre o gradiente da função objetivo e os gradientes das restrições.  
+O vetor $\nabla f(\bm{x})$ aponta para a direção de maior aumento de $f$, enquanto cada termo $\lambda_i \nabla g_i$ e $\mu_j \nabla h_j$ representa a reação das restrições, impedindo movimentos proibidos.
+
+No ponto ótimo:
+\[
+\nabla f(\bm{x}^*) = - \sum_i \lambda_i^* \nabla g_i(\bm{x}^*) - \sum_j \mu_j^* \nabla h_j(\bm{x}^*),
+\]
+ou seja, o vetor de descida natural é neutralizado por combinações dos gradientes das restrições — caracterizando uma situação de equilíbrio sem direção factível de melhora.
+
+\subsection*{Resumo}
+
+A formulação Lagrangeana unifica e simplifica as condições de primeira ordem discutidas anteriormente.  
+Ela permite tratar problemas com diferentes tipos de restrições sob uma mesma estrutura analítica, tornando explícita a relação entre o ponto ótimo, os gradientes das restrições e os multiplicadores de Lagrange.  
+Essa função é também a base para os métodos numéricos modernos, como os \textit{métodos dos multiplicadores de Lagrange} e os \textit{métodos sequenciais de programação quadrática (SQP)}.
+
+
+\vspace{1em}
+
+\section*{5. Condições de segunda ordem para problemas com restrições}
+
+As condições de primeira ordem garantem um ponto estacionário, mas não asseguram se é mínimo, máximo ou ponto de sela.
+
+As \textbf{condições de segunda ordem} avaliam a curvatura da Lagrangeana em relação às direções factíveis.
+
+Seja
+\[
+\mathcal{L}_{\bm{x}\bm{x}}(\bm{x}^*, \bm{\lambda}^*, \bm{\mu}^*) = \nabla_{\bm{x}\bm{x}}^2 f(\bm{x}^*) + \sum_i \lambda_i^* \nabla_{\bm{x}\bm{x}}^2 g_i(\bm{x}^*) + \sum_j \mu_j^* \nabla_{\bm{x}\bm{x}}^2 h_j(\bm{x}^*).
+\]
+Defina o espaço das direções factíveis:
+\[
+\mathcal{D} = \{\bm{d} \neq 0 : \nabla g_i(\bm{x}^*)^\top \bm{d} = 0, \, \nabla h_j(\bm{x}^*)^\top \bm{d} = 0 \text{ para } j \text{ ativo com } \mu_j^* > 0\}.
+\]
+
+Então:
+
+- **Condição necessária:**  
+  \(\bm{d}^\top \mathcal{L}_{\bm{x}\bm{x}}(\bm{x}^*, \bm{\lambda}^*, \bm{\mu}^*) \bm{d} \ge 0, \; \forall \bm{d} \in \mathcal{D}.\)
+
+- **Condição suficiente (mínimo local):**  
+  \(\bm{d}^\top \mathcal{L}_{\bm{x}\bm{x}}(\bm{x}^*, \bm{\lambda}^*, \bm{\mu}^*) \bm{d} > 0, \; \forall \bm{d} \in \mathcal{D}.\)
+
+Essas condições caracterizam a curvatura positiva da Lagrangeana nas direções que respeitam as restrições ativas.
+
+\vspace{1em}
+
+\begin{center}
+\textit{Essas condições são fundamentais para entender métodos como SQP e multiplicadores de Lagrange, base de muitos algoritmos de otimização moderna.}
+\end{center}
+
+\end{document}

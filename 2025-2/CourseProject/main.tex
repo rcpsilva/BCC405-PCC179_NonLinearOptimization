@@ -83,7 +83,8 @@ O \textit{Continual Learning} (ou aprendizado contínuo) é um paradigma de apre
 Ao treinar sequencialmente em um tarefa A e depois em B, modelos tendem a esquecer A. Estudaremos o \emph{trade-off} estabilidade–plasticidade em duas etapas complementares:
 \begin{itemize}
   \item \textbf{Parte 1} (minimização): penalização fixa de deriva para controlar o esquecimento.
-  \item \textbf{Parte 2} (min–max): penalização adaptativa via jogo entre parâmetros (abordagem min-max) e um multiplicador~$\lambda$.
+  \item \textbf{Parte 2} (baselines avançados): comparação do método de penalização fi
+  \item \textbf{Parte 3} (min–max): penalização adaptativa via jogo entre parâmetros (abordagem min-max) e um multiplicador~$\lambda$.
 \end{itemize}
 
 \subsection{Dados e modelo}
@@ -149,7 +150,7 @@ com grade inicial $\lambda \in \{0,10^{-4},10^{-3},10^{-2},10^{-1}\}$.
   \item \textbf{Trade-off}: pontos finais de cada $\lambda$ no plano Esquecimento (x) vs. acc(B) (y).
 \end{itemize}
 
-\subsection*{Baseline avançado obrigatório (escolher um)}
+\section*{Baseline avançado obrigatório (escolher um)}
 \paragraph{EWC.}
 Importâncias por parâmetro após A:
 \[
