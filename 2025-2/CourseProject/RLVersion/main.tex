@@ -1,0 +1,209 @@
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{parskip}
+
+% =====================
+% Codificação, idioma e layout
+% =====================
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{margin=2cm}
+\usepackage{microtype}
+
+% =====================
+% Matemática e símbolos
+% =====================
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{bm}
+
+% =====================
+% Links
+% =====================
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=black,urlcolor=blue}
+
+% =====================
+% Código-fonte (listings)
+% =====================
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{codebg}{rgb}{0.96,0.96,0.96}
+\definecolor{codekw}{RGB}{33,96,171}
+\definecolor{codecmt}{RGB}{120,120,120}
+\definecolor{codestr}{RGB}{163,21,21}
+\lstdefinestyle{pystyle}{
+  language=Python,
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{codekw}\bfseries,
+  commentstyle=\color{codecmt}\itshape,
+  stringstyle=\color{codestr},
+  showstringspaces=false,
+  frame=single,
+  breaklines=true,
+  tabsize=2,
+  inputencoding=utf8,
+  extendedchars=true,
+  literate=
+   {á}{{\'a}}1 {à}{{\`a}}1 {ã}{{\~a}}1 {â}{{\^a}}1
+   {é}{{\'e}}1 {ê}{{\^e}}1
+   {í}{{\'i}}1
+   {ó}{{\'o}}1 {õ}{{\~o}}1 {ô}{{\^o}}1
+   {ú}{{\'u}}1
+   {ç}{{\c{c}}}1
+   {Á}{{\'A}}1 {Ã}{{\~A}}1
+   {É}{{\'E}}1 {Ê}{{\^E}}1
+   {Í}{{\'I}}1
+   {Ó}{{\'O}}1 {Õ}{{\~O}}1 {Ô}{{\^O}}1
+   {Ú}{{\'U}}1
+   {Ç}{{\c{C}}}1
+}
+\lstset{style=pystyle}
+
+% =====================
+% Título
+% =====================
+\title{\textbf{TP — Aprendizado Contínuo com Controle por Reforço}\\\large Projeto Independente de Pesquisa}
+\author{Entrega: Código, Relatório curto, Slides}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+% ======================================================
+% VISÃO GERAL
+% ======================================================
+\section{Visão geral}
+O \textbf{aprendizado contínuo} (ou \emph{continual learning}) busca construir modelos que aprendem sequencialmente, incorporando novas tarefas sem esquecer as anteriores. O principal desafio é o \textit{catastrophic forgetting}, isto é, a perda de desempenho em tarefas já aprendidas ao adquirir novos conhecimentos.
+
+Projetos clássicos atacam esse problema por meio de regularizações fixas (como EWC e SI) ou jogos min–max adaptativos. Neste projeto, propomos uma abordagem alternativa: modelar o equilíbrio \textbf{estabilidade–plasticidade} como um \textbf{problema de controle sequencial} resolvido via \textbf{Aprendizado por Reforço (RL)}.
+
+A ideia é que um \textbf{agente} observe métricas do treinamento (como acurácias, perdas e deriva dos parâmetros) e \textbf{decida dinamicamente} hiperparâmetros de regularização, taxa de \textit{replay} ou congelamento de camadas, buscando maximizar o desempenho em novas tarefas sem violar limites de esquecimento.
+
+% ======================================================
+% OBJETIVOS
+% ======================================================
+\section{Objetivos}
+
+\subsection*{Objetivo geral}
+Investigar o uso de \textit{Reinforcement Learning} como controlador adaptativo da estabilidade–plasticidade em aprendizado contínuo, visando reduzir o esquecimento catastrófico e otimizar a retenção do conhecimento em cenários sequenciais.
+
+\subsection*{Objetivos específicos}
+\begin{enumerate}
+    \item Formular o aprendizado contínuo como um problema de controle com restrição de esquecimento.
+    \item Implementar um agente RL (bandit contextual e ator–crítico) para ajustar $\lambda_t$ (penalização de deriva) durante o treinamento.
+    \item Comparar desempenho, estabilidade e eficiência com baselines fixos e métodos regulares (EWC, SI).
+    \item Explorar variantes de controle: seleção adaptativa de taxa de \textit{replay} e congelamento seletivo de camadas.
+\end{enumerate}
+
+% ======================================================
+% FORMULAÇÃO
+% ======================================================
+\section{Formulação como CMDP}
+Modelamos o processo de aprendizado como um \textit{Constrained Markov Decision Process} (CMDP):
+
+\paragraph{Estados.} Vetores de métricas observadas: 
+\[
+s_t = (\mathrm{acc}_A, \mathrm{acc}_B, \mathcal{L}_A, \mathcal{L}_B, \|\bm{\theta}-\bm{\theta}_A\|_2, \text{época}, \text{grad-norms}).
+\]
+
+\paragraph{Ações.} 
+\[
+a_t = (\lambda_t, \rho_t),
+\]
+onde $\lambda_t \ge 0$ regula a penalização de deriva e $\rho_t \in [0,1]$ é a fração de \textit{replay} opcional.
+
+\paragraph{Recompensa e custo.}
+\[
+r_t = \Delta \mathrm{acc}_B, \quad c_t = \max(0,\mathrm{acc}_A^{(t-1)} - \mathrm{acc}_A^{(t)}).
+\]
+
+\paragraph{Objetivo.}
+Maximizar o retorno esperado sob uma restrição de custo:
+\[
+\max_\pi \ \mathbb{E}_\pi\!\Big[\sum_t r_t\Big]
+\quad \text{sujeito a} \quad
+\mathbb{E}_\pi\!\Big[\sum_t c_t\Big] \le \tau.
+\]
+
+\paragraph{Lagrangiano.}
+\[
+\mathcal{L}(\pi, \lambda) = \mathbb{E}_\pi\!\Big[\sum_t (r_t - \lambda c_t)\Big], 
+\quad \lambda \leftarrow [\lambda + \eta_\lambda(\bar{c} - \tau)]_+.
+\]
+
+% ======================================================
+% METODOLOGIA
+% ======================================================
+\section{Metodologia}
+
+\subsection*{Parte 1 — Bandit contextual (simples)}
+Cada época é um episódio. O agente observa o estado $(\mathrm{acc}_A,\mathrm{acc}_B,\|\bm{\theta}-\bm{\theta}_A\|_2)$ e escolhe $\lambda_t$ de uma grade discreta. A recompensa é o ganho de $\mathrm{acc}_B$ penalizado pelo esquecimento em A. O agente é treinado via Thompson Sampling ou UCB.
+
+\subsection*{Parte 2 — Ator–crítico com restrição}
+Treinamento contínuo com ator–crítico (PPO/A2C).  
+A política $\pi_\phi(a_t|s_t)$ aprende a ajustar $\lambda_t$ e $\rho_t$, enquanto o multiplicador $\lambda_\text{dual}$ é atualizado online para respeitar a restrição de esquecimento $\tau$.
+
+\subsection*{Parte 3 — Comparações e métricas}
+\begin{itemize}
+    \item Baselines: $\lambda$ fixo, EWC, SI.
+    \item Métricas: $\mathrm{acc}_A$, $\mathrm{acc}_B$, esquecimento total, deriva média, retorno acumulado.
+    \item Gráficos: trajetória de $\lambda_t$, custo acumulado vs. limite $\tau$, curva Pareto (esquecimento × desempenho em B).
+\end{itemize}
+
+% ======================================================
+% COMO RODAR
+% ======================================================
+\section*{Como rodar (protótipo)}
+\begin{verbatim}
+python rl_controller.py --epochs 10 --agent bandit --lambda_grid 1e-4 1e-3 1e-2
+python rl_controller.py --agent actor_critic --theta_lr 1e-3 --policy_lr 3e-4
+\end{verbatim}
+
+% ======================================================
+% EXEMPLO DE CÓDIGO
+% ======================================================
+\appendix
+\section*{Apêndice A — Esqueleto simplificado do agente RL}
+
+\begin{lstlisting}
+# rl_controller.py
+# Minimal example: bandit controlling lambda_t
+
+for epoch in range(E):
+    state = collect_metrics(model)
+    lambda_t = agent.act(state)
+    loss_B = CE(model(x_B), y_B)
+    theta = flatten_params(model)
+    F_drift = 0.5 * torch.sum((theta - theta_A)**2)
+    obj = loss_B + lambda_t * F_drift
+    backprop(obj)
+
+    accA_new, accB_new = evals(...)
+    reward = accB_new - accB_prev
+    cost = max(0, accA_prev - accA_new)
+    agent.update(state, lambda_t, reward - dual_lambda * cost)
+    dual_lambda = max(0, dual_lambda + eta * (cost - tau))
+\end{lstlisting}
+
+% ======================================================
+% RESULTADOS ESPERADOS
+% ======================================================
+\section{Resultados esperados}
+Espera-se que o controlador RL:
+\begin{itemize}
+    \item Ajuste $\lambda_t$ dinamicamente, evitando tanto esquecimento quanto rigidez excessiva;
+    \item Supere penalizações fixas em termos de estabilidade e desempenho;
+    \item Produza curvas de custo e acurácia mais estáveis, aproximando-se do limite Pareto ótimo entre retenção e aprendizado.
+\end{itemize}
+
+% ======================================================
+% CONCLUSÃO
+% ======================================================
+\section{Conclusão}
+Este projeto propõe uma integração direta entre aprendizado contínuo e aprendizado por reforço. O agente atua como um controlador adaptativo, aprendendo políticas de regularização que balanceiam estabilidade e plasticidade de forma autônoma. A abordagem abre caminho para sistemas de aprendizado contínuo verdadeiramente autoajustáveis.
+
+\end{document}
