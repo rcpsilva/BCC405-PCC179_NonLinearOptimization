@@ -1,0 +1,150 @@
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{parskip}
+
+% =====================
+% Codificação, idioma e layout
+% =====================
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{margin=2cm}
+\usepackage{microtype}
+
+% =====================
+% Matemática e símbolos
+% =====================
+\usepackage{amsmath, amssymb, amsthm, bm, mathtools}
+
+% =====================
+% Links
+% =====================
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=black,urlcolor=blue}
+
+% =====================
+% Início do documento
+% =====================
+\begin{document}
+
+\section*{Roteiro de Aula -- Métodos de Busca Unidirecional}
+
+\subsection*{1. Algoritmo de Descida (visão geral)}
+
+Um \textbf{algoritmo de descida} é um método iterativo para encontrar um ponto que minimiza uma função \( f(\bm{x}) \).
+A cada iteração \( k \), escolhe-se:
+\begin{itemize}
+  \item uma \textbf{direção de descida} \( \bm{d}_k \), tal que \( \nabla f(\bm{x}_k)^\top \bm{d}_k < 0 \);
+  \item um \textbf{comprimento de passo} \( \alpha_k > 0 \).
+\end{itemize}
+
+A atualização é dada por:
+\[
+\bm{x}_{k+1} = \bm{x}_k + \alpha_k \bm{d}_k.
+\]
+
+O desafio central é determinar um valor apropriado para \( \alpha_k \), o que leva ao \textbf{problema de busca unidirecional}.
+
+\subsection*{2. Problema de Busca Unidirecional}
+
+Dado \( \bm{x}_k \) e uma direção de descida \( \bm{d}_k \), define-se:
+\[
+\phi(\alpha) = f(\bm{x}_k + \alpha \bm{d}_k), \quad \alpha \ge 0.
+\]
+
+O problema consiste em resolver:
+\[
+\min_{\alpha > 0} \, \phi(\alpha),
+\]
+ou seja, determinar o valor de \( \alpha \) que reduz mais eficientemente o valor de \( f \) ao longo da direção escolhida.
+
+\subsection*{3. Método de Bracketing}
+
+O \textbf{método de bracketing} busca determinar um intervalo \( [a,b] \) que contenha um mínimo local de \( \phi(\alpha) \), satisfazendo:
+\[
+\phi(a) > \phi(b) < \phi(c).
+\]
+
+\textbf{Etapas:}
+\begin{enumerate}
+  \item Escolher um ponto inicial \( \alpha_0 \) e um incremento \( \Delta > 0 \);
+  \item Avaliar \( \phi(\alpha_0) \) e \( \phi(\alpha_0 + \Delta) \);
+  \item Expandir o intervalo enquanto \( \phi \) estiver decrescendo;
+  \item Parar quando encontrar um “vale”, isto é, quando a função voltar a crescer.
+\end{enumerate}
+
+O bracketing é normalmente usado como etapa inicial antes de métodos mais refinados, como a seção áurea ou interpolação.
+
+\subsection*{4. Método da Seção Áurea}
+
+O \textbf{método da seção áurea} reduz iterativamente o intervalo que contém o mínimo de uma função unimodal, sem necessidade de derivadas.
+
+Define-se a razão áurea:
+\[
+\tau = \frac{\sqrt{5} - 1}{2} \approx 0{,}618.
+\]
+
+\textbf{Etapas:}
+\begin{enumerate}
+  \item Inicializar um intervalo \( [a,b] \);
+  \item Calcular os pontos internos:
+  \[
+  \alpha_1 = a + (1 - \tau)(b - a), \quad
+  \alpha_2 = a + \tau(b - a);
+  \]
+  \item Avaliar \( \phi(\alpha_1) \) e \( \phi(\alpha_2) \);
+  \item Substituir o extremo com valor maior e repetir até que \( |b - a| \) seja pequeno.
+\end{enumerate}
+
+Esse método é eficiente, simples e garante convergência quando \( \phi \) é unimodal.
+
+\subsection*{5. Método de Interpolação Quadrática}
+
+O \textbf{método de interpolação quadrática} aproxima \( \phi(\alpha) \) por um polinômio de segunda ordem ajustado a três pontos conhecidos.
+
+\textbf{Etapas:}
+\begin{enumerate}
+  \item Escolher três pontos distintos \( \alpha_1, \alpha_2, \alpha_3 \);
+  \item Ajustar um modelo quadrático:
+  \[
+  q(\alpha) = a\alpha^2 + b\alpha + c;
+  \]
+  \item Determinar o ponto que minimiza \( q \):
+  \[
+  \alpha^* = -\frac{b}{2a};
+  \]
+  \item Atualizar os pontos, mantendo sempre os que delimitam o mínimo.
+\end{enumerate}
+
+Esse método converge rapidamente perto do mínimo, mas pode ser instável se os pontos forem mal espaçados ou o ruído numérico for alto.
+
+\subsection*{6. Busca Inexata -- Regra de Armijo (Backtracking)}
+
+Em muitos algoritmos práticos, não se busca o mínimo exato de \( \phi(\alpha) \), e sim um valor que reduza suficientemente a função.
+
+A \textbf{condição de Armijo} (ou de \emph{decréscimo suficiente}) é:
+\[
+f(\bm{x}_k + \alpha \bm{d}_k)
+\le f(\bm{x}_k) + c_1 \alpha \nabla f(\bm{x}_k)^\top \bm{d}_k,
+\]
+com \( 0 < c_1 < 1 \) (geralmente \( c_1 = 10^{-4} \)).
+
+\textbf{Algoritmo de Backtracking:}
+\begin{enumerate}
+  \item Definir \( \alpha \leftarrow \alpha_0 \) (por exemplo, \( \alpha_0 = 1 \));
+  \item Enquanto a condição de Armijo não for satisfeita, atualizar:
+  \[
+  \alpha \leftarrow \rho \alpha, \quad 0 < \rho < 1;
+  \]
+  \item Retornar o primeiro \( \alpha \) que satisfaz a desigualdade.
+\end{enumerate}
+
+Vantagens:
+\begin{itemize}
+  \item Simples e eficiente;
+  \item Evita passos grandes demais;
+  \item Muito usado em métodos de Gradiente, Newton e Quasi-Newton.
+\end{itemize}
+
+\end{document}
