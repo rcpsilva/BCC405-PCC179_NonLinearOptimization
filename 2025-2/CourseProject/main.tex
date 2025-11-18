@@ -67,7 +67,7 @@
 % =====================
 % Título
 % =====================
-\title{\textbf{TP — Aprendizagem Contínua}\\\large Disciplina de Otimização Não Linear}
+\title{\textbf{TP -- Aprendizagem Contínua}\\\large Disciplina de Otimização Não Linear}
 \author{Entrega: Código, Relatório curto, Slides}
 \date{\today}
 
@@ -80,17 +80,17 @@
 \section{Visão geral}
 O \textit{Continual Learning} (ou aprendizado contínuo) é um paradigma de aprendizado de máquina que busca desenvolver modelos capazes de aprender de forma sequencial, incorporando novos conhecimentos sem esquecer o que foi previamente aprendido. Diferentemente do aprendizado tradicional, em que o modelo é treinado uma única vez sobre um conjunto fixo de dados, o aprendizado contínuo enfrenta o desafio do \textit{catastrophic forgetting}, isto é, a perda drástica de desempenho em tarefas anteriores ao aprender novas. Para mitigar esse problema, diversas abordagens têm sido propostas, incluindo regularização dos parâmetros, uso de memória exemplar e arquiteturas dinâmicas que se adaptam ao longo do tempo.
 
-Ao treinar sequencialmente em um tarefa A e depois em B, modelos tendem a esquecer A. Estudaremos o \emph{trade-off} estabilidade–plasticidade em duas etapas complementares:
+Ao treinar sequencialmente em uma tarefa A e depois em B, modelos tendem a esquecer A. Estudaremos o \emph{trade-off} estabilidade--plasticidade em três etapas complementares:
 \begin{itemize}
   \item \textbf{Parte 1} (minimização): penalização fixa de deriva para controlar o esquecimento.
-  \item \textbf{Parte 2} (baselines avançados): comparação do método de penalização fi
-  \item \textbf{Parte 3} (min–max): penalização adaptativa via jogo entre parâmetros (abordagem min-max) e um multiplicador~$\lambda$.
+  \item \textbf{Parte 2} (baseline avançado): comparação do método de penalização fixa com um baseline clássico de aprendizagem contínua (EWC ou SI).
+  \item \textbf{Parte 3} (min--max): penalização adaptativa via jogo entre parâmetros (abordagem min--max) e um multiplicador~$\lambda$.
 \end{itemize}
 
 \subsection{Dados e modelo}
 
 \textbf{Split--MNIST}: neste experimento, o conjunto MNIST é dividido em duas tarefas disjuntas: 
-A = \{0–4\} e B = \{5–9\}. Cada tarefa é tratada como um problema de classificação independente, 
+A = \{0--4\} e B = \{5--9\}. Cada tarefa é tratada como um problema de classificação independente, 
 permitindo avaliar a capacidade do modelo em reter o conhecimento adquirido na tarefa A 
 após o treinamento sequencial na tarefa B.  
 
@@ -115,13 +115,12 @@ Essa medida serve tanto como diagnóstico quanto como termo de regularização
 em abordagens que buscam equilibrar \textit{plasticidade} (adaptação à nova tarefa) 
 e \textit{estabilidade} (retenção do conhecimento anterior).
 
-
 % ======================================================
 % PARTE 1
 % ======================================================
 \section{Desenvolvimento}
 
-\section*{Parte 1 — Trade-off com penalização fixa (sem min–max)}
+\section*{Parte 1 -- Trade-off com penalização fixa (sem min--max)}
 \textbf{Objetivo.} Quantificar e visualizar o conflito entre aprender B e reter A, variando a intensidade da penalização.
 
 \subsection*{Formulação de otimização}
@@ -150,8 +149,20 @@ com grade inicial $\lambda \in \{0,10^{-4},10^{-3},10^{-2},10^{-1}\}$.
   \item \textbf{Trade-off}: pontos finais de cada $\lambda$ no plano Esquecimento (x) vs. acc(B) (y).
 \end{itemize}
 
-\section*{Baseline avançado obrigatório (escolher um)}
-\paragraph{EWC.}
+\subsection*{Relatório curto -- Parte 1}
+\begin{enumerate}
+    \item Explique a função objetivo com $\lambda$ fixo, discuta por que há conflito entre aprender B e reter A, e interprete os gráficos.
+    \item Compare pelo menos dois otimizadores subjacentes (por exemplo, SGD vs. Adam) em termos de estabilidade, velocidade de convergência e retenção.
+\end{enumerate}
+
+% ======================================================
+% PARTE 2 -- BASELINE AVANÇADO
+% ======================================================
+\section*{Parte 2 -- Baseline avançado obrigatório (escolher um)}
+
+\textbf{Objetivo.} Implementar um baseline mais sofisticado de aprendizagem contínua (EWC ou SI) e comparar seus resultados com a penalização L2 isotrópica da Parte~1.
+
+\subsection*{Opção A: EWC (Elastic Weight Consolidation)}
 Importâncias por parâmetro após A:
 \[
 F_i \approx \frac{1}{|\mathcal{D}_A|}\sum_{(x,y)\in\mathcal{D}_A}
@@ -160,36 +171,63 @@ F_i \approx \frac{1}{|\mathcal{D}_A|}\sum_{(x,y)\in\mathcal{D}_A}
 \mathcal{L}_B(\bm{\theta}) + \lambda \sum_i F_i\,(\theta_i-\theta_{A,i})^2.
 \]
 
-\paragraph{Synaptic Intelligence (SI).}
+\subsection*{Opção B: Synaptic Intelligence (SI)}
 Durante A, acumule $\omega_i \leftarrow \omega_i + \Delta\theta_i \cdot g_i$. Ao final,
-$\Omega_i=\frac{\omega_i}{(\Delta\theta_i)^2+\xi}$, $\xi\approx 10^{-3}$, e use
-$\mathcal{L}_B(\bm{\theta}) + \lambda \sum_i \Omega_i\,(\theta_i-\theta_{A,i})^2$.
+\[
+\Omega_i=\frac{\omega_i}{(\Delta\theta_i)^2+\xi}, \quad \xi\approx 10^{-3},
+\]
+e use
+\[
+\mathcal{L}_B(\bm{\theta}) + \lambda \sum_i \Omega_i\,(\theta_i-\theta_{A,i})^2.
+\]
 
-\section*{Otimizadores alternativos}
-Os alunos devem variar o otimizador subjacente para estudar efeitos em estabilidade, velocidade e retenção.
-
-\subsection*{Relatório curto — Parte 1}
+\subsection*{Procedimento experimental}
 \begin{enumerate}
-    \item Explique a função objetivo com $\lambda$ fixo, discuta por que há conflito entre aprender B e reter A, e interprete os gráficos.
-    \item Faça uma comparação entre otimizadores. 
+    \item Escolha \textbf{um} baseline (EWC \emph{ou} SI) para implementar.
+    \item Reutilize o mesmo cenário da Parte~1: Split--MNIST, arquitetura, otimizador base e grade de valores de $\lambda$ (ou uma sub-grade razoável).
+    \item Para cada $\lambda$, repita o treino em A e o treino em B com o termo de regularização ponderado por $F_i$ ou $\Omega_i$.
+    \item Meça e registre as mesmas métricas da Parte~1 (acurácias, deriva, esquecimento).
+\end{enumerate}
+
+\subsection*{Plots sugeridos}
+\begin{itemize}
+    \item Comparação do trade-off Esquecimento vs. acc(B) entre:
+    \begin{itemize}
+        \item Penalização L2 simples (Parte~1);
+        \item Baseline avançado (EWC ou SI).
+    \end{itemize}
+    \item (Opcional) Mapas ou histogramas das importâncias $F_i$ ou $\Omega_i$ para ilustrar quais parâmetros são mais ``protegidos''.
+\end{itemize}
+
+\subsection*{Relatório curto -- Parte 2}
+\begin{enumerate}
+    \item Descreva o baseline escolhido (EWC ou SI), destacando a intuição por trás das importâncias por parâmetro.
+    \item Compare quantitativa e qualitativamente os resultados com a penalização L2 da Parte~1, destacando:
+    \begin{itemize}
+        \item Redução de esquecimento em A;
+        \item Impacto na acurácia final em B;
+        \item Sensibilidade a $\lambda$.
+    \end{itemize}
+    \item Discuta cenários em que o baseline avançado oferece vantagens claras em relação à penalização isotrópica simples.
 \end{enumerate}
 
 % ======================================================
-% PARTE 2
+% PARTE 3 -- MIN--MAX
 % ======================================================
-\section*{Parte 2 — Min–max com passos alternados e estabilização}
+\section*{Parte 3 -- Min--max com passos alternados e estabilização}
+
 \textbf{Objetivo.} Substituir o $\lambda$ fixo por um jogo adaptativo:
 \[
-\min_{\bm{\theta}}\;\max_{\lambda\ge 0}\;\; \mathcal{L}_B(\bm{\theta}) - \lambda\,F(\bm{\theta};\bm{\theta}_A),
+\min_{\bm{\theta}}\;\max_{\lambda\ge 0}\;\; \mathcal{L}_B(\bm{\theta}) + \lambda\,F(\bm{\theta};\bm{\theta}_A),
 \]
-com $F = F_{\text{drift}}$ para começar, passos alternados em $\bm{\theta}$ (descida) e $\lambda$ (subida), e projeção $\lambda \leftarrow \max(0,\lambda)$ a cada atualização. Estabilize com \textbf{OGDA} ou \textbf{Extragradient}.
+com $F = F_{\text{drift}}$ para começar, passos alternados em $\bm{\theta}$ (descida) e $\lambda$ (subida), e projeção $\lambda \leftarrow \max(0,\lambda)$ a cada atualização. Opcionalmente, projete também em um intervalo $[0,\lambda_{\max}]$ para evitar explosão de escala. Estabilize com \textbf{OGDA} ou \textbf{Extragradient}.
 
 \subsection*{Atualizações obrigatórias}
 \paragraph{Alternating steps.}
-A cada iteração: (i) desça em $\bm{\theta}$; (ii) suba em $\lambda$; (iii) projete $\lambda$ no semieixo positivo.
+A cada iteração: (i) desça em $\bm{\theta}$; (ii) suba em $\lambda$; (iii) projete $\lambda$ no semieixo (ou intervalo) positivo.
 
 \paragraph{OGDA.}
-Com $f(\bm{\theta},\lambda)=\mathcal{L}_B(\bm{\theta})-\lambda F(\bm{\theta};\bm{\theta}_A)$:
+Com $f(\bm{\theta},\lambda)=\mathcal{L}_B(\bm{\theta})+\lambda F(\bm{\theta};\bm{\theta}_A)$:
 \[
 \bm{\theta}_{t+1} = \bm{\theta}_{t} - \eta_\theta\big(2\nabla_{\bm{\theta}} f_t - \nabla_{\bm{\theta}} f_{t-1}\big),\quad
 \lambda_{t+1} = \big[\lambda_{t} + \eta_\lambda\big(2\nabla_{\lambda} f_t - \nabla_{\lambda} f_{t-1}\big)\big]_+.
@@ -198,28 +236,35 @@ Com $f(\bm{\theta},\lambda)=\mathcal{L}_B(\bm{\theta})-\lambda F(\bm{\theta};\bm
 \paragraph{Extragradient.}
 Dois estágios:
 \[
-(\hat{\bm{\theta}},\hat{\lambda}) = (\bm{\theta}_{t},\lambda_t) - (\eta_\theta,-\eta_\lambda)\odot \nabla f(\bm{\theta}_t,\lambda_t),
+(\hat{\bm{\theta}},\hat{\lambda}) = (\bm{\theta}_{t},\lambda_t) - (\eta_\theta,-\eta_\lambda)\nabla f(\bm{\theta}_t,\lambda_t),
 \]
 \[
-(\bm{\theta}_{t+1},\lambda_{t+1}) = (\bm{\theta}_{t},\lambda_t) - (\eta_\theta,-\eta_\lambda)\odot \nabla f(\hat{\bm{\theta}},\hat{\lambda}),\quad
+(\bm{\theta}_{t+1},\lambda_{t+1}) = (\bm{\theta}_{t},\lambda_t) - (\eta_\theta,-\eta_\lambda)\nabla f(\hat{\bm{\theta}},\hat{\lambda}),\quad
 \lambda_{t+1}\leftarrow[\lambda_{t+1}]_+.
 \]
 
 \subsection*{Métricas e comparação}
-Além das métricas da Parte 1, registre a trajetória de $\lambda$. Compare OGDA e Extragradient em estabilidade das curvas, tempo até entrar em regime estável e desempenho final.
+Além das métricas da Parte 1, registre:
+\begin{itemize}
+    \item A trajetória de $\lambda_t$ ao longo do treinamento;
+    \item Estabilidade das curvas de acurácia em A e B;
+    \item Tempo (em iterações/épocas) até entrar em regime estável;
+    \item Desempenho final em A, B e esquecimento.
+\end{itemize}
+Compare OGDA e Extragradient em termos de estabilidade das trajetórias e desempenho final.
 
 % ======================================================
-% SEÇÃO EXTRA: OTIMIZADORES ALTERNATIVOS
+% SEÇÃO EXTRA: OTIMIZADORES ALTERNATIVOS NO JOGO
 % ======================================================
-\section*{Otimizadores alternativos}
-Além de OGDA/Extragradient para estabilizar o \emph{jogo}, os alunos podem variar o otimizador subjacente em cada variável (ex.: Adam para $\theta$ e SGD para $\lambda$) para estudar efeitos em estabilidade, velocidade e retenção.
+\section*{Otimizadores alternativos (jogo min--max)}
+Além de OGDA/Extragradient para estabilizar o \emph{jogo}, os alunos podem variar o otimizador subjacente em cada variável (ex.: Adam para $\bm{\theta}$ e SGD para $\lambda$) para estudar efeitos em estabilidade, velocidade e retenção. Discuta brevemente quaisquer combinações que tenham se mostrado notavelmente melhores ou piores.
 
-\subsection*{Relatório curto — Parte 2}
+\subsection*{Relatório curto -- Parte 3}
 \begin{enumerate}
-    \item Explique a formulação min–max e por que min e max competem; 
-    \item Compare OGDA vs. Extragradient visualmente e textualmente; 
-    \item Relacione com os resultados da Parte~1.
-    \item Apresente uma análise sobre o comportamento dos diferentes algoritmos de otimização.
+    \item Explique a formulação min--max e por que os papéis de minimização (em $\bm{\theta}$) e maximização (em $\lambda$) geram um jogo competitivo.
+    \item Compare OGDA vs. Extragradient visualmente e textualmente (curvas de acurácia, deriva, trajetória de $\lambda$).
+    \item Relacione os resultados da Parte~3 com os da Parte~1 (penalização fixa) e da Parte~2 (baseline avançado).
+    \item Apresente uma análise sobre o comportamento dos diferentes algoritmos de otimização usados no jogo (incluindo variações de otimizador base em $\bm{\theta}$ e em $\lambda$, se testadas).
 \end{enumerate}
 
 % ======================================================
@@ -231,18 +276,21 @@ Além de OGDA/Extragradient para estabilizar o \emph{jogo}, os alunos podem vari
 python simple_drift_example.py --epochsA 3 --epochsB 3 --lambda_reg 1e-3
 \end{verbatim}
 
-\textbf{Parte 2} (a implementar):
+\textbf{Parte 3} (jogo min--max, a implementar em \texttt{game\_minmax.py}):
+
 \begin{verbatim}
 python game_minmax.py --ogda --theta_lr 1e-3 --lambda_lr 1e-2
 python game_minmax.py --extragrad --theta_lr 1e-3 --lambda_lr 1e-2
 \end{verbatim}
+
+(A Parte 2 pode ser implementada como extensão de \texttt{simple\_drift\_example.py} ou em um arquivo próprio, mantendo a mesma interface de experimentos.)
 
 % ======================================================
 % APÊNDICE: EXEMPLO MÍNIMO (PARTE 1)
 % ======================================================
 \clearpage
 \appendix
-\section*{Apêndice A — Exemplo mínimo: $\min_\theta \mathcal{L}_B(\theta)+\lambda F_{\text{drift}}(\theta;\theta_A)$}
+\section*{Apêndice A -- Exemplo mínimo: $\min_\theta \mathcal{L}_B(\theta)+\lambda F_{\text{drift}}(\theta;\theta_A)$}
 \noindent
 \textit{Nota:} comentários em inglês para evitar problemas de acentuação dentro de \texttt{listings}.
 
