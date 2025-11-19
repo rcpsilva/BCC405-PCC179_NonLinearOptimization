@@ -1,0 +1,504 @@
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{parskip}
+
+% =====================
+% Codificação, idioma e layout
+% =====================
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{margin=2cm}
+\usepackage{microtype}
+
+% =====================
+% Matemática e símbolos
+% =====================
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{bm}
+
+% =====================
+% Links
+% =====================
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=black,urlcolor=blue}
+
+% =====================
+% Outros
+% =====================
+\usepackage{enumitem}
+
+\begin{document}
+
+\begin{center}
+    \large
+    Universidade Federal de Ouro Preto (UFOP)\\
+    Instituto de Ciências Exatas e Biológicas (ICEB)\\
+    Departamento de Computação (DECOM)\\[0.5em]
+    \normalsize
+    Disciplina: Otimização Não Linear\\[0.5em]
+    \textbf{Roteiro de Aula – Métodos de Busca Direta}
+\end{center}
+
+\vspace{1em}
+
+\section*{Objetivos de Aprendizagem}
+
+Ao final desta aula, o(a) estudante deverá ser capaz de:
+\begin{itemize}
+    \item Diferenciar conceitualmente métodos diretos e indiretos de otimização.
+    \item Descrever a ideia básica de métodos aleatórios de busca direta:
+    \begin{itemize}
+        \item Random Jumping;
+        \item Random Walk;
+        \item Random Walk with Direction Exploitation;
+        \item Grid Search.
+    \end{itemize}
+    \item Aplicar e analisar, em exemplos numéricos simples:
+    \begin{itemize}
+        \item o método univariado (\emph{univariate search});
+        \item o método de Powell (pattern search / direções conjugadas);
+        \item o método do simplex de Nelder--Mead.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Leitura Recomendada}
+
+\begin{itemize}
+    \item Kalyanmoy Deb (ou Rao): capítulo sobre \emph{Direct Search Methods} (seção de métodos aleatórios, método univariado, Powell e simplex).
+\end{itemize}
+
+\section{Introdução: Métodos Diretos vs. Indiretos}
+
+\subsection{Motivação Geral}
+
+Em problemas de otimização não linear, podemos agrupar os algoritmos em duas grandes famílias:
+
+\begin{description}
+    \item[Métodos indiretos (baseados em derivadas)] utilizam explicitamente informações de derivadas da função objetivo:
+    \begin{itemize}
+        \item gradiente $\nabla f(\bm{x})$;
+        \item Hessiana $\nabla^2 f(\bm{x})$ ou aproximações.
+    \end{itemize}
+    Exemplos: método do gradiente, Newton, quasi-Newton, gradiente conjugado.
+    \item[Métodos diretos (sem derivadas)] utilizam apenas valores da função $f(\bm{x})$, sem exigir derivadas analíticas ou numéricas.
+    Exemplos: métodos aleatórios de busca, método univariado, Powell, simplex de Nelder--Mead.
+\end{description}
+
+Contextos em que métodos diretos são particularmente úteis:
+\begin{itemize}
+    \item Funções objetivo \emph{caixa-preta}, oriundas de simulações complexas;
+    \item Funções não diferenciáveis, com descontinuidades ou ruído numérico;
+    \item Situações em que derivadas são caras ou difíceis de obter e/ou implementar.
+\end{itemize}
+
+Contraste importante para enfatizar em sala:
+\begin{itemize}
+    \item Métodos indiretos tendem a ser mais eficientes quando derivadas são confiáveis;
+    \item Métodos diretos tendem a ser mais \textbf{robustos} e mais gerais, porém normalmente exigem mais avaliações de $f$.
+\end{itemize}
+
+\section{Visão Geral: Métodos Aleatórios e Grid Search}
+
+Nesta seção, a ideia é apenas dar a \emph{intuição} dos métodos, sem entrar em detalhes de implementação.
+
+\subsection{Random Jumping Method}
+
+\subsubsection*{Ideia Básica}
+
+\begin{itemize}
+    \item Suponha um problema irrestrito, mas com limites estabelecidos para cada variável:
+    \[
+        l_i \le x_i \le u_i,\quad i = 1,2,\dots,n.
+    \]
+    \item Geramos vetores aleatórios $\bm{r} = (r_1,\dots,r_n)^T$ com $r_i \sim U(0,1)$.
+    \item Construímos pontos no hipercubo:
+    \[
+        x_i = l_i + r_i (u_i - l_i), \quad i = 1,\dots,n.
+    \]
+    \item Avaliamos $f(\bm{x})$ em cada ponto e mantemos o melhor valor encontrado.
+\end{itemize}
+
+Comentários:
+\begin{itemize}
+    \item Método extremamente simples e fácil de programar;
+    \item Adequado como \textbf{exploração inicial} do espaço de busca;
+    \item Desvantagem: pode precisar de muitas amostras aleatórias para localizar bons mínimos em alta dimensão.
+\end{itemize}
+
+\subsection{Random Walk Method}
+
+\subsubsection*{Ideia Básica}
+
+\begin{itemize}
+    \item Em vez de escolher pontos independentes, construímos uma trajetória:
+    \[
+        \bm{X}_{i+1} = \bm{X}_i + \lambda \bm{u}_i,
+    \]
+    onde:
+    \begin{itemize}
+        \item $\lambda$ é um comprimento de passo (step length);
+        \item $\bm{u}_i$ é um vetor unitário aleatório.
+    \end{itemize}
+    \item Se $f(\bm{X}_{i+1}) < f(\bm{X}_i)$, aceitamos o novo ponto;
+    \item Caso contrário, geramos uma nova direção aleatória.
+    \item Quando não há melhorias após muitas tentativas, reduzimos $\lambda$ (por exemplo, $\lambda \leftarrow \lambda/2$).
+\end{itemize}
+
+Observações:
+\begin{itemize}
+    \item Usa-se um critério geométrico para evitar viés para as diagonais do hipercubo (aceita-se apenas vetores aleatórios com comprimento $R \le 1$ antes da normalização);
+    \item O método “caminha” pelo espaço, explorando regiões de menor valor de $f$.
+\end{itemize}
+
+\subsection{Random Walk com Exploração de Direção}
+
+\subsubsection*{Motivação}
+
+Se uma direção aleatória $\bm{u}_i$ reduziu o valor de $f$, faz sentido aproveitar ao máximo essa direção, em vez de dar apenas um passo de comprimento fixo.
+
+\subsubsection*{Ideia}
+
+\begin{itemize}
+    \item A partir de $\bm{X}_i$, fazemos uma minimização unidimensional ao longo de $\bm{u}_i$:
+    \[
+        \bm{X}_{i+1} = \bm{X}_i + \lambda_i^\ast \bm{u}_i,
+    \]
+    com
+    \[
+        \lambda_i^\ast = \arg\min_\lambda f(\bm{X}_i + \lambda \bm{u}_i).
+    \]
+    \item Para encontrar $\lambda_i^\ast$, emprega-se um dos métodos unidimensionais vistos anteriormente (seção áurea, interpolação quadrática etc.).
+\end{itemize}
+
+\subsection{Grid Search}
+
+\subsubsection*{Ideia Básica}
+
+\begin{itemize}
+    \item Discretizamos cada intervalo $[l_i,u_i]$ em $p_i$ pontos:
+    \[
+        x_i^{(1)}, x_i^{(2)}, \dots, x_i^{(p_i)},\quad i=1,\dots,n.
+    \]
+    \item Construímos a grade cartesiana com $p_1 p_2 \cdots p_n$ pontos;
+    \item Avaliamos $f$ em todos os pontos da grade;
+    \item Escolhemos o ponto de menor valor de $f$ como solução aproximada.
+\end{itemize}
+
+Comentários:
+\begin{itemize}
+    \item Simples e determinístico;
+    \item Sofre com a explosão combinatória em alta dimensão (ex.: $n=10$, $p_i=4$ leva a $4^{10}$ pontos);
+    \item Útil para:
+    \begin{itemize}
+        \item problemas de baixa dimensão;
+        \item geração de bons pontos iniciais para métodos mais sofisticados.
+    \end{itemize}
+\end{itemize}
+
+\section{Método Univariado (Univariate Search)}
+
+\subsection{Ideia Geral}
+
+No método univariado, otimizamos uma variável de cada vez, mantendo as demais fixas.
+
+\begin{itemize}
+    \item Em cada iteração, escolhemos uma direção coordenada $S_i$ (vetor da base canônica);
+    \item Fazemos uma busca unidimensional ao longo dessa direção;
+    \item Ao final de $n$ buscas (uma por coordenada), completa-se um ciclo.
+\end{itemize}
+
+As direções típicas são:
+\[
+S_1 = (1, 0, 0, \dots, 0)^T,\quad
+S_2 = (0, 1, 0, \dots, 0)^T,\quad
+\dots,\quad
+S_n = (0, 0, \dots, 1)^T.
+\]
+
+\subsection{Algoritmo Esquemático}
+
+\begin{enumerate}
+    \item Escolher um ponto inicial $\bm{X}_1$ e um \emph{probe} pequeno $\varepsilon$ (por exemplo, $\varepsilon = 0{,}01$).
+    \item Para cada direção $S_i$:
+    \begin{enumerate}[label=(\alph*)]
+        \item Calcular $f(\bm{X}_k)$, $f(\bm{X}_k + \varepsilon S_i)$ e $f(\bm{X}_k - \varepsilon S_i)$;
+        \item Determinar a direção de descida:
+        \begin{itemize}
+            \item se $f(\bm{X}_k + \varepsilon S_i) < f(\bm{X}_k)$, usar $+S_i$;
+            \item se $f(\bm{X}_k - \varepsilon S_i) < f(\bm{X}_k)$, usar $-S_i$;
+            \item se nenhuma reduz $f$, considerar que não há melhora naquela coordenada.
+        \end{itemize}
+        \item Se houver direção de descida, resolver
+        \[
+            \min_\lambda f(\bm{X}_k \pm \lambda S_i)
+        \]
+        com um método unidimensional adequado e obter $\lambda_i^\ast$.
+        \item Atualizar:
+        \[
+            \bm{X}_{k+1} = \bm{X}_k \pm \lambda_i^\ast S_i.
+        \]
+    \end{enumerate}
+    \item Repetir ciclos sobre as $n$ direções até que a melhoria em $f$ seja pequena.
+\end{enumerate}
+
+\subsection{Exemplo Numérico}
+
+Considere a função
+\[
+    f(x_1,x_2) = x_1 - x_2 + 2x_1^2 + 2x_1x_2 + x_2^2,
+\]
+e o ponto inicial
+\[
+    \bm{X}_1 = (0,0)^T.
+\]
+
+\subsubsection*{Iteração 1: direção $S_1 = (1,0)^T$}
+
+\begin{itemize}
+    \item $f(0,0) = 0$;
+    \item $f(\varepsilon,0) = \varepsilon + 2\varepsilon^2$; para $\varepsilon = 0{,}01$,
+    \[
+        f(0{,}01,0) \approx 0{,}0102;
+    \]
+    \item $f(-\varepsilon,0) = -\varepsilon + 2\varepsilon^2$;
+    \[
+        f(-0{,}01,0) \approx -0{,}0098.
+    \]
+\end{itemize}
+
+Como $f(-\varepsilon,0) < f(0,0)$, a direção de descida é $-S_1$.
+
+Agora minimizamos $f(-\lambda,0) = 2\lambda^2 - \lambda$. Derivando:
+\[
+    \frac{d}{d\lambda} (2\lambda^2 - \lambda) = 4\lambda - 1 = 0
+    \quad\Rightarrow\quad
+    \lambda^\ast = \frac{1}{4}.
+\]
+
+Logo, o novo ponto é
+\[
+    \bm{X}_2 = \bm{X}_1 - \lambda^\ast S_1 = \left(-\frac{1}{4}, 0\right)^T,
+\]
+com
+\[
+    f\left(-\frac{1}{4},0\right) = -\frac{1}{8}.
+\]
+
+\subsubsection*{Iteração 2: direção $S_2 = (0,1)^T$}
+
+A partir de $\bm{X}_2 = (-1/4,0)$, repete-se o procedimento:
+\begin{itemize}
+    \item calcula-se $f(-1/4,0)$, $f(-1/4,\varepsilon)$ e $f(-1/4,-\varepsilon)$;
+    \item determina-se se a direção correta é $+S_2$ ou $-S_2$;
+    \item realiza-se a minimização unidimensional $f(-1/4, \lambda)$ para encontrar $\lambda^\ast$;
+    \item obtém-se o novo ponto $\bm{X}_3$.
+\end{itemize}
+
+\textbf{Comentário didático:} é interessante realizar pelo menos um ciclo completo no quadro, mostrando a trajetória aproximada e discutindo:
+\begin{itemize}
+    \item lentidão perto do ótimo;
+    \item possibilidade de travamento em vales estreitos (exemplo com falha do univariate em um vale muito “fino”).
+\end{itemize}
+
+\section{Método de Powell (Pattern Search / Direções Conjugadas)}
+
+\subsection{Intuição}
+
+Problema do método univariado:
+\begin{itemize}
+    \item As direções de busca são sempre paralelas aos eixos de coordenadas;
+    \item Perto do mínimo, isso gera uma trajetória “dente de serra” e convergência lenta;
+    \item Em funções com vales alongados, o método pode oscilar muito.
+\end{itemize}
+
+Ideia de Powell:
+\begin{itemize}
+    \item Observar que, para funções quadráticas em duas variáveis, as retas que ligam pontos alternados do método univariado tendem a passar pelo mínimo;
+    \item Usar essas retas como novas direções de busca, chamadas \textbf{direções padrão} ou \textbf{direções conjugadas};
+    \item Em funções quadráticas de $n$ variáveis, um conjunto de $n$ direções \emph{conjugadas} permite atingir o mínimo em no máximo $n$ passos de minimização unidimensional (convergência quadrática).
+\end{itemize}
+
+\subsection{Ideia de Direções Conjugadas}
+
+Seja $A$ uma matriz simétrica $n \times n$ (por exemplo, a Hessiana de uma função quadrática). Um conjunto de vetores $S_1,\dots,S_n$ é \textbf{$A$-conjugado} se
+\[
+    S_i^T A S_j = 0,\quad \text{para } i \neq j.
+\]
+
+Direções ortogonais (no sentido usual) são um caso particular, quando $A = I$.
+
+\subsection{Esboço do Algoritmo de Powell}
+
+Para um problema em $n$ variáveis:
+
+\begin{enumerate}
+    \item Escolher ponto inicial $\bm{X}_1$.
+    \item Inicializar as direções $S_1,\dots,S_n$ como os vetores coordenados.
+    \item \textbf{Para cada ciclo}:
+    \begin{enumerate}[label=(\alph*)]
+        \item Guardar o ponto inicial do ciclo: $Z = X$.
+        \item Para $i=1,\dots,n$:
+        \begin{itemize}
+            \item Minimizar $f$ ao longo de $S_i$ a partir de $X$;
+            \item Atualizar o ponto $X$ com o resultado da minimização unidimensional.
+        \end{itemize}
+        \item Ao final do ciclo, construir a \textbf{direção padrão}:
+        \[
+            S_p = X - Z.
+        \]
+        \item Minimizar $f$ ao longo de $S_p$, atualizando novamente $X$.
+        \item Atualizar o conjunto de direções substituindo a \emph{mais antiga} por $S_p$.
+    \end{enumerate}
+    \item Repetir ciclos até que a melhoria em $f$ seja pequena.
+\end{enumerate}
+
+\subsection{Exemplo Numérico (Esboço)}
+
+Usando novamente
+\[
+    f(x_1,x_2) = x_1 - x_2 + 2x_1^2 + 2x_1x_2 + x_2^2,
+\]
+e ponto inicial $\bm{X}_1 = (0,0)$:
+
+\begin{itemize}
+    \item Primeiramente, execute um ciclo de busca univariada ao longo de $S_1$ e $S_2$ para obter um ponto $X_4$;
+    \item Defina $S_p = X_4 - X_1$;
+    \item Faça uma busca unidimensional ao longo de $S_p$;
+    \item Mostre (em quadro) que, neste exemplo quadrático, o ponto ótimo é atingido rapidamente.
+\end{itemize}
+
+\textbf{Mensagem didática:}
+\begin{itemize}
+    \item Powell é um método direto eficiente para funções suaves;
+    \item Para funções quadráticas, é teoricamente quadraticamente convergente;
+    \item Em funções gerais, continua sendo útil, embora sem as garantias exatas de convergência em $n$ ciclos.
+\end{itemize}
+
+\section{Método do Simplex (Nelder--Mead)}
+
+\subsection{Visão Geométrica}
+
+Definição de simplex:
+\begin{itemize}
+    \item Em $\mathbb{R}^n$, um \textbf{simplex} é o envelope convexo de $n+1$ pontos não coplanares;
+    \item Para $n=1$, é um segmento de reta (2 pontos);
+    \item Para $n=2$, é um triângulo (3 pontos);
+    \item Para $n=3$, é um tetraedro (4 pontos), etc.
+\end{itemize}
+
+No método de Nelder--Mead:
+\begin{itemize}
+    \item Mantém-se um simplex a cada iteração;
+    \item Em cada passo, avalia-se $f$ nos vértices;
+    \item Movimenta-se o simplex via:
+    \begin{itemize}
+        \item \textbf{Reflexão} do pior vértice;
+        \item \textbf{Expansão}, se a reflexão produziu um valor muito bom;
+        \item \textbf{Contração}, se a reflexão não foi boa;
+        \item \textbf{Encolhimento} (\emph{shrink}), se mesmo a contração falhar.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Passos Básicos em 2D (Triângulo)}
+
+Considere $n=2$ (didaticamente mais simples):
+
+\begin{enumerate}
+    \item Iniciar com três pontos $X_1, X_2, X_3$ e calcular $f(X_i)$.
+    \item Identificar:
+    \begin{itemize}
+        \item $X_l$: ponto com menor valor $f$ (melhor);
+        \item $X_h$: ponto com maior valor $f$ (pior);
+        \item $X_m$: ponto intermediário.
+    \end{itemize}
+    \item Calcular o centroide dos vértices exceto o pior:
+    \[
+        X_0 = \frac{1}{n} \sum_{i \neq h} X_i.
+    \]
+    \item \textbf{Reflexão}:
+    \[
+        X_r = X_0 + \alpha (X_0 - X_h),\quad \alpha>0.
+    \]
+    \item Avaliar $f(X_r)$ e aplicar a regra:
+    \begin{itemize}
+        \item Se $f(X_l) \le f(X_r) < f(X_m)$, substituir $X_h$ por $X_r$ e seguir para a próxima iteração;
+        \item Se $f(X_r) < f(X_l)$, tentar \textbf{expansão};
+        \item Se $f(X_r) \ge f(X_m)$, tentar \textbf{contração}.
+    \end{itemize}
+    \item \textbf{Expansão} (se $X_r$ for muito bom):
+    \[
+        X_e = X_0 + \gamma (X_r - X_0),\quad \gamma > 1.
+    \]
+    Escolher entre $X_r$ e $X_e$ o ponto com menor valor para substituir $X_h$.
+    \item \textbf{Contração}: se reflexão foi ruim:
+    \[
+        X_c = X_0 + \beta (X_h - X_0),\quad 0<\beta<1.
+    \]
+    Se $f(X_c)$ melhorar o simplex, substituir $X_h$ por $X_c$. Caso contrário, realizar \textbf{encolhimento}:
+    \[
+        X_i \leftarrow \frac{X_i + X_l}{2},\quad \text{para todos os vértices } i.
+    \]
+\end{enumerate}
+
+\subsection{Exemplo Numérico Esquemático}
+
+Considere novamente
+\[
+    f(x_1,x_2) = x_1 - x_2 + 2x_1^2 + 2x_1x_2 + x_2^2,
+\]
+e um simplex inicial com:
+\[
+    X_1 = (4,4),\quad
+    X_2 = (5,4),\quad
+    X_3 = (4,5).
+\]
+
+Sugestão para a aula:
+\begin{enumerate}
+    \item Calcular $f(X_1)$, $f(X_2)$, $f(X_3)$;
+    \item Identificar $X_l$, $X_m$, $X_h$;
+    \item Calcular $X_0$ e construir $X_r$;
+    \item Verificar se é caso de expansão ou não;
+    \item Desenhar o triângulo original e o triângulo após a operação em um gráfico de contorno (mesmo qualitativo).
+\end{enumerate}
+
+\subsection{Comentários Finais sobre o Simplex de Nelder--Mead}
+
+\begin{itemize}
+    \item Método direto popular em baixa dimensão;
+    \item Não usa derivadas, é puramente geométrico;
+    \item Funciona bem em muitas aplicações práticas, mas não tem garantias fortes de convergência global;
+    \item Em dimensões mais altas, o comportamento pode se deteriorar (necessidade de muitas avaliações de $f$ e geometria do simplex pode ficar pobre).
+\end{itemize}
+
+\section*{Resumo e Pontos para Fixação}
+
+\begin{itemize}
+    \item \textbf{Métodos diretos} são apropriados quando derivadas são indisponíveis, não confiáveis ou muito caras.
+    \item Métodos simples como \textbf{Random Jumping}, \textbf{Random Walk} e \textbf{Grid Search} são úteis para explorar o espaço e encontrar regiões promissoras.
+    \item O \textbf{método univariado} é conceitualmente simples, mas pode ser lento e sofrer com vales estreitos.
+    \item O \textbf{método de Powell} explora direções padrão (aproximadamente conjugadas) para acelerar a convergência em funções suaves, especialmente quadráticas.
+    \item O \textbf{método do simplex (Nelder--Mead)} usa operações geométricas (reflexão, expansão, contração, encolhimento) sobre um simplex para aproximar o mínimo.
+\end{itemize}
+
+\section*{Sugestões de Exercícios}
+
+\begin{enumerate}
+    \item Implementar o método univariado para a função
+    \[
+        f(x_1,x_2) = x_1 - x_2 + 2x_1^2 + 2x_1x_2 + x_2^2
+    \]
+    e comparar a trajetória com um método de gradiente.
+    \item Implementar o método de Powell em duas dimensões e testar em:
+    \begin{itemize}
+        \item uma função quadrática;
+        \item uma função não quadrática com vale alongado.
+    \end{itemize}
+    \item Implementar o método do simplex de Nelder--Mead em 2D, reproduzindo pelo menos duas iterações completas (com reflexão e alguma combinação de expansão/contração).
+    \item Investigar numericamente o efeito da escolha dos parâmetros $\alpha$, $\beta$ e $\gamma$ no comportamento do método do simplex.
+\end{enumerate}
+
+\end{document}
