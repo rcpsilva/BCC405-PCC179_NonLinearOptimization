@@ -1,0 +1,227 @@
+\documentclass[9pt,a4paper]{extarticle}
+
+% ======================
+% Codificação, idioma e layout
+% ======================
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{geometry}
+\geometry{margin=2cm}
+\usepackage{parskip}
+\usepackage{setspace}
+\usepackage{microtype}
+
+% ======================
+% Matemática e símbolos
+% ======================
+\usepackage{amsmath, amssymb, amsthm, bm}
+
+% ======================
+% Figuras e tabelas
+% ======================
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+
+% ======================
+% Hiperlinks
+% ======================
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue
+}
+
+% ======================
+% Início do documento
+% ======================
+\begin{document}
+
+\begin{center}
+  \Large \textbf{Estudo Dirigido – Condições de Primeira e Segunda Ordem para Problemas com Restrições} \\[4pt]
+  \normalsize Disciplina: Otimização Não Linear
+\end{center}
+
+\begin{enumerate}
+
+
+% ============================================================
+% 5. Interpretação das KKT
+% ============================================================
+\item \textbf{Interpretação das Condições KKT}
+
+Considere o problema geral:
+\[
+\min_{\mathbf{x}} \; f(\mathbf{x})
+\quad\text{sujeito a}\quad 
+g_i(\mathbf{x}) = 0,\; i=1,\ldots,m,\qquad
+h_j(\mathbf{x}) \le 0,\; j=1,\ldots,p.
+\]
+
+As Condições de Karush--Kuhn--Tucker (KKT) de primeira ordem são:
+\[
+\begin{cases}
+\text{(1) Estacionariedade:} 
+& \nabla f(\mathbf{x}^*) 
++ \displaystyle\sum_{i=1}^m \lambda_i^* \nabla g_i(\mathbf{x}^*)
++ \displaystyle\sum_{j=1}^p \mu_j^* \nabla h_j(\mathbf{x}^*)
+= 0, \\[6pt]
+
+\text{(2) Viabilidade primária:}
+& g_i(\mathbf{x}^*) = 0,\quad i=1,\ldots,m, \\
+& h_j(\mathbf{x}^*) \le 0,\quad j=1,\ldots,p, \\[6pt]
+
+\text{(3) Viabilidade dual:} 
+& \mu_j^* \ge 0,\quad j=1,\ldots,p, \\[6pt]
+
+\text{(4) Complementaridade:}
+& \mu_j^* \, h_j(\mathbf{x}^*) = 0,\quad j=1,\ldots,p.
+\end{cases}
+\]
+
+Responda:
+
+\begin{enumerate}
+    \item Nas consições apresentadas em aula, não colocamos $\mu_j^* \geq 0$. Utilize um problema com apenas uma restrição de desigualdade para explicar a necessidade desta condição.  
+    \item Explique detalhadamente o significado de cada uma das três condições restantes, incluindo:
+    \begin{enumerate}
+        \item a interpretação geométrica de cada condição;
+        \item o papel de cada condição na eliminação de direções de descida factíveis;
+        \item o papel dos multiplicadores na interpretação das restrições;
+        \item por que a complementaridade distingue quais restrições influenciam o ótimo.
+    \end{enumerate}
+\end{enumerate}
+
+
+
+
+% ============================================================
+% 1. Direções factíveis e de melhora
+% ============================================================
+\item \textbf{Direções factíveis e de melhora}
+
+Considere o problema:
+\[
+\min f(x,y)=x^2+y^2 
+\qquad \text{sujeito a } 
+g(x,y)=x+y-1=0.
+\]
+
+\begin{enumerate}
+    \item Encontre todas as direções factíveis no ponto $(x,y)=(0,1)$.
+    \item Determine se existe alguma direção de melhora nesse ponto.
+    \item Conclua se $(0,1)$ pode ser um ponto ótimo local.
+\end{enumerate}
+
+
+% ============================================================
+% 2. Lagrangeana e KKT básicas
+% ============================================================
+\item \textbf{Construção da Lagrangeana e condições de primeira ordem}
+
+Considere o problema:
+\[
+\min_{x,y} \; f(x,y) = x^2 + y^2 - 4x
+\]
+\[
+\text{sujeito a } h(x,y)=x+y-2\le 0.
+\]
+
+\begin{enumerate}
+    \item Escreva a Lagrangeana $\mathcal{L}(x,y,\mu)$.
+    \item Encontre as condições KKT de primeira ordem.
+    \item Determine os candidatos a ponto ótimo resolvendo o sistema KKT.
+    \item Classifique a restrição como ativa ou inativa no ponto obtido.
+\end{enumerate}
+
+
+% ============================================================
+% 3. KKT com múltiplas restrições
+% ============================================================
+\item \textbf{KKT com múltiplas restrições e interpretação geométrica}
+
+Considere o problema:
+\[
+\min_{x,y} \; f(x,y) = x 
+\]
+\[
+\text{sujeito a }
+\begin{cases}
+g_1(x,y)=x^2+y^2-1=0, \\
+g_2(x,y)=y- x \le 0.
+\end{cases}
+\]
+
+\begin{enumerate}
+    \item Desenhe qualitativamente a região viável.
+    \item Liste quais restrições são ativas no ponto que minimiza $x$.
+    \item Escreva as condições KKT para esse problema.
+    \item Mostre que o ponto ótimo deve satisfazer simultaneamente $g_1(x,y)=0$ e $g_2(x,y)=0$.
+    \item Encontre o ponto ótimo e os multiplicadores correspondentes.
+\end{enumerate}
+
+
+% ============================================================
+% 4. Segunda ordem com igualdade
+% ============================================================
+\item \textbf{Condições de segunda ordem com restrições de igualdade}
+
+As condições de segunda ordem analisam a curvatura da Lagrangeana ao longo das direções factíveis.  
+Para um problema geral
+\[
+\min_{\bm{x}} f(\bm{x})
+\quad \text{sujeito a} \quad g_i(\bm{x}) = 0,\; i=1,\dots,m,
+\]
+se $(\bm{x}^*, \bm{\lambda}^*)$ satisfaz as condições de primeira ordem, define-se o Hessiano da Lagrangeana em relação a $\bm{x}$:
+\[
+\nabla^2_{\bm{x}\bm{x}} \mathcal{L}(\bm{x}^*, \bm{\lambda}^*)
+= \nabla^2 f(\bm{x}^*) + \sum_{i=1}^m \lambda_i^* \nabla^2 g_i(\bm{x}^*).
+\]
+Seja ainda o espaço das direções tangentes factíveis no ponto ótimo:
+\[
+\mathcal{D} = \{\bm{d} \neq 0 : \nabla g_i(\bm{x}^*)^\top \bm{d} = 0,\; i=1,\dots,m\}.
+\]
+
+Então:
+\begin{itemize}
+    \item \textbf{Condição necessária de segunda ordem:}
+    \[
+    \bm{d}^\top \nabla^2_{\bm{x}\bm{x}} \mathcal{L}(\bm{x}^*, \bm{\lambda}^*) \bm{d} \ge 0,
+    \quad \forall \bm{d} \in \mathcal{D}.
+    \]
+    \item \textbf{Condição suficiente (mínimo local):}
+    \[
+    \bm{d}^\top \nabla^2_{\bm{x}\bm{x}} \mathcal{L}(\bm{x}^*, \bm{\lambda}^*) \bm{d} > 0,
+    \quad \forall \bm{d} \in \mathcal{D}.
+    \]
+\end{itemize}
+
+Considere agora o problema específico:
+\[
+\min f(x,y)= x^2 +xy + y^2
+\]
+\[
+\text{sujeito a } g(x,y)=x-y=0.
+\]
+
+\begin{enumerate}
+    \item Escreva a Lagrangeana e encontre $(x^*,y^*,\lambda^*)$.
+    \item Encontre o espaço das direções tangente factíveis no ponto ótimo.
+    \item Calcule o Hessiano da Lagrangeana $\mathcal{L}_{xx}$.
+    \item Verifique a condição necessária de segunda ordem.
+    \item Verifique a condição suficiente de segunda ordem.
+    \item Classifique o ponto como mínimo, máximo ou ponto de sela dentro da variedade factível.
+\end{enumerate}
+
+\end{enumerate}
+
+
+
+\end{document}
+
