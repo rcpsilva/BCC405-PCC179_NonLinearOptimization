@@ -1,0 +1,450 @@
+\documentclass[9pt,a4paper]{extarticle}
+
+% ======================
+% Codificação, idioma e layout
+% ======================
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{geometry}
+\geometry{margin=2cm}
+\usepackage{parskip}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{microtype}
+
+% ======================
+% Matemática e símbolos
+% ======================
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{bm}
+
+% ======================
+% Figuras, tabelas e cores (se quiser adicionar desenhos/contornos)
+% ======================
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+
+% ======================
+% Listas e hyperlinks
+% ======================
+\usepackage{enumitem}
+\setlist{nosep}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=blue
+}
+
+% ======================
+% Título
+% ======================
+\title{\vspace{-1cm}Roteiro de Aula\\Otimização Não Linear\\Métodos de Busca Indireta (Descent Methods)}
+\author{Prof. Rodrigo Silva}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{Objetivos da aula}
+
+Ao final desta aula, o estudante deverá ser capaz de:
+\begin{itemize}
+    \item Definir o \textbf{gradiente} de uma função $f:\mathbb{R}^n \to \mathbb{R}$ e interpretar seu significado geométrico.
+    \item Explicar por que o gradiente é a \textbf{direção de máximo crescimento} (steepest ascent) e $-\nabla f$ é a direção de \textbf{máxima descida}.
+    \item Discutir dificuldades práticas na \textbf{avaliação do gradiente} e aplicar \textbf{diferenças finitas} para aproximá-lo.
+    \item Calcular a \textbf{taxa de variação de $f$ ao longo de uma direção} $S_i$:
+    \[
+      \frac{df}{d\lambda} = \nabla f^\top S_i.
+    \]
+    \item Descrever e aplicar o \textbf{método do declive máximo} (steepest descent / método de Cauchy) em um exemplo simples.
+    \item Apresentar e interpretar \textbf{critérios de parada} em métodos iterativos de otimização irrestrita.
+\end{itemize}
+
+Baseado em \textit{RAO, Singiresu S. Engineering Optimization: Theory and Practice. 5. ed. Hoboken: John Wiley and Sons, 2020.}
+
+\section{Contextualização}
+
+\begin{itemize}
+    \item Problema geral de \textbf{minimização irrestrita}:
+    \[
+      \min_{X \in \mathbb{R}^n} f(X).
+    \]
+    \item Nas aulas anteriores foram estudados métodos de \textbf{busca direta} (sem derivadas).
+    \item Motivação para \textbf{métodos de busca indireta (descent methods)}:
+    \begin{itemize}
+        \item Usar informação de derivada para escolher direções de busca mais eficientes.
+        \item Em problemas suaves, espera-se convergência mais rápida comparada a métodos puramente heurísticos.
+    \end{itemize}
+\end{itemize}
+
+\section{Gradiente de uma função}
+
+\subsection{Definição}
+
+Seja $f:\mathbb{R}^n \to \mathbb{R}$ uma função escalar diferenciável. O \textbf{gradiente} de $f$ em $X = (x_1,\dots,x_n)^\top$ é o vetor coluna
+\[
+  \nabla f(X) =
+  \begin{bmatrix}
+    \dfrac{\partial f}{\partial x_1} \\[0.5em]
+    \dfrac{\partial f}{\partial x_2} \\
+    \vdots \\
+    \dfrac{\partial f}{\partial x_n}
+  \end{bmatrix}.
+\]
+
+\begin{itemize}
+    \item $\nabla f(X)$ aponta, localmente, na direção em que $f$ cresce mais rapidamente.
+    \item Geometricamente, em $\mathbb{R}^2$, o gradiente é ortogonal às curvas de nível de $f$.
+\end{itemize}
+
+\subsection{Intuição geométrica: direção de máxima inclinação}
+
+\begin{itemize}
+    \item Em $n=2$, imagine $f(x_1,x_2)$ como uma superfície.
+    \item As curvas de nível $f(x_1,x_2)=c$ são linhas no plano $(x_1,x_2)$.
+    \item O gradiente $\nabla f$ é perpendicular a essas curvas de nível e aponta para valores maiores de $f$.
+    \item Consequentemente, $-\nabla f$ aponta para a direção de maior \textbf{decréscimo} de $f$.
+\end{itemize}
+
+\subsection{Teorema 6.3: o gradiente como direção de steepest ascent}
+
+\textbf{Teorema 6.3.} \emph{O vetor gradiente $\nabla f(X)$ representa a direção de \textbf{máxima taxa de crescimento} (steepest ascent) da função $f$ no ponto $X$.}
+
+\subsubsection*{Ideia da demonstração}
+
+Considere um ponto arbitrário $X$ e um ponto vizinho $X + dX$ com
+\[
+  dX =
+  \begin{bmatrix}
+    dx_1 \\ dx_2 \\ \vdots \\ dx_n
+  \end{bmatrix}.
+\]
+
+\begin{enumerate}[label=(\alph*)]
+    \item O comprimento do vetor $dX$ é
+    \[
+      (ds)^2 = dX^\top dX = \sum_{i=1}^n (dx_i)^2.
+    \]
+    \item A variação de $f$ é dada por
+    \[
+      df = \sum_{i=1}^n \frac{\partial f}{\partial x_i} dx_i = \nabla f^\top dX.
+    \]
+    \item Escrevemos $dX = u\,ds$, onde $u$ é um vetor unitário ($\|u\|=1$) que indica a direção do passo.
+    \item Então,
+    \[
+      \frac{df}{ds} = \nabla f^\top u.
+    \]
+    \item Usando o produto interno, obtemos
+    \[
+      \frac{df}{ds} = \|\nabla f\| \,\|u\| \cos\theta = \|\nabla f\| \cos\theta,
+    \]
+    onde $\theta$ é o ângulo entre $\nabla f$ e $u$.
+    \item Como $\cos\theta \leq 1$, a taxa de variação $\dfrac{df}{ds}$ é máxima quando $\theta = 0^\circ$, isto é, quando $u$ está alinhado com $\nabla f$.
+\end{enumerate}
+
+\subsection{Teorema 6.4: valor máximo da taxa de mudança}
+
+\textbf{Teorema 6.4.} \emph{A taxa máxima de variação de $f$ em um ponto $X$ é igual à norma do gradiente nesse ponto:}
+\[
+  \left(\frac{df}{ds}\right)_{\max} = \|\nabla f(X)\|.
+\]
+
+\noindent Isso decorre diretamente da expressão
+\[
+  \frac{df}{ds} = \|\nabla f\| \cos\theta,
+\]
+que atinge seu máximo em $\cos\theta = 1$.
+
+\medskip
+
+\noindent \textbf{Observação:} se o gradiente é a direção de máximo crescimento, então $-\nabla f$ é a direção de \textbf{máximo decréscimo} (steepest descent).
+
+\section{Avaliação do gradiente na prática}
+
+\subsection{Situações típicas problemáticas}
+
+A avaliação de $\nabla f$ pode ser problemática em três situações:
+
+\begin{enumerate}
+    \item $f$ é diferenciável, mas é impraticável ou impossível derivar as expressões analíticas de $\dfrac{\partial f}{\partial x_i}$.
+    \item As expressões analíticas existem, mas são muito complexas e caras de avaliar (alto custo computacional).
+    \item O gradiente não é definido em todos os pontos (função não diferenciável em certos pontos).
+\end{enumerate}
+
+\noindent Nas situações (1) e (2), frequentemente se usam \textbf{diferenças finitas}. Na situação (3), o uso de diferenças finitas pode levar à quebra do algoritmo; métodos de busca direta são mais adequados.
+
+\subsection{Diferenças finitas progressivas (forward difference)}
+
+Para aproximar a derivada parcial em $X_m$:
+\[
+  \left.\frac{\partial f}{\partial x_i}\right|_{X_m}
+  \approx
+  \frac{ f(X_m + \Delta x_i u_i) - f(X_m) }{\Delta x_i},
+\]
+onde:
+\begin{itemize}
+    \item $\Delta x_i$ é um pequeno incremento na coordenada $x_i$;
+    \item $u_i$ é o vetor canônico com $1$ na posição $i$ e $0$ nas demais.
+\end{itemize}
+
+\noindent Se $f(X_m)$ já for conhecido, essa aproximação requer apenas \textbf{uma avaliação adicional} de $f$ por componente. O gradiente completo em $\mathbb{R}^n$ requer $n$ avaliações adicionais de $f$.
+
+\subsection{Diferenças finitas centrais (central difference)}
+
+Uma aproximação mais precisa é dada por:
+\[
+  \left.\frac{\partial f}{\partial x_i}\right|_{X_m}
+  \approx
+  \frac{ f(X_m + \Delta x_i u_i) - f(X_m - \Delta x_i u_i) }{2\Delta x_i}.
+\]
+
+\noindent Nesse caso, são necessárias \textbf{duas avaliações} de $f$ por componente, em troca de maior precisão.
+
+\subsection{Escolha de $\Delta x_i$: erros de arredondamento e truncamento}
+
+\begin{itemize}
+    \item Se $\Delta x_i$ é \textbf{muito pequeno}, os valores de $f$ em $X_m \pm \Delta x_i u_i$ são muito próximos e o erro de arredondamento pode dominar.
+    \item Se $\Delta x_i$ é \textbf{muito grande}, perde-se a localidade da aproximação e o erro de truncamento aumenta.
+    \item Na prática, escolhe-se $\Delta x_i$ de acordo com a escala de $x_i$ e a precisão numérica disponível.
+\end{itemize}
+
+\subsection{Gradiente não definido em todos os pontos}
+
+Quando $f$ possui descontinuidades na derivada (quinas), a derivada pode não existir em certos pontos. Nesses casos:
+
+\begin{itemize}
+    \item Diferentes valores de $\Delta x_i$ podem produzir inclinações diferentes ao aplicar fórmulas de diferença finita.
+    \item Isso é um indicativo de que a derivada não existe naquele ponto.
+    \item Métodos baseados em gradiente podem falhar; é preferível usar métodos de busca direta.
+\end{itemize}
+
+\section{Taxa de variação ao longo de uma direção}
+
+Em muitos métodos de otimização, escolhemos uma direção de busca $S_i$ e realizamos uma \textbf{busca unidirecional} em $\lambda$.
+
+\subsection{Parametrização ao longo de $S_i$}
+
+Dado um ponto $X_i$ e uma direção $S_i$, qualquer ponto sobre a reta é da forma
+\[
+  X(\lambda) = X_i + \lambda S_i.
+\]
+Definimos uma função escalar de uma variável:
+\[
+  \varphi(\lambda) = f(X_i + \lambda S_i).
+\]
+
+\subsection{Derivada direcional: $\dfrac{df}{d\lambda} = \nabla f^\top S_i$}
+
+Pela regra da cadeia:
+\[
+  \frac{df}{d\lambda}
+  = \sum_{j=1}^n \frac{\partial f}{\partial x_j} \frac{\partial x_j}{\partial \lambda}.
+\]
+
+Como $x_j(\lambda) = x_{ij} + \lambda s_{ij}$, temos $\dfrac{\partial x_j}{\partial \lambda} = s_{ij}$. Logo,
+\[
+  \frac{df}{d\lambda}
+  = \sum_{j=1}^n \frac{\partial f}{\partial x_j} s_{ij}
+  = \nabla f^\top S_i.
+\]
+
+\noindent Se $\lambda^\ast$ minimiza $\varphi(\lambda)$, então
+\[
+  \left.\frac{df}{d\lambda}\right|_{\lambda=\lambda^\ast} = 0
+  \quad \Rightarrow \quad
+  \nabla f(X_i + \lambda^\ast S_i)^\top S_i = 0.
+\]
+
+\noindent Esse resultado é fundamental em rotinas de \textbf{busca linear} (line search).
+
+\section{Método do declive máximo (steepest descent / Cauchy)}
+
+\subsection{Ideia básica}
+
+\begin{itemize}
+    \item Em cada iteração $i$, escolhemos a direção
+    \[
+      S_i = -\nabla f(X_i),
+    \]
+    que é a direção de \textbf{máxima descida} de $f$ a partir de $X_i$.
+    \item Em seguida, realizamos uma busca unidimensional em $\lambda$ para encontrar o melhor passo $\lambda_i^\ast$.
+    \item Atualizamos o ponto usando $X_{i+1} = X_i + \lambda_i^\ast S_i$.
+\end{itemize}
+
+\subsection{Algoritmo}
+
+\begin{enumerate}
+    \item \textbf{Inicialização:} escolher um ponto inicial $X_1 \in \mathbb{R}^n$ e definir $i = 1$.
+    \item \textbf{Direção de busca:}
+    \[
+      S_i = -\nabla f(X_i).
+    \]
+    \item \textbf{Busca unidimensional:} determinar o passo ótimo
+    \[
+      \lambda_i^\ast = \arg\min_{\lambda \ge 0} f(X_i + \lambda S_i).
+    \]
+    \item \textbf{Atualização do ponto:}
+    \[
+      X_{i+1} = X_i + \lambda_i^\ast S_i = X_i - \lambda_i^\ast \nabla f(X_i).
+    \]
+    \item \textbf{Teste de convergência:} se algum critério de parada for satisfeito, encerrar; caso contrário, definir $i \leftarrow i+1$ e voltar ao passo 2.
+\end{enumerate}
+
+\noindent \textbf{Observação didática:} apesar de usar a melhor direção local de descida, o método pode ser \textbf{lento} em vales estreitos (comportamento de ``zigue-zague''), motivando o estudo de métodos mais avançados (Newton, quasi-Newton, gradiente conjugado, etc.).
+
+\section{Exemplo: aplicação do método do declive máximo}
+
+Considere
+\[
+  f(x_1,x_2) = x_1 - x_2 + 2x_1^2 + 2x_1x_2 + x_2^2.
+\]
+
+\subsection{Gradiente}
+
+\[
+  \nabla f =
+  \begin{bmatrix}
+    \dfrac{\partial f}{\partial x_1} \\[0.5em]
+    \dfrac{\partial f}{\partial x_2}
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    1 + 4x_1 + 2x_2 \\
+    -1 + 2x_1 + 2x_2
+  \end{bmatrix}.
+\]
+
+\subsection{Iteração 1}
+
+\begin{itemize}
+    \item Ponto inicial:
+    \[
+      X_1 =
+      \begin{bmatrix}
+        0 \\ 0
+      \end{bmatrix}.
+    \]
+    \item Gradiente em $X_1$:
+    \[
+      \nabla f_1 = \nabla f(X_1) =
+      \begin{bmatrix}
+        1 \\ -1
+      \end{bmatrix}.
+    \]
+    \item Direção de descida:
+    \[
+      S_1 = -\nabla f_1 =
+      \begin{bmatrix}
+        -1 \\ 1
+      \end{bmatrix}.
+    \]
+    \item Ponto ao longo da direção:
+    \[
+      X(\lambda_1) = X_1 + \lambda_1 S_1 = (-\lambda_1, \lambda_1).
+    \]
+    \item Função ao longo da reta:
+    \[
+      f(-\lambda_1, \lambda_1) = \lambda_1^2 - 2\lambda_1.
+    \]
+    \item Derivada em relação a $\lambda_1$:
+    \[
+      \frac{df}{d\lambda_1} = 2\lambda_1 - 2.
+    \]
+    \item Passo ótimo:
+    \[
+      2\lambda_1 - 2 = 0 \;\Rightarrow\; \lambda_1^\ast = 1.
+    \]
+    \item Atualização:
+    \[
+      X_2 = X_1 + \lambda_1^\ast S_1 =
+      \begin{bmatrix}
+        -1 \\ 1
+      \end{bmatrix}.
+    \]
+\end{itemize}
+
+\subsection{Iterações seguintes (esboço)}
+
+\begin{itemize}
+    \item \textbf{Iteração 2:} calcular $\nabla f_2$, $S_2$, construir $f(X_2 + \lambda_2 S_2)$, encontrar $\lambda_2^\ast$, obter $X_3$.
+    \item \textbf{Iteração 3 e seguintes:} repetir o procedimento até satisfazer um critério de parada.
+    \item O ponto ótimo é
+    \[
+      X^\ast =
+      \begin{bmatrix}
+        -1.0 \\ 1.5
+      \end{bmatrix}.
+    \]
+\end{itemize}
+
+\noindent Em sala, pode-se:
+\begin{itemize}
+    \item Resolver a Iteração 2 com os alunos.
+    \item Deixar as iterações seguintes como exercício.
+    \item Discutir o comportamento de zigue-zague em curvas de nível.
+\end{itemize}
+
+\section{Critérios de parada}
+
+Critérios usuais para encerrar o método iterativo:
+
+\subsection{Variação relativa pequena em $f$}
+
+\[
+  \left|
+  \frac{f(X_{i+1}) - f(X_i)}{f(X_i)}
+  \right|
+  \leq \varepsilon_1.
+\]
+
+\subsection{Norma do gradiente pequena}
+
+\[
+  \left| \frac{\partial f}{\partial x_j} \right| \leq \varepsilon_2,
+  \quad j=1,\dots,n,
+\]
+ou, mais compactamente,
+\[
+  \|\nabla f(X_i)\| \leq \varepsilon_2.
+\]
+
+\subsection{Mudança pequena em $X$}
+
+\[
+  \|X_{i+1} - X_i\| \leq \varepsilon_3.
+\]
+
+\noindent Na prática, usualmente combina-se mais de um critério, com tolerâncias como $10^{-3}$, $10^{-4}$, etc., dependendo da aplicação.
+
+\section{Encerramento e próximos passos}
+
+\begin{itemize}
+    \item Nesta aula:
+    \begin{itemize}
+        \item Definimos o gradiente e interpretamos seu papel como direção de \textbf{steepest ascent}.
+        \item Vimos que $-\nabla f$ define uma direção de \textbf{steepest descent}.
+        \item Apresentamos formas de \textbf{aproximar numericamente} o gradiente via diferenças finitas.
+        \item Derivamos a taxa de variação de $f$ ao longo de uma direção $S_i$:
+        \[
+          \frac{df}{d\lambda} = \nabla f^\top S_i.
+        \]
+        \item Estudamos o \textbf{método do declive máximo} (Cauchy) e aplicamos a um exemplo.
+        \item Discutimos \textbf{critérios de parada} em métodos iterativos.
+    \end{itemize}
+    \item Próximas aulas:
+    \begin{itemize}
+        \item Limitações do steepest descent em vales estreitos.
+        \item Métodos mais avançados: \textbf{Newton}, \textbf{quasi-Newton}, \textbf{gradiente conjugado}, etc.
+    \end{itemize}
+\end{itemize}
+
+\end{document}
