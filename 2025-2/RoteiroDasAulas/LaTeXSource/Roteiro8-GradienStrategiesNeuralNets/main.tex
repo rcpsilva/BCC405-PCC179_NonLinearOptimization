@@ -1,0 +1,221 @@
+\documentclass[9pt,a4paper]{extarticle}
+
+% ======================
+% Pacotes básicos
+% ======================
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{geometry}
+\geometry{margin=2cm}
+\usepackage{parskip}
+\usepackage{setspace}
+\usepackage{microtype}
+
+% ======================
+% Matemática
+% ======================
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{bm}
+
+% ======================
+% Listas e hyperlinks
+% ======================
+\usepackage{enumitem}
+\setlist{nosep}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
+
+% ======================
+% Título
+% ======================
+\title{\vspace{-1cm}Roteiro de Aula -- Métodos de Gradiente para Treinamento de Redes Neurais}
+\author{Prof.\ Rodrigo Silva}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Motivação}
+O treinamento de redes neurais consiste em minimizar uma função de perda 
+\[
+L(\theta),
+\]
+onde $\theta$ representa todos os parâmetros do modelo. O gradiente pode ser calculado eficientemente via \emph{backpropagation}, de modo que métodos baseados em gradiente são a principal ferramenta de otimização em aprendizagem profunda.
+
+\vspace{0.2cm}
+Nesta aula estudaremos os principais métodos de descida comumente utilizados no treinamento de redes neurais.
+
+% ============================================================
+\section{Gradient Descent Básico}
+
+Dado um vetor de parâmetros $\theta_k$, a atualização por descida do gradiente é:
+
+\[
+\theta_{k+1} = \theta_k - \alpha \nabla_\theta L(\theta_k),
+\]
+
+onde $\alpha > 0$ é a taxa de aprendizado. As principais variantes práticas são:
+
+\begin{itemize}
+    \item \textbf{Batch GD}: usa todo o conjunto de dados.
+    \item \textbf{Stochastic GD}: usa apenas um exemplo por iteração.
+    \item \textbf{Mini-batch GD}: usa subconjuntos dos dados (forma usual).
+\end{itemize}
+
+Limitações principais:
+\begin{itemize}
+    \item sensibilidade à escolha do $\alpha$;
+    \item pode oscilar em vales estreitos da função;
+    \item pode convergir lentamente.
+\end{itemize}
+
+% ============================================================
+\section{Gradient Descent com Momentum}
+
+O método adiciona o conceito de ``velocidade'' acumulada:
+
+\[
+v_{k+1} = \beta v_k + (1-\beta)\nabla L(\theta_k),
+\]
+\[
+\theta_{k+1} = \theta_k - \alpha v_{k+1},
+\]
+
+onde $\beta \in [0.9,0.99]$ regula a influência do passado.
+
+Vantagens:
+\begin{itemize}
+    \item acelera o avanço em direções consistentes;
+    \item reduz oscilações devido a ruído no gradiente.
+\end{itemize}
+
+% ============================================================
+\section{AdaGrad}
+
+O AdaGrad adapta a taxa de aprendizado individualmente para cada parâmetro acumulando os quadrados dos gradientes:
+
+\[
+g_{k+1} = g_k + \left(\nabla L(\theta_k)\right)^2,
+\]
+
+\[
+\theta_{k+1} = \theta_k - \frac{\alpha}{\sqrt{g_{k+1}} + \varepsilon} \nabla L(\theta_k).
+\]
+
+Consequências:
+\begin{itemize}
+    \item parâmetros com gradientes grandes têm passo reduzido;
+    \item parâmetros com gradientes pequenos têm passo ampliado.
+\end{itemize}
+
+Problema principal: o termo acumulado cresce monotonicamente, levando a passos cada vez menores.
+
+% ============================================================
+\section{RMSProp}
+
+RMSProp corrige o AdaGrad substituindo a soma acumulada por uma média móvel exponencial:
+
+\[
+s_{k+1} = \beta s_k + (1-\beta)(\nabla L(\theta_k))^2,
+\]
+
+\[
+\theta_{k+1} = \theta_k - \frac{\alpha}{\sqrt{s_{k+1}} + \varepsilon} \nabla L(\theta_k).
+\]
+
+Vantagens:
+\begin{itemize}
+    \item evita que o passo tenda a zero;
+    \item funciona bem com gradientes ruidosos;
+    \item é amplamente utilizado em redes profundas.
+\end{itemize}
+
+% ============================================================
+\section{RMSProp com Momentum}
+
+Combinação da média móvel adaptativa do RMSProp com o acúmulo de velocidade do momentum:
+
+\[
+s_{k+1} = \beta s_k + (1-\beta)(\nabla L(\theta_k))^2,
+\]
+\[
+v_{k+1} = \mu v_k + \frac{\alpha}{\sqrt{s_{k+1}}+\varepsilon}\nabla L(\theta_k),
+\]
+\[
+\theta_{k+1} = \theta_k - v_{k+1}.
+\]
+
+Vantagens: maior estabilidade e aceleração.
+
+% ============================================================
+\section{AdaDelta}
+
+O AdaDelta busca eliminar a dependência direta do parâmetro $\alpha$.
+
+Acumula gradientes:
+\[
+E[g^2]_{k+1} = \beta E[g^2]_k + (1-\beta)(\nabla L(\theta_k))^2.
+\]
+
+Define a atualização:
+\[
+\Delta\theta_k = -\frac{\sqrt{E[\Delta\theta^2]_k + \varepsilon}}{\sqrt{E[g^2]_{k+1}}+\varepsilon}\nabla L(\theta_k).
+\]
+
+Acumula as atualizações:
+\[
+E[\Delta\theta^2]_{k+1} = \beta E[\Delta\theta^2]_k + (1-\beta)(\Delta\theta_k)^2.
+\]
+
+Benefícios:
+\begin{itemize}
+    \item reduz a necessidade de escolher $\alpha$;
+    \item acelera regiões planas e estabiliza regiões de grande curvatura.
+\end{itemize}
+
+% ============================================================
+\section{Adam -- Adaptive Moment Estimation}
+
+O Adam combina momentum com RMSProp e inclui correção de viés.
+
+Momentos:
+\[
+m_{k+1} = \beta_1 m_k + (1-\beta_1)\nabla L(\theta_k),
+\]
+\[
+v_{k+1} = \beta_2 v_k + (1-\beta_2)(\nabla L(\theta_k))^2.
+\]
+
+Correções de viés:
+\[
+\hat{m}_{k+1} = \frac{m_{k+1}}{1-\beta_1^{k+1}}, \qquad
+\hat{v}_{k+1} = \frac{v_{k+1}}{1-\beta_2^{k+1}}.
+\]
+
+Atualização final:
+\[
+\theta_{k+1} = \theta_k - \frac{\alpha \hat{m}_{k+1}}{\sqrt{\hat{v}_{k+1}} + \varepsilon}.
+\]
+
+Vantagens principais:
+\begin{itemize}
+    \item rápido e estável;
+    \item altamente utilizado em aprendizagem profunda;
+    \item adapta-se automaticamente a diferentes escalas de parâmetros.
+\end{itemize}
+
+% ============================================================
+\section{Resumo Comparativo}
+
+\begin{itemize}
+    \item GD: simples, porém lento e sensível ao passo.
+    \item Momentum: acelera e suaviza oscilações.
+    \item AdaGrad: adapta o passo, mas pode estagnar.
+    \item RMSProp: adapta o passo sem estagnação.
+    \item RMSProp + Momentum: equilíbrio entre estabilidade e velocidade.
+    \item AdaDelta: reduz dependência do $\alpha$.
+    \item Adam: método mais utilizado atualmente.
+\end{itemize}
+
+\end{document}

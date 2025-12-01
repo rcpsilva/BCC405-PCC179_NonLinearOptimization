@@ -1,0 +1,674 @@
+\documentclass[9pt,a4paper]{extarticle}
+
+% ==========================================
+% Basic packages
+% ==========================================
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{geometry}
+\geometry{margin=2cm}
+\usepackage{parskip}
+\usepackage{microtype}
+
+% Math
+\usepackage{amsmath, amssymb, amsthm, bm}
+
+% ==========================================
+% Document
+% ==========================================
+\begin{document}
+
+\section*{Lecture Notes: Fletcher--Reeves Method (Conjugate Gradient)}
+
+\section{Motivation}
+
+The Conjugate Gradient method is an efficient alternative to steepest descent for minimizing quadratic functions of the form
+\[
+f(x)=\tfrac12 x^\top A x + b^\top x + c,
+\]
+where $A$ is symmetric positive definite. Unlike steepest descent, which may zig-zag, the Conjugate Gradient method constructs mutually $A$-conjugate directions, ensuring convergence in at most $n$ iterations for quadratic functions.
+
+\section{Line Minimization}
+
+Consider a quadratic objective function of the form
+\[
+f(x) = \tfrac{1}{2} x^\top A x + b^\top x + c,
+\]
+where $A$ is symmetric (and, no contexto do método, definida positiva).
+
+Given a current point $x_i$ and a search direction $S_i$, we define the next iterate as
+\[
+x_{i+1} = x_i + \lambda_i S_i,
+\]
+where the scalar $\lambda_i$ is chosen to minimize $f$ along the line
+\[
+\phi(\lambda) = f(x_i + \lambda S_i).
+\]
+
+\subsection*{Step 1: Gradient of the quadratic function}
+
+For the quadratic function above, the gradient is
+\[
+\nabla f(x) = A x + b.
+\]
+
+Em particular, no ponto $x_i$ temos
+\[
+\nabla f_i := \nabla f(x_i) = A x_i + b.
+\]
+
+\subsection*{Step 2: Expressing the gradient along the line}
+
+Ao longo da reta $x(\lambda) = x_i + \lambda S_i$, o gradiente em função de $\lambda$ é
+\[
+\nabla f(x_i + \lambda S_i)
+= A(x_i + \lambda S_i) + b.
+\]
+
+Usando a distributividade,
+\[
+\nabla f(x_i + \lambda S_i)
+= A x_i + \lambda A S_i + b.
+\]
+
+Reagrupando os termos conhecidos em $x_i$:
+\[
+\nabla f(x_i + \lambda S_i)
+= (A x_i + b) + \lambda A S_i
+= \nabla f_i + \lambda A S_i.
+\]
+
+\subsection*{Step 3: Derivative of the line function \texorpdfstring{$\phi(\lambda)$}{phi(lambda)}}
+
+A função de uma variável real que estamos minimizando é
+\[
+\phi(\lambda) = f(x_i + \lambda S_i).
+\]
+
+Pela regra da cadeia,
+\[
+\frac{d\phi}{d\lambda}
+= \nabla f(x_i + \lambda S_i)^\top \frac{d}{d\lambda}(x_i + \lambda S_i).
+\]
+
+Como
+\[
+\frac{d}{d\lambda}(x_i + \lambda S_i) = S_i,
+\]
+temos
+\[
+\frac{d\phi}{d\lambda}
+= \nabla f(x_i + \lambda S_i)^\top S_i.
+\]
+
+Substituindo a expressão da Subsecção 2:
+\[
+\frac{d\phi}{d\lambda}
+= (\nabla f_i + \lambda A S_i)^\top S_i.
+\]
+
+\subsection*{Step 4: Simplifying the derivative}
+
+Usando $(u+v)^\top S_i = u^\top S_i + v^\top S_i$:
+\[
+\frac{d\phi}{d\lambda}
+= \nabla f_i^\top S_i + (\lambda A S_i)^\top S_i.
+\]
+
+Note que $(\lambda A S_i)^\top S_i = \lambda (A S_i)^\top S_i$.  
+Como $A$ é simétrica, $(A S_i)^\top S_i = S_i^\top A S_i$. Logo:
+\[
+\frac{d\phi}{d\lambda}
+= \nabla f_i^\top S_i + \lambda S_i^\top A S_i.
+\]
+
+Podemos também escrever
+\[
+\frac{d\phi}{d\lambda}
+= S_i^\top \nabla f_i + \lambda S_i^\top A S_i.
+\]
+
+\subsection*{Step 5: Optimal step size}
+
+O valor ótimo $\lambda_i^*$ é obtido impondo a condição de primeira ordem
+\[
+\frac{d\phi}{d\lambda} = 0.
+\]
+
+Assim,
+\[
+S_i^\top \nabla f_i + \lambda_i^* S_i^\top A S_i = 0.
+\]
+
+Isolando $\lambda_i^*$:
+\[
+\lambda_i^* S_i^\top A S_i = - S_i^\top \nabla f_i,
+\]
+\[
+\lambda_i^* = -\frac{S_i^\top \nabla f_i}{S_i^\top A S_i}.
+\]
+
+Em particular, na primeira iteração ($i=1$) temos
+\[
+\lambda_1^* = -\frac{S_1^\top \nabla f_1}{S_1^\top A S_1}.
+\]
+
+
+\section{Conjugate Directions}
+
+We now show in detail how to construct the second search direction $S_2$ and how to obtain
+the scalar $\beta_2$ that makes $S_1$ and $S_2$ $A$-conjugate.
+
+\subsection*{Step 1: First search direction}
+
+The first search direction is chosen as the negative gradient:
+\[
+S_1 = - \nabla f_1,
+\]
+where
+\[
+\nabla f_1 := \nabla f(x_1).
+\]
+
+\subsection*{Step 2: Second search direction as a combination}
+
+We assume that the second direction is a linear combination of the new steepest descent
+direction $-\nabla f_2$ and the previous direction $S_1$:
+\[
+S_2 = -\nabla f_2 + \beta_2 S_1,
+\]
+where
+\[
+\nabla f_2 := \nabla f(x_2),
+\qquad
+x_2 = x_1 + \lambda_1^* S_1,
+\]
+and $\beta_2$ is an unknown scalar to be determined.
+
+\subsection*{Step 3: Conjugacy condition}
+
+We want $S_1$ and $S_2$ to be $A$-conjugate, i.e.,
+\[
+S_1^\top A S_2 = 0.
+\]
+
+Substitute the expression of $S_2$:
+\[
+S_1^\top A(-\nabla f_2 + \beta_2 S_1) = 0.
+\]
+
+Distribute $A$ and separate the terms:
+\[
+- S_1^\top A \nabla f_2 + \beta_2 S_1^\top A S_1 = 0.
+\]
+
+Now solve for $\beta_2$:
+\[
+\beta_2 S_1^\top A S_1 = S_1^\top A \nabla f_2,
+\]
+\[
+\beta_2 = \frac{S_1^\top A \nabla f_2}{S_1^\top A S_1}.
+\]
+
+Neste ponto, a expressão ainda contém a matriz $A$. O próximo passo é reescrevê-la usando apenas gradientes.
+
+\subsection*{Step 4: Relation between consecutive gradients}
+
+Recall that, for the quadratic function
+\[
+f(x) = \tfrac{1}{2} x^\top A x + b^\top x + c,
+\]
+the gradient is
+\[
+\nabla f(x) = A x + b.
+\]
+
+At $x_1$ and $x_2$:
+\[
+\nabla f_1 = A x_1 + b, 
+\qquad
+\nabla f_2 = A x_2 + b.
+\]
+
+Since
+\[
+x_2 = x_1 + \lambda_1^* S_1,
+\]
+we have
+\[
+\nabla f_2
+= A(x_1 + \lambda_1^* S_1) + b
+= A x_1 + \lambda_1^* A S_1 + b
+= (A x_1 + b) + \lambda_1^* A S_1
+= \nabla f_1 + \lambda_1^* A S_1.
+\]
+
+Rearranging, we obtain:
+\[
+A S_1 = \frac{\nabla f_2 - \nabla f_1}{\lambda_1^*}.
+\]
+
+\subsection*{Step 5: Denominator $S_1^\top A S_1$ in terms of gradients}
+
+Use the identity above:
+\[
+S_1^\top A S_1
+= S_1^\top \left( \frac{\nabla f_2 - \nabla f_1}{\lambda_1^*} \right)
+= \frac{S_1^\top \nabla f_2 - S_1^\top \nabla f_1}{\lambda_1^*}.
+\]
+
+Next, we will use the fact that the line search is exact.
+
+\subsection*{Step 6: Orthogonality from exact line search}
+
+Consider the line function
+\[
+\phi(\lambda) = f(x_1 + \lambda S_1).
+\]
+
+We know that the derivative at the optimal step $\lambda_1^*$ is zero:
+\[
+\left. \frac{d\phi}{d\lambda} \right|_{\lambda = \lambda_1^*}
+= 0.
+\]
+
+As seen before,
+\[
+\frac{d\phi}{d\lambda}
+= \nabla f(x_1 + \lambda S_1)^\top S_1,
+\]
+thus, at $\lambda = \lambda_1^*$,
+\[
+\nabla f_2^\top S_1 = 0
+\quad\Longrightarrow\quad
+S_1^\top \nabla f_2 = 0.
+\]
+
+Substitute this into the denominator:
+\[
+S_1^\top A S_1
+= \frac{0 - S_1^\top \nabla f_1}{\lambda_1^*}
+= - \frac{S_1^\top \nabla f_1}{\lambda_1^*}.
+\]
+
+Using $S_1 = -\nabla f_1$:
+\[
+S_1^\top \nabla f_1 = - \nabla f_1^\top \nabla f_1,
+\]
+so
+\[
+S_1^\top A S_1
+= - \frac{- \nabla f_1^\top \nabla f_1}{\lambda_1^*}
+= \frac{\nabla f_1^\top \nabla f_1}{\lambda_1^*}.
+\]
+
+\subsection*{Step 7: Numerator $S_1^\top A \nabla f_2$ in terms of gradients}
+
+Using $A S_1 = (\nabla f_2 - \nabla f_1)/\lambda_1^*$:
+\[
+S_1^\top A \nabla f_2
+= (A S_1)^\top \nabla f_2
+= \left( \frac{\nabla f_2 - \nabla f_1}{\lambda_1^*} \right)^\top \nabla f_2.
+\]
+
+Compute the product:
+\[
+S_1^\top A \nabla f_2
+= \frac{\nabla f_2^\top \nabla f_2 - \nabla f_1^\top \nabla f_2}{\lambda_1^*}.
+\]
+
+Agora usamos novamente uma ortogonalidade importante.
+
+Note that
+\[
+S_1 = -\nabla f_1
+\quad\Longrightarrow\quad
+S_1^\top \nabla f_2 = - \nabla f_1^\top \nabla f_2.
+\]
+
+But from the exact line search condition we already know that
+\[
+S_1^\top \nabla f_2 = 0
+\quad\Longrightarrow\quad
+\nabla f_1^\top \nabla f_2 = 0.
+\]
+
+Thus,
+\[
+S_1^\top A \nabla f_2
+= \frac{\nabla f_2^\top \nabla f_2 - 0}{\lambda_1^*}
+= \frac{\nabla f_2^\top \nabla f_2}{\lambda_1^*}.
+\]
+
+\subsection*{Step 8: Final expression for \texorpdfstring{$\beta_2$}{beta2}}
+
+Recall
+\[
+\beta_2 = \frac{S_1^\top A \nabla f_2}{S_1^\top A S_1}.
+\]
+
+Substitute numerator and denominator:
+\[
+\beta_2
+= \frac{\dfrac{\nabla f_2^\top \nabla f_2}{\lambda_1^*}}{\dfrac{\nabla f_1^\top \nabla f_1}{\lambda_1^*}}
+= \frac{\nabla f_2^\top \nabla f_2}{\nabla f_1^\top \nabla f_1}.
+\]
+
+This is exactly the Fletcher--Reeves formula for $\beta_2$.
+
+\section{General Formula for \texorpdfstring{$\beta_i$}{beta\_i}}
+
+We now generalize the previous derivation to obtain the expression for $\beta_i$ for $i \ge 2$.
+
+\subsection*{Step 1: General search direction}
+
+Assume that, at iteration $i$, the search direction is defined by
+\[
+S_i = -\nabla f_i + \beta_i S_{i-1},
+\]
+where $\nabla f_i := \nabla f(x_i)$.
+
+We require $S_{i-1}$ and $S_i$ to be $A$-conjugate:
+\[
+S_{i-1}^\top A S_i = 0.
+\]
+
+Substitute $S_i$:
+\[
+S_{i-1}^\top A(-\nabla f_i + \beta_i S_{i-1}) = 0.
+\]
+
+Expand:
+\[
+- S_{i-1}^\top A \nabla f_i + \beta_i S_{i-1}^\top A S_{i-1} = 0.
+\]
+
+Solve for $\beta_i$:
+\[
+\beta_i S_{i-1}^\top A S_{i-1} = S_{i-1}^\top A \nabla f_i,
+\]
+\[
+\beta_i = \frac{S_{i-1}^\top A \nabla f_i}{S_{i-1}^\top A S_{i-1}}.
+\]
+
+Again, we want to eliminate $A$ using gradient relations.
+
+\subsection*{Step 2: Relation between \texorpdfstring{$\nabla f_i$}{grad fi} and \texorpdfstring{$\nabla f_{i-1}$}{grad f(i-1)}}
+
+As before, for the quadratic function
+\[
+\nabla f(x) = A x + b.
+\]
+
+At iterations $i-1$ and $i$:
+\[
+\nabla f_{i-1} = A x_{i-1} + b,
+\qquad
+\nabla f_i = A x_i + b.
+\]
+
+We also have
+\[
+x_i = x_{i-1} + \lambda_{i-1}^* S_{i-1}.
+\]
+
+Therefore,
+\[
+\nabla f_i
+= A(x_{i-1} + \lambda_{i-1}^* S_{i-1}) + b
+= (A x_{i-1} + b) + \lambda_{i-1}^* A S_{i-1}
+= \nabla f_{i-1} + \lambda_{i-1}^* A S_{i-1}.
+\]
+
+Rearranging:
+\[
+A S_{i-1} = \frac{\nabla f_i - \nabla f_{i-1}}{\lambda_{i-1}^*}.
+\]
+
+\subsection*{Step 3: Denominator $S_{i-1}^\top A S_{i-1}$}
+
+Compute:
+\[
+S_{i-1}^\top A S_{i-1}
+= S_{i-1}^\top \left( \frac{\nabla f_i - \nabla f_{i-1}}{\lambda_{i-1}^*} \right)
+= \frac{S_{i-1}^\top \nabla f_i - S_{i-1}^\top \nabla f_{i-1}}{\lambda_{i-1}^*}.
+\]
+
+As in the case $i=1$, the exact line search at step $i-1$ implies
+\[
+\left. \frac{d}{d\lambda} f(x_{i-1} + \lambda S_{i-1}) \right|_{\lambda = \lambda_{i-1}^*}
+= 0,
+\]
+which gives
+\[
+\nabla f_i^\top S_{i-1} = 0
+\quad\Longrightarrow\quad
+S_{i-1}^\top \nabla f_i = 0.
+\]
+
+Thus,
+\[
+S_{i-1}^\top A S_{i-1}
+= \frac{0 - S_{i-1}^\top \nabla f_{i-1}}{\lambda_{i-1}^*}
+= - \frac{S_{i-1}^\top \nabla f_{i-1}}{\lambda_{i-1}^*}.
+\]
+
+Using the structure of $S_{i-1}$, one can show that the gradients are mutually orthogonal and, in particular,
+\[
+\nabla f_{i-1}^\top \nabla f_i = 0,
+\]
+and $S_{i-1}$ has a component $-\nabla f_{i-1}$ dominating the product with $\nabla f_{i-1}$. Em termos práticos, obtém-se
+\[
+S_{i-1}^\top A S_{i-1} = \frac{\nabla f_{i-1}^\top \nabla f_{i-1}}{\lambda_{i-1}^*}.
+\]
+
+(Para uma prova completa, segue-se o mesmo raciocínio recursivo do caso $i=1$.)
+
+\subsection*{Step 4: Numerator $S_{i-1}^\top A \nabla f_i$}
+
+Using $A S_{i-1} = (\nabla f_i - \nabla f_{i-1})/\lambda_{i-1}^*$:
+\[
+S_{i-1}^\top A \nabla f_i
+= (A S_{i-1})^\top \nabla f_i
+= \left( \frac{\nabla f_i - \nabla f_{i-1}}{\lambda_{i-1}^*} \right)^\top \nabla f_i.
+\]
+
+Compute:
+\[
+S_{i-1}^\top A \nabla f_i
+= \frac{\nabla f_i^\top \nabla f_i - \nabla f_{i-1}^\top \nabla f_i}{\lambda_{i-1}^*}.
+\]
+
+Again, by orthogonality of consecutive gradients (from exact line search),
+\[
+\nabla f_{i-1}^\top \nabla f_i = 0,
+\]
+so
+\[
+S_{i-1}^\top A \nabla f_i
+= \frac{\nabla f_i^\top \nabla f_i}{\lambda_{i-1}^*}.
+\]
+
+\subsection*{Step 5: Final expression for \texorpdfstring{$\beta_i$}{beta\_i}}
+
+Now,
+\[
+\beta_i = \frac{S_{i-1}^\top A \nabla f_i}{S_{i-1}^\top A S_{i-1}}
+= \frac{\dfrac{\nabla f_i^\top \nabla f_i}{\lambda_{i-1}^*}}{\dfrac{\nabla f_{i-1}^\top \nabla f_{i-1}}{\lambda_{i-1}^*}}
+= \frac{\nabla f_i^\top \nabla f_i}{\nabla f_{i-1}^\top \nabla f_{i-1}}.
+\]
+
+Thus, for all $i \ge 2$,
+\[
+\beta_i =
+\frac{\nabla f_i^\top \nabla f_i}{\nabla f_{i-1}^\top \nabla f_{i-1}}.
+\]
+
+This is the Fletcher--Reeves update formula used in the Conjugate Gradient method.
+
+\section{Fletcher--Reeves Algorithm (English Version)}
+
+\begin{enumerate}
+    \item Choose initial guess $x_1$.
+    \item Compute $\nabla f_1$ and set $S_1 = -\nabla f_1$.
+    \item For $i = 1, 2, \dots$:
+    \begin{enumerate}
+        \item Compute the step size
+        \[
+        \lambda_i^* = -\frac{S_i^\top \nabla f_i}{S_i^\top A S_i}.
+        \]
+        \item Update the iterate
+        \[
+        x_{i+1} = x_i + \lambda_i^* S_i.
+        \]
+        \item Compute the new gradient $\nabla f_{i+1}$.
+        \item If $\|\nabla f_{i+1}\|$ is sufficiently small, stop.
+        \item Compute the scalar
+        \[
+        \beta_{i+1} = \frac{\nabla f_{i+1}^\top \nabla f_{i+1}}{\nabla f_i^\top \nabla f_i}.
+        \]
+        \item Update the direction
+        \[
+        S_{i+1} = -\nabla f_{i+1} + \beta_{i+1} S_i.
+        \]
+    \end{enumerate}
+\end{enumerate}
+
+\section{Example 6.9}
+
+Minimize:
+\[
+f(x_1, x_2) = x_1 - x_2 + 2x_1^2 + 2x_1 x_2 + x_2^2,
+\]
+starting from:
+\[
+X_1 =
+\begin{bmatrix}
+0\\
+0
+\end{bmatrix}.
+\]
+
+\subsection*{Iteration 1}
+
+The gradient is:
+\[
+\nabla f =
+\begin{bmatrix}
+1 + 4x_1 + 2x_2 \\
+-1 + 2x_1 + 2x_2
+\end{bmatrix}.
+\]
+
+Thus:
+\[
+\nabla f_1 = \nabla f(0,0) =
+\begin{bmatrix}
+1\\
+-1
+\end{bmatrix},
+\qquad
+S_1 = -\nabla f_1 =
+\begin{bmatrix}
+-1\\
+1
+\end{bmatrix}.
+\]
+
+Along this direction:
+\[
+f(X_1 + \lambda_1 S_1)
+= f(-\lambda_1, +\lambda_1) = \lambda_1^2 - 2\lambda_1.
+\]
+
+Derivative:
+\[
+\frac{d}{d\lambda_1} = 2\lambda_1 - 2 = 0
+\quad\Rightarrow\quad
+\lambda_1^* = 1.
+\]
+
+Update:
+\[
+X_2 = X_1 + S_1 =
+\begin{bmatrix}
+-1\\
+1
+\end{bmatrix}.
+\]
+
+\subsection*{Iteration 2}
+
+\[
+\nabla f_2 = \nabla f(-1,1) =
+\begin{bmatrix}
+-1\\
+-1
+\end{bmatrix}.
+\]
+
+Norms:
+\[
+\|\nabla f_1\|^2 = 2,
+\qquad
+\|\nabla f_2\|^2 = 2.
+\]
+
+Direction:
+\[
+S_2 = -\nabla f_2 + \frac{\|\nabla f_2\|^2}{\|\nabla f_1\|^2} S_1
+=
+\begin{bmatrix}
+0\\
+2
+\end{bmatrix}.
+\]
+
+Compute step:
+\[
+f(X_2 + \lambda_2 S_2)
+= f(-1,1 + 2\lambda_2)
+= 4\lambda_2^2 - 2\lambda_2 - 1.
+\]
+
+Derivative:
+\[
+8\lambda_2 - 2 = 0
+\Rightarrow
+\lambda_2^* = \frac14.
+\]
+
+Update:
+\[
+X_3 =
+\begin{bmatrix}
+-1\\[4pt]
+1.5
+\end{bmatrix}.
+\]
+
+\subsection*{Iteration 3}
+
+\[
+\nabla f_3 = \nabla f(-1,1.5)=
+\begin{bmatrix}
+0\\
+0
+\end{bmatrix}.
+\]
+
+Thus:
+\[
+\beta_3 = 0, 
+\qquad
+S_3 = 0.
+\]
+
+No further descent direction exists, hence $X_3$ is the minimizer.
+
+\section{Conclusion}
+
+The Fletcher--Reeves method constructs conjugate directions using only gradient information. For quadratic functions, it converges in at most $n$ iterations, as illustrated in the example.
+
+\end{document}
