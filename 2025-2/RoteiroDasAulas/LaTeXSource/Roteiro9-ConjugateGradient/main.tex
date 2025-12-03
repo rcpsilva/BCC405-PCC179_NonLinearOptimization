@@ -671,4 +671,52 @@ No further descent direction exists, hence $X_3$ is the minimizer.
 
 The Fletcher--Reeves method constructs conjugate directions using only gradient information. For quadratic functions, it converges in at most $n$ iterations, as illustrated in the example.
 
+\section{Fraquezas do Método de Fletcher--Reeves}
+
+Embora o método de Fletcher--Reeves (FR) seja um dos formuladores clássicos do Método dos Gradientes Conjugados, seu desempenho prático apresenta limitações importantes. A seguir destacamos suas principais fraquezas, especialmente relevantes em problemas não quadráticos ou mal condicionados.
+
+\subsection*{Sensibilidade ao \textit{line search}}
+
+O método FR depende criticamente de uma busca linear que satisfaça as condições de Wolfe de forma relativamente precisa. Quando o \textit{line search} é inexato ou instável, o valor de $\beta_i$ tende a oscilar, e as direções deixam de ser verdadeiramente $A$-conjugadas. Como consequência, o algoritmo perde suas propriedades teóricas e passa a se comportar de modo semelhante ao método de gradiente descendente.
+
+\subsection*{Perda de conjugação devido a erros numéricos}
+
+A construção das direções conjugadas pressupõe que operações envolvendo o gradiente e a matriz $A$ (implícita) sejam numericamente estáveis. Em problemas de grande dimensão ou com forte assimetria de escalas, erros de arredondamento acumulam-se ao longo das iterações, destruindo a relação
+\[
+S_i^\top A S_j = 0 \quad (i \neq j).
+\]
+Quando isso ocorre, o método perde eficiência e necessita de reinicializações frequentes.
+
+\subsection*{Desempenho ruim em problemas mal condicionados}
+
+Quando a matriz Hessiana (ou $A$, no caso quadrático) é mal condicionada, isto é, possui número de condição elevado,
+\[
+\kappa(A) = \frac{\lambda_{\max}}{\lambda_{\min}} \gg 1,
+\]
+as curvas de nível tornam-se elipses muito alongadas. Nesse cenário, os gradientes mudam de direção abruptamente, levando a valores de $\beta_i$ pouco informativos e dificultando a manutenção das direções conjugadas. Na prática, o método tende a gerar trajetórias em ``zigue-zague'' e convergência lenta.
+
+\subsection*{Fragilidade em funções não quadráticas}
+
+A teoria que garante convergência em até $n$ passos vale apenas para funções quadráticas. Em funções gerais (como as encontradas em otimização não linear ou aprendizado de máquina), a relação exata entre gradientes consecutivos deixa de valer, comprometendo a validade de $\beta_i^{FR}$. O método pode apresentar estagnação, oscilações ou necessidade de reinicializações constantes.
+
+\subsection*{Necessidade de reinicializações periódicas}
+
+Para mitigar perda de conjugação, é comum reiniciar o método definindo
+\[
+S_i = -\nabla f_i.
+\]
+Entretanto, reinicializações excessivas fazem com que o método se aproxime de um gradiente descendente, perdendo as vantagens de conjugação; reinicializações escassas, por outro lado, mantêm direções degradadas que acumulam erro numérico.
+
+\subsection*{Resumo}
+
+O método de Fletcher--Reeves funciona bem quando:
+\begin{itemize}
+    \item a função é quadrática ou quase quadrática;
+    \item a matriz Hessiana é bem condicionada;
+    \item há um \textit{line search} de boa qualidade.
+\end{itemize}
+
+Fora dessas condições, o método tende a apresentar perda de conjugação, sensibilidade numérica e degradação de desempenho.
+
+
 \end{document}
