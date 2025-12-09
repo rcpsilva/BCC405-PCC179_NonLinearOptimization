@@ -1,0 +1,450 @@
+\documentclass[9pt,a4paper]{extarticle}
+
+% ==========================================
+% Basic packages
+% ==========================================
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{geometry}
+\geometry{margin=2cm}
+\usepackage{parskip}
+\usepackage{microtype}
+
+% Math
+\usepackage{amsmath, amssymb, amsthm, bm}
+
+% ==========================================
+% Document
+% ==========================================
+\begin{document}
+
+\section*{Lecture Notes: Newton's Method (Unconstrained Optimization)}
+
+\section{Motivation}
+
+Newton's method is a second-order optimization technique that uses information
+from the gradient and the Hessian (matrix of second derivatives) of the objective
+function to construct a local quadratic model around the current iterate. This
+quadratic approximation is then minimized to obtain a new point.
+
+The basic idea is: if the function $f:\mathbb{R}^n\to\mathbb{R}$ is smooth and
+we are at a point $x_i$ close to a minimizer, then a quadratic Taylor
+approximation of $f$ around $x_i$ can be used to compute a search direction that
+points directly toward the optimum (for quadratic functions, in a single step).
+
+\section{Quadratic Approximation and Newton Step}
+
+\subsection*{Step 1: Taylor expansion around the current point}
+
+Consider a twice continuously differentiable function $f:\mathbb{R}^n \to \mathbb{R}$.
+Around a point $x_i$, we can approximate $f$ by a second-order Taylor expansion:
+\[
+f(x) \approx f(x_i)
++ \nabla f_i^\top (x - x_i)
++ \tfrac12 (x - x_i)^\top H_i (x - x_i),
+\]
+where
+\[
+\nabla f_i := \nabla f(x_i)
+\quad\text{e}\quad
+H_i := \nabla^2 f(x_i)
+\]
+é a matriz Hessiana avaliada em $x_i$.
+
+\subsection*{Step 2: Local quadratic model}
+
+Definimos o modelo quadrático local $m_i:\mathbb{R}^n\to\mathbb{R}$ como
+\[
+m_i(x)
+= f(x_i)
++ \nabla f_i^\top (x - x_i)
++ \tfrac12 (x - x_i)^\top H_i (x - x_i).
+\]
+
+Queremos encontrar o ponto que minimiza esse modelo. Seja
+\[
+p := x - x_i
+\]
+o deslocamento a partir de $x_i$. Então
+\[
+m_i(x_i + p)
+= f(x_i) + \nabla f_i^\top p + \tfrac12 p^\top H_i p.
+\]
+
+O problema local de minimização torna-se:
+\[
+\min_{p \in \mathbb{R}^n} \;
+q(p) := \nabla f_i^\top p + \tfrac12 p^\top H_i p.
+\]
+
+\subsection*{Step 3: Condição de otimalidade do modelo quadrático}
+
+Para minimizar $q(p)$, derivamos em relação a $p$ e igualamos a zero:
+\[
+\nabla_p q(p)
+= \nabla f_i + H_i p = 0.
+\]
+
+Assim, a condição de primeira ordem para o mínimo do modelo é
+\[
+H_i p = - \nabla f_i.
+\]
+
+Supondo que $H_i$ seja não singular (invertível), obtemos
+\[
+p^* = - H_i^{-1} \nabla f_i.
+\]
+
+\subsection*{Step 4: Atualização de Newton}
+
+O próximo ponto $x_{i+1}$ é obtido somando o deslocamento ótimo $p^*$ ao ponto atual:
+\[
+x_{i+1} = x_i + p^*
+= x_i - H_i^{-1} \nabla f_i.
+\]
+
+Esta é a fórmula clássica do passo de Newton:
+\[
+\boxed{
+x_{i+1} = x_i - \bigl[\nabla^2 f(x_i)\bigr]^{-1} \nabla f(x_i).
+}
+\]
+
+Como a aproximação de Taylor truncou termos de ordem superior, essa atualização
+é aplicada de forma iterativa para aproximar um ponto $x^*$ tal que $\nabla f(x^*)=0$.
+
+\section{Geometric Interpretation}
+
+Em uma dimensão ($n=1$), Newton para encontrar raízes de $f'(x)=0$ interpreta-se
+como:
+\begin{itemize}
+    \item A reta tangente ao gráfico de $f'(x)$ em $x_i$ é usada para encontrar
+          o próximo ponto onde a derivada se anula.
+    \item Em múltiplas dimensões, o mesmo raciocínio é generalizado usando o
+          gradiente $\nabla f$ e a Hessiana $\nabla^2 f$ para determinar o
+          deslocamento $p^*$ que anula o gradiente do modelo quadrático.
+\end{itemize}
+
+Quando $x_i$ está suficientemente próximo de um mínimo estrito e $H_i$ é
+definida positiva, o método apresenta convergência quadrática.
+
+\section{Newton's Method Algorithm (Basic Version)}
+
+We summarize the basic Newton method for unconstrained minimization.
+
+\begin{enumerate}
+    \item Choose an initial guess $x_1$.
+    \item For $i = 1,2,\dots$:
+    \begin{enumerate}
+        \item Compute the gradient and Hessian at $x_i$:
+        \[
+        \nabla f_i = \nabla f(x_i),
+        \qquad
+        H_i = \nabla^2 f(x_i).
+        \]
+        \item Solve the linear system
+        \[
+        H_i p_i = - \nabla f_i
+        \]
+        for the Newton step $p_i$.
+        \item Update
+        \[
+        x_{i+1} = x_i + p_i.
+        \]
+        \item If $\|\nabla f_{i+1}\|$ is sufficiently small, stop.
+    \end{enumerate}
+\end{enumerate}
+
+\section{Special Case: Quadratic Functions}
+
+Considere uma função quadrática geral
+\[
+f(x) = \tfrac12 x^\top A x + b^\top x + c,
+\]
+onde $A$ é uma matriz simétrica definida positiva. Então:
+\[
+\nabla f(x) = A x + b,
+\qquad
+\nabla^2 f(x) = A.
+\]
+
+O ponto de mínimo é dado por
+\[
+\nabla f(x^*) = 0
+\quad\Longrightarrow\quad
+A x^* + b = 0
+\quad\Longrightarrow\quad
+x^* = - A^{-1} b.
+\]
+
+O passo de Newton, em qualquer iteração $i$, é
+\[
+x_{i+1}
+= x_i - A^{-1} (A x_i + b)
+= x_i - A^{-1} A x_i - A^{-1} b
+= - A^{-1} b
+= x^*.
+\]
+
+Ou seja, para funções quadráticas com Hessiana constante $A$, o método de
+Newton encontra o ponto ótimo em \emph{uma única iteração} (independentemente
+de $x_1$), desde que $A$ seja não singular.
+
+\section{Example: Minimization of a Quadratic Function}
+
+Considere a função
+\[
+f(x_1, x_2) = x_1 - x_2 + 2x_1^2 + 2x_1 x_2 + x_2^2,
+\]
+com ponto inicial
+\[
+x_1 =
+\begin{bmatrix}
+0\\
+0
+\end{bmatrix}.
+\]
+
+\subsection*{Step 1: Gradient and Hessian}
+
+O gradiente é
+\[
+\nabla f(x_1, x_2) =
+\begin{bmatrix}
+\frac{\partial f}{\partial x_1}\\[4pt]
+\frac{\partial f}{\partial x_2}
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 + 4x_1 + 2x_2\\[4pt]
+-1 + 2x_1 + 2x_2
+\end{bmatrix}.
+\]
+
+O Hessiano (constante) é
+\[
+\nabla^2 f(x) =
+\begin{bmatrix}
+\frac{\partial^2 f}{\partial x_1^2} & \frac{\partial^2 f}{\partial x_1 \partial x_2}\\[4pt]
+\frac{\partial^2 f}{\partial x_2 \partial x_1} & \frac{\partial^2 f}{\partial x_2^2}
+\end{bmatrix}
+=
+\begin{bmatrix}
+4 & 2\\[4pt]
+2 & 2
+\end{bmatrix}
+= H.
+\]
+
+\subsection*{Step 2: Evaluate at the initial point}
+
+No ponto inicial $x_1 = (0,0)^\top$,
+\[
+\nabla f_1 = \nabla f(0,0) =
+\begin{bmatrix}
+1\\
+-1
+\end{bmatrix}.
+\]
+
+\subsection*{Step 3: Compute the Newton step}
+
+Precisamos de $H^{-1}$. Como
+\[
+H =
+\begin{bmatrix}
+4 & 2\\[4pt]
+2 & 2
+\end{bmatrix},
+\]
+uma inversa possível é
+\[
+H^{-1}
+=
+\begin{bmatrix}
+\frac12 & -\frac12\\[4pt]
+-\frac12 & 1
+\end{bmatrix}.
+\]
+
+O passo de Newton é
+\[
+p_1 = - H^{-1} \nabla f_1
+= -
+\begin{bmatrix}
+\frac12 & -\frac12\\[4pt]
+-\frac12 & 1
+\end{bmatrix}
+\begin{bmatrix}
+1\\
+-1
+\end{bmatrix}
+=
+-
+\begin{bmatrix}
+\frac12(1) + (-\frac12)(-1)\\[4pt]
+-\frac12(1) + 1(-1)
+\end{bmatrix}
+=
+-
+\begin{bmatrix}
+1\\[4pt]
+-\tfrac32
+\end{bmatrix}
+=
+\begin{bmatrix}
+-1\\[4pt]
+\tfrac32
+\end{bmatrix}.
+\]
+
+\subsection*{Step 4: Update the point}
+
+\[
+x_2 = x_1 + p_1
+=
+\begin{bmatrix}
+0\\
+0
+\end{bmatrix}
++
+\begin{bmatrix}
+-1\\[4pt]
+\frac32
+\end{bmatrix}
+=
+\begin{bmatrix}
+-1\\[4pt]
+\frac32
+\end{bmatrix}.
+\]
+
+\subsection*{Step 5: Check optimality}
+
+Calculamos o gradiente em $x_2$:
+\[
+\nabla f_2 = \nabla f(-1, \tfrac32)
+=
+\begin{bmatrix}
+1 + 4(-1) + 2(\tfrac32)\\[4pt]
+-1 + 2(-1) + 2(\tfrac32)
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 - 4 + 3\\[4pt]
+-1 - 2 + 3
+\end{bmatrix}
+=
+\begin{bmatrix}
+0\\[4pt]
+0
+\end{bmatrix}.
+\]
+
+Logo, $\nabla f_2 = 0$ e $x_2$ é o ponto ótimo.
+Como esperado para uma função quadrática, o método de Newton convergiu em
+uma única iteração.
+
+\section{Newton's Method with Line Search}
+
+Na prática, para funções não quadráticas, o passo
+\[
+x_{i+1} = x_i - H_i^{-1} \nabla f_i
+\]
+pode não ser adequado:
+\begin{itemize}
+    \item o método pode divergir;
+    \item pode convergir para um ponto de sela ou máximo;
+    \item o tamanho do passo pode ser muito grande ou muito pequeno.
+\end{itemize}
+
+Uma modificação comum é introduzir um \emph{line search} na direção de Newton:
+\[
+s_i = - H_i^{-1} \nabla f_i,
+\]
+\[
+x_{i+1} = x_i + \lambda_i^* s_i,
+\]
+onde $\lambda_i^*$ é um passo que tenta minimizar $f(x_i + \lambda s_i)$ em relação a $\lambda$ (por exemplo, satisfazendo condições de Wolfe). Isso leva ao \emph{método de Newton com busca linear}, que em geral é mais robusto e evita convergência para pontos indesejáveis.
+
+\section{Weaknesses of Newton's Method}
+
+Apesar de suas boas propriedades teóricas (convergência quadrática próxima ao
+ótimo, convergência em um passo para funções quadráticas), o método de Newton
+tem limitações práticas importantes.
+
+\subsection*{Cálculo e armazenamento da Hessiana}
+
+O método requer a matriz Hessiana $H_i = \nabla^2 f(x_i)$:
+\begin{itemize}
+    \item Para problemas de dimensão $n$, $H_i$ é uma matriz $n \times n$, com
+          $O(n^2)$ elementos.
+    \item Em muitos problemas práticos (como em aprendizado de máquina com
+          milhares ou milhões de parâmetros), é inviável calcular e armazenar
+          explicitamente a Hessiana.
+\end{itemize}
+
+\subsection*{Custo de inversão / solução de sistemas lineares}
+
+A cada iteração é necessário resolver
+\[
+H_i p_i = - \nabla f_i.
+\]
+Mesmo usando métodos numéricos eficientes, o custo típico é $O(n^3)$ em tempo
+para inversão direta ou fatorações, o que se torna proibitivo em alta dimensão.
+
+\subsection*{Dificuldade em obter derivadas de segunda ordem}
+
+Para funções complicadas, a expressão analítica de $\nabla^2 f(x)$ pode ser:
+\begin{itemize}
+    \item difícil de derivar manualmente;
+    \item sujeita a erros de implementação;
+    \item custosa de avaliar numericamente.
+\end{itemize}
+Técnicas como diferenciação automática ajudam, mas ainda há custo de memória e
+tempo consideráveis.
+
+\subsection*{Sensibilidade e não convergência em funções não quadráticas}
+
+Em funções não quadráticas:
+\begin{itemize}
+    \item a Hessiana pode não ser definida positiva em toda a região de interesse;
+    \item o método pode divergir se o ponto inicial não estiver suficientemente
+          próximo do mínimo;
+    \item o método pode convergir para pontos de sela ou máximos se não houver
+          controle adicional (por exemplo, via modificações da Hessiana ou
+          line search adequado).
+\end{itemize}
+
+\subsection*{Resumo}
+
+O método de Newton é muito eficiente quando:
+\begin{itemize}
+    \item $f$ é bem aproximada localmente por uma função quadrática;
+    \item a Hessiana é definida positiva e não muda radicalmente;
+    \item o custo de computar e manipular a Hessiana é aceitável.
+\end{itemize}
+
+Em problemas de grande escala ou com funções muito não lineares, essas condições
+raramente são satisfeitas, motivando variantes como métodos quasi-Newton
+(BFGS, L-BFGS) e métodos baseados apenas em primeira ordem.
+
+\section{Conclusion}
+
+Newton's method uses second-order information to build a local quadratic model
+of the objective function and update the iterate by solving a linear system
+involving the Hessian. For quadratic functions, it reaches the minimum in a single
+iteration. For general nonlinear functions, it can exhibit fast (quadratic)
+convergence near a local minimizer, but its practical use is limited by:
+\begin{itemize}
+    \item the cost of computing and storing the Hessian;
+    \item the need to solve large linear systems;
+    \item potential divergence or convergence to saddle points without safeguards.
+\end{itemize}
+
+These limitations motivate many modern variants that trade off exact second-order
+information for cheaper approximations, preserving some of Newton's advantages
+while remaining computationally feasible.
+
+\end{document}
