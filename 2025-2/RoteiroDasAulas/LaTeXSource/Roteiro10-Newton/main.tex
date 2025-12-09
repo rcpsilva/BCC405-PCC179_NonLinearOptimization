@@ -417,6 +417,161 @@ Em funções não quadráticas:
           line search adequado).
 \end{itemize}
 
+\section{Por que o Método de Newton Pode Divergir?}
+
+Apesar de suas excelentes propriedades teóricas --- incluindo convergência quadrática 
+e obtenção do minimizador em uma única iteração no caso quadrático --- o método de 
+Newton pode divergir de forma severa quando aplicado a funções não quadráticas, 
+quando o ponto inicial está longe do ótimo ou quando a Hessiana não é definida 
+positiva. Nesta seção discutimos, de maneira detalhada, as causas mais comuns de 
+divergência.
+
+\subsection*{1. A Hessiana pode não ser definida positiva}
+
+O passo de Newton é obtido resolvendo
+\[
+H_i p_i = -\nabla f_i,
+\]
+onde $H_i = \nabla^2 f(x_i)$.
+
+Se a Hessiana for indefinida (isto é, contiver autovalores positivos e negativos), 
+então a direção $p_i$ pode apontar para uma direção de \emph{subida}, não de 
+descida. Mais ainda:
+
+\begin{itemize}
+    \item se $H_i$ tem autovalores negativos, Newton pode mover o ponto em direção 
+    a máximos locais;
+    \item se $H_i$ é indefinida, Newton mistura direções de subida e descida,
+    gerando comportamento altamente instável.
+\end{itemize}
+
+\noindent
+\textbf{Exemplo:} A função sela
+\[
+f(x,y) = x^2 - y^2
+\]
+possui Hessiana
+\[
+H = \begin{bmatrix}
+2 & 0\\
+0 & -2
+\end{bmatrix},
+\]
+com um autovalor positivo e um negativo. O método de Newton leva a quedas ao longo 
+da direção $x$ e disparos divergentes ao longo da direção $y$. Assim, $x_i$ 
+tende ao mínimo enquanto $y_i$ diverge para $\pm\infty$, tornando o método 
+praticamente inútil nesse caso.
+
+\subsection*{2. A aproximação quadrática pode ser ruim longe do ótimo}
+
+Newton supõe que $f$ é bem aproximada localmente por uma função quadrática:
+\[
+f(x) \approx f(x_i) + \nabla f_i^\top (x - x_i) + \tfrac12 (x-x_i)^\top H_i (x-x_i).
+\]
+
+Quando $x_i$ está longe do ótimo, esta aproximação pode ser extremamente ruim,
+fazendo com que o passo de Newton seja exagerado. O resultado pode ser:
+
+\begin{itemize}
+    \item saltos grandes que saem da região de interesse;
+    \item oscilações entre regiões distantes;
+    \item \emph{overshooting}, em que o método ``passa direto'' pelo vale;
+    \item divergência numérica.
+\end{itemize}
+
+\noindent
+\textbf{Exemplo:} A função $f(x)=\sqrt{x}$ (definida em $x>0$) produz passos de Newton 
+que estouram rapidamente e podem sair do domínio da função.
+
+\subsection*{3. O método pode convergir para pontos de sela ou máximos}
+
+Newton procura resolver $\nabla f = 0$, mas não distingue entre tipos de pontos
+críticos. Assim, ele pode facilmente convergir para:
+
+\begin{itemize}
+    \item máximos locais (onde $H$ é definida negativa),
+    \item pontos de sela (onde $H$ é indefinida),
+    \item pontos estacionários degenerados.
+\end{itemize}
+
+\noindent
+\textbf{Exemplo ilustrativo:}  
+\[
+f(x) = x^3.
+\]
+Seu único ponto crítico é $x=0$, que é um ponto de sela. No entanto, Newton gera:
+\[
+x_{i+1} = x_i - \frac{3x_i^2}{6x_i} = \frac{x_i}{2},
+\]
+convergindo para $0$, interpretando-o erroneamente como solução aceitável.
+
+\subsection*{4. Segunda derivada pequena pode gerar passos catastróficos}
+
+Em uma dimensão, Newton usa:
+\[
+x_{i+1} = x_i - \frac{f'(x_i)}{f''(x_i)}.
+\]
+
+Se $f''(x_i)$ é muito pequeno, então o denominador torna o passo extremamente 
+grande, lançando o método muito longe do ótimo. Esse é um dos mecanismos mais 
+comuns de divergência em funções suaves, mas relativamente planas.
+
+\subsection*{5. O próximo ponto pode sair do domínio da função}
+
+Quando a função é restrita a um domínio especial (por exemplo, $x>0$ em 
+$f(x)=\ln x$), Newton pode gerar $x_{i+1}$ fora do domínio e tornar o processo 
+inviável.
+
+\noindent
+\textbf{Exemplo:}
+\[
+f(x) = \ln(x), \qquad x > 0.
+\]
+Newton produz:
+\[
+x_{i+1} = 2x_i,
+\]
+que pode facilmente sair da região em que a função é bem comportada, levando a 
+valores inválidos ou divergentes.
+
+\subsection*{6. Sensibilidade extrema ao ponto inicial}
+
+Newton só é garantidamente eficiente quando $x_1$ está suficientemente próximo do 
+ótimo. Se o ponto inicial estiver longe:
+
+\begin{itemize}
+    \item a aproximação quadrática é incorreta;
+    \item a Hessiana pode ter sinal errado;
+    \item as derivações sucessivas podem magnificar erros.
+\end{itemize}
+
+Esse comportamento explica por que, na prática, usa-se:
+
+\begin{itemize}
+    \item line search (Newton amortecido),
+    \item métodos de região de confiança,
+    \item Hessianas modificadas para garantir positividade.
+\end{itemize}
+
+\subsection*{Resumo}
+
+O método de Newton pode divergir devido a:
+\begin{itemize}
+    \item Hessianas indefinidas ou negativas,
+    \item más aproximações quadráticas longe do ótimo,
+    \item passos muito grandes quando $f''(x)$ é pequeno,
+    \item convergência para pontos de sela,
+    \item saída do domínio da função,
+    \item alta sensibilidade ao ponto inicial.
+\end{itemize}
+
+Quando utilizado sem salvaguardas, o método pode apresentar comportamento
+oscilatório ou mesmo explodir numericamente. A inclusão de uma busca linear ou de 
+uma região de confiança corrige a maior parte desses problemas, tornando o método 
+de Newton mais estável e aplicável em larga escala.
+
+
+
 \subsection*{Resumo}
 
 O método de Newton é muito eficiente quando:
